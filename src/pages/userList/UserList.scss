@@ -1,0 +1,154 @@
+.user-list {
+  color: #333;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 12px; // Rounded edges for the user list container
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+  .table {
+    padding: 10px;
+    width: 100%;
+    overflow-x: auto;
+    background-color: #fff;
+    border-radius: 12px; // Rounded edges for the table
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+
+    .search {
+      width: 100%;
+      max-width: 300px;
+      margin-bottom: 20px;
+
+      input {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 10px;
+        width: 100%;
+        font-size: 1.2rem;
+        transition: all 0.3s ease;
+
+        &:focus {
+          border-color: var(--light-blue);
+          box-shadow: 0 0 5px rgba(31, 147, 255, 0.3);
+          outline: none;
+        }
+      }
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      font-size: 1.4rem;
+      border-radius: 12px;
+      overflow: hidden;
+
+      thead {
+        border-top: 2px solid var(--light-blue);
+        border-bottom: 2px solid var(--light-blue);
+        background-color: #f5f7fa;
+        text-transform: uppercase;
+        font-weight: bold;
+      }
+
+      th,
+      td {
+        vertical-align: middle;
+        text-align: left;
+        padding: 12px 15px;
+        border-bottom: 1px solid #eee;
+
+        &.icons {
+          display: flex;
+          justify-content: flex-start;
+          align-items: center;
+
+          > * {
+            margin-right: 7px;
+            cursor: pointer;
+            vertical-align: middle;
+            transition: transform 0.2s ease;
+
+            &:hover {
+              transform: scale(1.1);
+            }
+          }
+        }
+      }
+
+      th {
+        background-color: #f1f4f8;
+        border-bottom: 2px solid #ddd;
+        color: #333;
+      }
+
+      tbody tr {
+        border-bottom: 1px solid #ddd;
+        transition: background-color 0.3s ease;
+      }
+
+      tr:nth-child(even) {
+        background-color: #f9f9f9;
+      }
+
+      tbody tr:hover {
+        cursor: pointer;
+        background-color: rgba(31, 147, 255, 0.1); // Soft hover effect
+      }
+
+      td {
+        color: #555;
+      }
+    }
+  }
+}
+
+.sort {
+  label {
+    font-size: 1.4rem;
+    font-weight: 500;
+    margin: 0 5px;
+  }
+
+  select {
+    font-size: 1.6rem;
+    font-weight: 300;
+    padding: 4px 8px;
+    margin: 0 5px 0 0;
+    border: none;
+    border-bottom: 2px solid #777;
+    outline: none;
+  }
+}
+.search-and-add {
+  display: flex;
+  align-items: center; // Vertically center the search bar and button
+  gap: 10px; // Add some space between the search input and button
+
+  .add-store-link {
+    display: inline-flex;
+    text-decoration: none;
+  }
+
+  button.--btn {
+    margin-left: 0;
+    padding: 1.2rem 1.5rem; // Match padding with search box input
+    font-size: 1.6rem; // Match font-size with search box input
+    height: auto; // Allow the button height to match the padding set above
+    line-height: 1; // Ensure the line-height does not affect height
+    border-radius: 8px; // Match border-radius with search box input
+    border: 1px solid #ddd;
+    transition: all 0.3s ease;
+    background-color: var(--light-blue);
+    color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+
+    &:hover {
+      background-color: rgba(
+        31,
+        147,
+        255,
+        0.9
+      ); // Change to a slightly darker version using RGBA
+      box-shadow: 0 0 8px rgba(31, 147, 255, 0.3);
+    }
+  }
+}

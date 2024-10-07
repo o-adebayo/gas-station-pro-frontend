@@ -1,0 +1,99 @@
+.report-list {
+  color: #333;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 12px; // Rounded edges for the report list container
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+  .table {
+    padding: 10px;
+    width: 100%;
+    overflow-x: auto;
+    background-color: #fff;
+    border-radius: 12px; // Rounded edges for the table
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+
+    .search {
+      width: 100%;
+      max-width: 300px;
+      margin-bottom: 20px;
+      input {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 10px;
+        width: 100%;
+        font-size: 1.2rem;
+        transition: all 0.3s ease;
+
+        &:focus {
+          border-color: var(--light-blue);
+          box-shadow: 0 0 5px rgba(31, 147, 255, 0.3);
+          outline: none;
+        }
+      }
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      font-size: 1.4rem;
+      border-radius: 12px;
+      overflow: hidden;
+
+      thead {
+        border-top: 2px solid var(--light-blue);
+        border-bottom: 2px solid var(--light-blue);
+        background-color: #f5f7fa;
+        text-transform: uppercase;
+        font-weight: bold;
+      }
+
+      th,
+      td {
+        vertical-align: middle;
+        text-align: left;
+        padding: 12px 15px;
+        border-bottom: 1px solid #eee;
+
+        &.icons {
+          display: flex;
+          justify-content: flex-start;
+          align-items: center;
+          > * {
+            margin-right: 7px;
+            cursor: pointer;
+            vertical-align: middle;
+            transition: transform 0.2s ease;
+            &:hover {
+              transform: scale(1.1);
+            }
+          }
+        }
+      }
+
+      th {
+        background-color: #f1f4f8;
+        border-bottom: 2px solid #ddd;
+        color: #333;
+      }
+
+      tbody tr {
+        border-bottom: 1px solid #ddd;
+        transition: background-color 0.3s ease;
+      }
+
+      tr:nth-child(even) {
+        background-color: #f9f9f9;
+      }
+
+      tbody tr:hover {
+        cursor: pointer;
+        background-color: rgba(31, 147, 255, 0.1); // Soft hover effect
+      }
+
+      td {
+        color: #555;
+      }
+    }
+  }
+}

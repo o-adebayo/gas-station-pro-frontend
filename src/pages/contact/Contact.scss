@@ -1,0 +1,176 @@
+.contact {
+  .section {
+    display: flex;
+    align-items: flex-start;
+    gap: 3rem;
+    flex-wrap: wrap;
+
+    form {
+      flex: 1;
+      max-width: 700px; // Make form wider
+      background: #fff;
+      padding: 3rem;
+      border-radius: 15px;
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+
+      label {
+        display: block;
+        font-size: 1.6rem; // Larger font size for labels
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #333;
+      }
+
+      input[type="text"],
+      input[type="email"],
+      textarea {
+        display: block;
+        font-size: 1.4rem; // Increased font size for inputs
+        font-weight: 400;
+        padding: 1.2rem; // More padding for a bigger input box
+        margin-bottom: 2rem;
+        width: 100%;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        outline: none;
+        transition: border 0.3s ease, box-shadow 0.3s ease;
+
+        &:focus {
+          border-color: #007bff;
+          box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.2);
+        }
+      }
+
+      button {
+        display: block;
+        margin-top: 2rem; // Add space above the button
+        background-color: #007bff;
+        color: #fff;
+        padding: 1.2rem 2rem; // Increase padding for bigger button
+        border: none;
+        border-radius: 10px;
+        font-size: 1.6rem; // Larger button font size
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+
+        &:hover {
+          background-color: #0056b3;
+        }
+      }
+    }
+  }
+
+  .card2 {
+    padding: 3rem;
+    background-color: #007bff; // Updated to modern blue color
+    color: #fff;
+    border-radius: 15px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+
+    h3,
+    p {
+      color: #f9f9f9;
+      margin-bottom: 1.5rem;
+      font-size: 1.8rem; // Increased size for better readability
+    }
+
+    .icons {
+      margin: 4rem 0;
+
+      span {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        margin-bottom: 2rem;
+
+        svg {
+          font-size: 3rem; // Larger icon size
+          color: #fff;
+        }
+
+        a,
+        p {
+          margin-left: 15px;
+          color: #fff;
+          font-size: 1.6rem; // Increased text size for better visibility
+          transition: color 0.3s ease;
+
+          &:hover {
+            color: #dcdcdc; // Lighter hover effect
+          }
+        }
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .contact {
+    .section {
+      flex-direction: column;
+
+      form {
+        width: 100%;
+        margin-bottom: 2rem;
+        padding: 2rem; // Reduce padding for smaller screens
+      }
+
+      .card2 {
+        padding: 2.5rem;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .contact {
+    .card2 {
+      padding: 2rem;
+
+      h3 {
+        font-size: 1.6rem; // Reduce size for smaller screens
+      }
+
+      p {
+        font-size: 1.2rem; // Reduce size for smaller screens
+      }
+
+      .icons {
+        margin: 3rem 0;
+
+        span {
+          svg {
+            font-size: 2rem; // Reduce icon size for smaller screens
+          }
+
+          a,
+          p {
+            font-size: 1.2rem;
+          }
+        }
+      }
+    }
+
+    .section {
+      form {
+        padding: 2rem;
+
+        label {
+          font-size: 1.4rem; // Keep label font large enough to read easily
+        }
+
+        input[type="text"],
+        input[type="email"],
+        textarea {
+          font-size: 1.2rem;
+          padding: 1rem; // Adjust padding for smaller screens
+        }
+
+        button {
+          padding: 1rem 1.5rem;
+          font-size: 1.4rem; // Adjust button size for smaller screens
+        }
+      }
+    }
+  }
+}

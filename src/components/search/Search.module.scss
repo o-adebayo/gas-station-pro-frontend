@@ -1,0 +1,42 @@
+.search {
+  margin: 10px 0; // Increased margin for spacing
+  position: relative;
+  flex: 1;
+
+  .icon {
+    position: absolute;
+    top: 50%;
+    left: 1.5rem;
+    transform: translateY(-50%);
+    color: #777; // Updated color for a more subtle look
+    font-size: 1.8rem; // Increased icon size for better visibility
+  }
+
+  input[type="text"] {
+    display: block;
+    font-size: 1.6rem;
+    font-weight: 400;
+    padding: 1.2rem 1.5rem;
+    padding-left: 4rem; // More space to account for the icon
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 8px; // Rounded edges for a modern look
+    outline: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+
+    &:focus {
+      border-color: var(--light-blue);
+      box-shadow: 0 0 8px rgba(31, 147, 255, 0.3); // Softer glow effect on focus
+      outline: none;
+    }
+
+    &:hover {
+      border-color: #bbb; // Subtle change on hover for better UX
+    }
+
+    &::placeholder {
+      color: #aaa; // Softer color for placeholder text
+    }
+  }
+}

@@ -1,0 +1,99 @@
+.user-summary {
+  width: 100%;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 12px; // Rounded edges for the user summary container
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+  h3 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #333;
+  }
+
+  .info-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+}
+
+.card {
+  flex: 1 1 250px;
+  padding: 20px;
+  border-radius: 16px; // Rounded edges for each card
+  background-color: #fff;
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #fff;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+  }
+
+  .icon {
+    font-size: 40px;
+    opacity: 0.8;
+  }
+
+  .info {
+    text-align: right;
+    h4 {
+      font-size: 18px;
+      margin: 0;
+      font-weight: 500;
+    }
+    p {
+      font-size: 32px;
+      margin: 0;
+      font-weight: bold;
+    }
+  }
+}
+
+.card1 {
+  background-color: #b624ff;
+  background: linear-gradient(135deg, #a619ff, #c045ff);
+  border-radius: 16px; // Ensure all cards have rounded corners
+}
+
+.card2 {
+  background-color: #32963d;
+  background: linear-gradient(135deg, #28a745, #45c962);
+  border-radius: 16px;
+}
+
+.card3 {
+  background-color: #c41849;
+  background: linear-gradient(135deg, #e91e63, #d63369);
+  border-radius: 16px;
+}
+
+.card4 {
+  background-color: #03a5fc;
+  background: linear-gradient(135deg, #00b4d8, #0096c7);
+  border-radius: 16px;
+}
+
+.card5 {
+  background-color: #fc6703;
+  background: linear-gradient(135deg, #f56d02, #ff8a00);
+  border-radius: 16px;
+}
+
+.card6 {
+  background-color: #ffb900;
+  background: linear-gradient(135deg, #ffc107, #ffb300);
+  border-radius: 16px; // Distinct yellow gradient
+}
+
+.card7 {
+  background-color: #6f42c1;
+  background: linear-gradient(135deg, #6c63ff, #7851a9);
+  border-radius: 16px; // Purple gradient to stand out from other colors
+}

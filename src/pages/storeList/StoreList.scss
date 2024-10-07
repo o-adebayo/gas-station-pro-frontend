@@ -1,0 +1,134 @@
+.store-list-container {
+  padding: 20px;
+
+  .store-list {
+    color: #333;
+    background-color: #f9f9f9;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+
+    .--flex-between {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .search-and-add {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      .add-store-link {
+        .--btn {
+          padding: 10px 20px;
+          font-size: 1.4rem;
+        }
+      }
+    }
+
+    .store-cards {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .store-card {
+      background-color: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      padding: 20px;
+      width: calc(33.333% - 20px); // 3 cards per row with a gap of 20px
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+
+      .store-info {
+        h4 {
+          margin: 0 0 10px 0;
+          color: #007bff;
+        }
+        p {
+          margin: 5px 0;
+          color: #555;
+        }
+      }
+
+      .store-actions {
+        margin-top: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px; // Spacing between actions
+
+        .--btn {
+          padding: 1rem 1.5rem;
+          font-size: 1.6rem;
+          height: auto;
+          line-height: 1;
+          border-radius: 8px;
+          border: none;
+          transition: all 0.3s ease;
+          cursor: pointer;
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+
+          &.--btn-delete {
+            background-color: #f08080; // Light red color for delete button
+            color: #fff;
+
+            &:hover {
+              background-color: #e06666; // Darker red on hover
+              box-shadow: 0 0 8px rgba(240, 128, 128, 0.5);
+            }
+          }
+
+          &.--btn-primary {
+            background-color: var(--light-blue);
+            color: #fff;
+
+            &:hover {
+              background-color: rgba(31, 147, 255, 0.9);
+              box-shadow: 0 0 8px rgba(31, 147, 255, 0.3);
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.search-and-add {
+  display: flex;
+  align-items: center; // Vertically center the search bar and button
+  gap: 10px; // Add some space between the search input and button
+
+  .add-store-link {
+    display: inline-flex;
+    text-decoration: none;
+  }
+
+  button.--btn {
+    margin-left: 0;
+    padding: 1.2rem 1.5rem; // Match padding with search box input
+    font-size: 1.6rem; // Match font-size with search box input
+    height: auto; // Allow the button height to match the padding set above
+    line-height: 1; // Ensure the line-height does not affect height
+    border-radius: 8px; // Match border-radius with search box input
+    border: 1px solid #ddd;
+    transition: all 0.3s ease;
+    background-color: var(--light-blue);
+    color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+
+    &:hover {
+      background-color: rgba(
+        31,
+        147,
+        255,
+        0.9
+      ); // Change to a slightly darker version using RGBA
+      box-shadow: 0 0 8px rgba(31, 147, 255, 0.3);
+    }
+  }
+}
