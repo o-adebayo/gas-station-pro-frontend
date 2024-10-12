@@ -34,7 +34,7 @@ const Header = () => {
         <div className="button-group">
           {" "}
           {/* New container for buttons */}
-          <button onClick={logoutUser} className="text-reg navigation__cta">
+          <button onClick={logoutUser} className="text-med navigation__cta">
             Logout
           </button>
           <SuperAdminLink>

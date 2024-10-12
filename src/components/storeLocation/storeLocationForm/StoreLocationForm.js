@@ -104,7 +104,7 @@ const StoreLocationForm = ({
             />
           }
           <div className="--my">
-            <button type="submit" className="--btn --btn-primary">
+            <button type="submit" className="text-reg navigation__cta">
               Save Store
             </button>
           </div>

@@ -76,7 +76,7 @@ const UserForm = ({ user, handleInputChange, saveUser, stores }) => {
           </div>
 
           <div className="form-actions">
-            <button type="submit" className="--btn --btn-primary --btn-block">
+            <button type="submit" className="text-reg navigation__cta">
               Save User
             </button>
           </div>

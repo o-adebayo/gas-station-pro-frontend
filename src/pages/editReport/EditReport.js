@@ -147,6 +147,8 @@ const EditReport = () => {
       images: updatedImages, // Combine existing and newly uploaded images
     };
 
+    console.log(updatedData);
+
     try {
       // Send updatedData as a JSON object instead of FormData
       await dispatch(updateReport({ id, formData: updatedData }));

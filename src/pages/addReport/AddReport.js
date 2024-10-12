@@ -56,6 +56,12 @@ const AddReport = () => {
   const user = useSelector(selectUser);
   const isLoggedIn = useSelector(selectIsLoggedIn);
 
+  const [isCollapsed, setIsCollapsed] = useState(true);
+
+  const toggleInstructions = () => {
+    setIsCollapsed(!isCollapsed);
+  };
+
   // Fetch user data when component mounts if user is logged in
   useEffect(() => {
     if (isLoggedIn && !user) {
@@ -207,7 +213,30 @@ const AddReport = () => {
   return (
     <div>
       {(isLoading || loadingState) && <Loader />}
-      <h3 className="--mt">Add New Sales Report</h3>
+      {/* <h3 className="text-large primary-100">Add New Sales Report</h3> */}
+
+      {/* Step-by-step instructions for the user */}
+      <div className="instructions">
+        <h4 onClick={toggleInstructions} className="instructions__toggle">
+          Instructions (Click to expand/collapse)
+        </h4>
+        <div
+          className={`instructions__content ${isCollapsed ? "collapsed" : ""}`}
+        >
+          <ol>
+            <li>Step 1: Select the date</li>
+            <li>Step 2: For each product, select Add DippingTanks...</li>
+            <li>Step 3: Select Add Pumps and add all your pump values</li>
+            <li>Step 4: Enter the rate</li>
+            <li>Step 5: Enter the Sales Breakdown (POS, Cash, Expenses)</li>
+            <li>Step 6: Repeat the same steps for other products</li>
+            <li>Step 7: Add any notes in the notes section</li>
+            <li>Step 8: Upload your images</li>
+            <li>Step 9: Click Save Report</li>
+          </ol>
+        </div>
+      </div>
+
       <ReportForm
         report={report}
         notes={notes}

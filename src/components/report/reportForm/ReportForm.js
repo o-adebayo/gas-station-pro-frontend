@@ -4,6 +4,8 @@ import "react-quill/dist/quill.snow.css";
 import "./ReportForm.scss";
 import Card from "../../card/Card";
 import { v4 as uuidv4 } from "uuid";
+import { confirmAlert } from "react-confirm-alert"; // Import
+import "react-confirm-alert/src/react-confirm-alert.css"; // Import CSS
 
 const ReportForm = ({
   report,
@@ -16,10 +18,8 @@ const ReportForm = ({
   imagePreviews,
   isEditMode,
 }) => {
-  // At the beginning of the component
-  //console.log("saveReport prop:", saveReport);
-
   const [validationError, setValidationError] = useState("");
+  const [dateMismatch, setDateMismatch] = useState(false);
 
   const handleAddField = (product, type) => {
     if (type === "pumps") {
@@ -145,76 +145,147 @@ const ReportForm = ({
     }));
   };
 
-  // Updated validation function to check all required fields
-  const validateForm = () => {
-    if (!report.date) {
-      setValidationError("Please select a date.");
+  // Function to show confirmation dialog for date mismatch or incomplete products
+  const confirmSubmit = (message) => {
+    confirmAlert({
+      title: "Confirmation Required",
+      message,
+      buttons: [
+        {
+          label: "Yes, Save",
+          onClick: () => saveReport(),
+        },
+        {
+          label: "Cancel",
+        },
+      ],
+    });
+  };
+
+  const validateDate = () => {
+    const today = new Date().toISOString().split("T")[0];
+    if (report.date && report.date !== today) {
+      setDateMismatch(true);
       return false;
     }
+    setDateMismatch(false);
+    return true;
+  };
+
+  const validateForm = () => {
+    let atLeastOneProductComplete = false;
 
     for (const productKey in report.products) {
       const product = report.products[productKey];
+      const dippingTanksAdded =
+        product.dippingTanks && product.dippingTanks.length > 0;
+      const pumpsAdded = product.pumps && product.pumps.length > 0;
 
-      // Validate tanks and pumps fields
-      for (const type of ["dippingTanks", "pumps"]) {
-        const fields = product[type] || [];
-        for (const field of fields) {
-          if (type === "pumps") {
-            for (const nozzle of field.nozzles) {
-              if (!nozzle.opening || !nozzle.closing) {
+      // If DippingTanks is added, but Pumps is not, show validation error
+      if (dippingTanksAdded && !pumpsAdded) {
+        setValidationError(
+          `Please add Pumps for ${productKey} if DippingTanks is added.`
+        );
+        return false;
+      }
+
+      // If Pumps is added, but DippingTanks is not, show validation error
+      if (pumpsAdded && !dippingTanksAdded) {
+        setValidationError(
+          `Please add DippingTanks for ${productKey} if Pumps is added.`
+        );
+        return false;
+      }
+
+      // If both fields are added, validate the fields
+      if (dippingTanksAdded || pumpsAdded) {
+        for (const type of ["dippingTanks", "pumps"]) {
+          const fields = product[type] || [];
+          for (const field of fields) {
+            if (type === "pumps") {
+              for (const nozzle of field.nozzles) {
+                if (!nozzle.opening || !nozzle.closing) {
+                  setValidationError(
+                    "All nozzle fields must have opening and closing values."
+                  );
+                  return false;
+                }
+                if (parseFloat(nozzle.opening) > parseFloat(nozzle.closing)) {
+                  setValidationError(
+                    `For ${productKey}, each nozzle's closing must be greater than its opening.`
+                  );
+                  return false;
+                }
+              }
+            } else {
+              if (!field.opening || !field.closing) {
                 setValidationError(
-                  "All nozzle fields must have opening and closing values."
+                  "All tank fields must have opening and closing values."
+                );
+                return false;
+              }
+              if (parseFloat(field.closing) > parseFloat(field.opening)) {
+                setValidationError(
+                  `For ${productKey}, the closing value for tanks must be less than the opening value.`
                 );
                 return false;
               }
             }
-          } else {
-            if (!field.opening || !field.closing) {
-              setValidationError(
-                "All tank fields must have opening and closing values."
-              );
-              return false;
-            }
           }
         }
-      }
 
-      // Validate product rate
-      if (
-        product.rate === undefined ||
-        product.rate === null ||
-        product.rate === ""
-      ) {
-        setValidationError(`Please enter the rate for ${productKey}.`);
-        return false;
-      }
+        // Validate product rate
+        if (!product.rate) {
+          setValidationError(`Please enter the rate for ${productKey}.`);
+          return false;
+        }
 
-      // Validate total sales breakdown (POS, cash, expenses)
-      const breakdown = product.totalSalesBreakdown || {};
-      if (
-        breakdown.pos === undefined ||
-        breakdown.pos === "" ||
-        breakdown.cash === undefined ||
-        breakdown.cash === "" ||
-        breakdown.expenses === undefined ||
-        breakdown.expenses === ""
-      ) {
-        setValidationError(
-          `Please enter POS, cash, and expenses for ${productKey}.`
-        );
-        return false;
+        // Validate total sales breakdown (POS, cash, expenses)
+        const breakdown = product.totalSalesBreakdown || {};
+        if (
+          !breakdown.pos ||
+          !breakdown.cash ||
+          !breakdown.expenses ||
+          breakdown.pos === "" ||
+          breakdown.cash === "" ||
+          breakdown.expenses === ""
+        ) {
+          setValidationError(
+            `Please enter POS, cash, and expenses for ${productKey}.`
+          );
+          return false;
+        }
+
+        // Mark this product as complete if all checks pass
+        atLeastOneProductComplete = true;
       }
+    }
+
+    if (!atLeastOneProductComplete) {
+      setValidationError("At least one product sales detail is required.");
+      return false;
     }
 
     setValidationError("");
     return true;
   };
 
-  // Modified saveReport function to include validation
   const handleSaveReport = (e) => {
     e.preventDefault();
-    if (validateForm()) {
-      saveReport(); // Remove the event argument
+    const formIsValid = validateForm();
+    const dateIsValid = validateDate();
+
+    if (formIsValid) {
+      if (!dateIsValid) {
+        // If the date is not today's date, show the confirmation window
+        confirmSubmit(
+          "The selected date is not today. Do you still want to proceed?"
+        );
+      } else {
+        confirmSubmit(
+          "Some products do not have sales data. Do you still want to save the report?"
+        );
+      }
     }
   };
 
@@ -241,6 +312,7 @@ const ReportForm = ({
                 name="date"
                 value={report.date || ""}
                 onChange={handleInputChange}
+                required
               />
             </>
           )}
@@ -564,7 +636,7 @@ const ReportForm = ({
           )}
 
           <div className="--my">
-            <button type="submit" className="--btn --btn-primary">
+            <button type="submit" className="text-reg navigation__cta">
               Save Report
             </button>
           </div>
