@@ -1,66 +1,104 @@
 import React from "react";
-import { MdOutlineGasMeter } from "react-icons/md";
-import { Link } from "react-router-dom";
+//import { MdOutlineGasMeter } from "react-icons/md";
+//import { Link } from "react-router-dom";
 import "./Home.scss";
-import heroImg from "../../assets/inv-img.png";
-import { ShowOnLogin, ShowOnLogout } from "../../components/protect/HiddenLink";
+//import heroImg from "../../assets/inv-img.png";
+//import { ShowOnLogin, ShowOnLogout } from "../../components/protect/HiddenLink";
+
+//images
+import doubleQoute from "../../assets/double-quote.svg";
+
+// fonts
+import "../../fonts/fonts.css";
+
+// components that are displayed or used on the home page
+import Page from "../../components/Page/Page";
+import HeaderO from "../../components/HeaderO/HeaderO";
+import Hero from "../../components/Hero/Hero";
+import Logos from "../../components/Logos/Logos";
+import Testimonial from "../../components/Testimonial/Testimonial";
+import Features from "../../components/Features/Features";
+//import Video from "../../components/Video/Video";
+import Pricing from "../../components/Pricing/Pricing";
+import FAQ from "../../components/FAQ/FAQ";
+import CTA from "../../components/CTA/CTA";
+import FooterO from "../../components/FooterO/FooterO";
+import Navigation from "../../components/Navigation/Navigation";
+import Accordion from "../../components/Accordion/Accordion";
 
 const Home = () => {
   return (
-    <div className="home">
-      <nav className="container --flex-between">
-        <div className="logo">
-          <MdOutlineGasMeter size={35} />
-        </div>
-        <ul className="home-links">
-          <ShowOnLogout>
-            <li>
-              <Link to="/register">Register</Link>
-            </li>
-          </ShowOnLogout>
-          <ShowOnLogout>
-            <li>
-              <button className="--btn --btn-primary">
-                <Link to="/login">Login</Link>
-              </button>
-            </li>
-          </ShowOnLogout>
-          <ShowOnLogin>
-            <li>
-              <button className="--btn --btn-primary">
-                <Link to="/dashboard">Dashboard</Link>
-              </button>
-            </li>
-          </ShowOnLogin>
-        </ul>
-      </nav>
-      {/* HERO SECTION */}
-      <section className="container hero">
-        <div className="hero-text">
-          <h2>Gas Station Sales Report Solution</h2>
-          <p>
-            Daily sales reporting system to manage your Gas Station data in the
-            cloud. This takes away the manual process of saving data in a book
-            and allows you to access and control your data from anywhere in the
-            world.
-          </p>
-          <div className="hero-buttons">
-            <button className="--btn --btn-secondary">
-              <Link to="/dashboard">Request Demo</Link>
-            </button>
-          </div>
-          <div className="--flex-start">
-            <NumberText num="2K" text="Companies" />
-            <NumberText num="17K" text="Stores" />
-            <NumberText num="500+" text="Partners" />
-          </div>
-        </div>
+    <Page>
+      <HeaderO>
+        <Navigation />
+        <Hero />
+      </HeaderO>
+      <Logos />
+      <Testimonial>
+        <h5 className="h5 testimonial__heading">
+          With Gas Station Pro, our store managers can seamlessly save daily
+          sales reports to the cloud, ensuring secure, real-time access and
+          boosting operational efficiency like never before.
+        </h5>
+        <div className="testimonial__author-section">
+          <p className="text-reg testimonial__author">Isiaka Jamiu</p>
 
-        <div className="hero-image">
-          <img src={heroImg} alt="Gas Station Hero" />
+          <p className="text-reg testimonial__organization">Habeeb Oil</p>
         </div>
+        <img className="testimonial__quotes" src={doubleQoute} alt="quote" />
+      </Testimonial>
+      {/* Features Section */}
+      <section id="features">
+        <Features />
       </section>
-    </div>
+      <Testimonial>
+        <h5 className="h5 testimonial__heading">
+          Gas Station Pro has made managing our daily sales reports so much
+          easier. The real-time updates and data insights have allowed us to
+          make better business decisions.
+        </h5>
+        <div className="testimonial__author-section">
+          <p className="text-reg testimonial__author">Adedayo Ojo</p>
+          <p className="text-reg testimonial__organization">Peak Petroleum</p>
+        </div>
+        <img className="testimonial__quotes" src={doubleQoute} alt="quote" />
+      </Testimonial>
+      {/*  <Video /> */}
+      {/* Pricing Section */}
+      <section id="pricing">
+        <Pricing />
+      </section>
+      <Testimonial>
+        <h5 className="h5 testimonial__heading">
+          Their Support team is always available and ready to help when we
+          contact them. We enjoy working with them.
+        </h5>
+        <div className="testimonial__author-section">
+          <p className="text-reg testimonial__author">Neemat Idera</p>
+
+          <p className="text-reg testimonial__organization">Obat Oil</p>
+        </div>
+        <img className="testimonial__quotes" src={doubleQoute} alt="quote" />
+      </Testimonial>
+      <FAQ>
+        <Accordion></Accordion>
+      </FAQ>
+      <Testimonial>
+        <h5 className="h5 testimonial__heading">
+          Gas Station Pro has streamlined our operations significantly. The
+          platform is user-friendly, and the ability to manage multiple stations
+          from one dashboard has been a game-changer for us.
+        </h5>
+        <div className="testimonial__author-section">
+          <p className="text-reg testimonial__author">James Adewale</p>
+          <p className="text-reg testimonial__organization">FuelMax Ventures</p>
+        </div>
+        <img className="testimonial__quotes" src={doubleQoute} alt="quote" />
+      </Testimonial>
+
+      <CTA />
+      <FooterO />
+    </Page>
   );
 };
 
