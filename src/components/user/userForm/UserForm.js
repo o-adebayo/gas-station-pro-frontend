@@ -9,7 +9,9 @@ const UserForm = ({ user, handleInputChange, saveUser, stores }) => {
       <Card cardClass={"card form-card"}>
         <form onSubmit={saveUser} className="user-form">
           <div className="form-group">
-            <label>User Name</label>
+            <label>
+              User Name <span className="asterisk">*</span>
+            </label>
             <input
               type="text"
               placeholder="User Name"
@@ -21,7 +23,9 @@ const UserForm = ({ user, handleInputChange, saveUser, stores }) => {
           </div>
 
           <div className="form-group">
-            <label>User Email</label>
+            <label>
+              User Email <span className="asterisk">*</span>
+            </label>
             <input
               type="email"
               placeholder="User Email"
@@ -33,7 +37,9 @@ const UserForm = ({ user, handleInputChange, saveUser, stores }) => {
           </div>
 
           <div className="form-group">
-            <label>User Role</label>
+            <label>
+              User Role <span className="asterisk">*</span>
+            </label>
             <select
               name="role"
               value={user?.role}

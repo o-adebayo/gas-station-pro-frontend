@@ -57,20 +57,20 @@ const ReportSummary = ({ reports = [], userRole }) => {
         {userRole === "admin" && (
           <InfoBox
             icon={storeIcon}
-            title={"Unique Stores"}
+            title={"Stores"}
             count={uniqueStores}
             bgColor="card1"
           />
         )}
         <InfoBox
           icon={managerIcon}
-          title={"Unique Managers"}
+          title={"Managers"}
           count={uniqueManagers}
           bgColor="card5"
         />
         <InfoBox
           icon={categoryIcon}
-          title={"Unique Products"}
+          title={"Products"}
           count={uniqueProducts}
           bgColor="card3"
         />

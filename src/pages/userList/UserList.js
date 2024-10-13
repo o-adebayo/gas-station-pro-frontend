@@ -3,12 +3,16 @@ import { useDispatch, useSelector } from "react-redux";
 import "./UserList.scss";
 import UserStats from "../../components/userStats/UserStats";
 import Search from "../../components/search/Search";
-import { FaTrashAlt } from "react-icons/fa";
+import { FaEnvelope, FaTrashAlt } from "react-icons/fa";
 import ChangeRole from "../../components/changeRole/ChangeRole";
 import ChangeStatus from "../../components/changeStatus/ChangeStatus";
 import AdminSetPassword from "../../components/adminSetPassword/AdminSetPassword";
 import { Link } from "react-router-dom";
-import { fetchUsers, removeUser } from "../../redux/features/auth/authSlice";
+import {
+  fetchUsers,
+  removeUser,
+  resendUerActivationEmailByAdmin,
+} from "../../redux/features/auth/authSlice";
 import Loader, { SpinnerImg } from "../../components/loader/Loader";
 import useRedirectLoggedOutUser from "../../customHook/useRedirectLoggedOutUser";
 import { shortenText } from "../profile/Profile";
@@ -61,6 +65,17 @@ const UserList = () => {
         },
       ],
     });
+  };
+
+  const handleResendActivationEmail = async (email) => {
+    try {
+      //console.log(email);
+
+      await dispatch(resendUerActivationEmailByAdmin({ email }));
+      //alert("Activation link sent!");
+    } catch (error) {
+      alert("Failed to resend activation email");
+    }
   };
 
   useEffect(() => {
@@ -141,13 +156,25 @@ const UserList = () => {
                       <AdminSetPassword _id={user._id} email={user.email} />
                     </td>
                     <td>
-                      <span>
+                      <span title="Delete User">
                         <FaTrashAlt
                           size={20}
                           color="red"
                           onClick={() => confirmDelete(user._id)}
                         />
                       </span>
+                      {/* Show envelope icon if the user is inactive */}
+                      {user.status === "inactive" && (
+                        <span
+                          title="Resend Activation Email"
+                          onClick={() =>
+                            handleResendActivationEmail(user.email)
+                          }
+                          style={{ cursor: "pointer", marginLeft: "10px" }}
+                        >
+                          <FaEnvelope size={20} color="green" />
+                        </span>
+                      )}
                     </td>
                   </tr>
                 ))

@@ -158,3 +158,9 @@ export const sendActivationEmail = async () => {
   const response = await axios.post(API_URL + "sendActivationEmail");
   return response.data.message;
 };
+
+// reSend activation email
+export const resendActivationEmailByAdmin = async (email) => {
+  const response = await axios.post(API_URL + "resend-activation", email);
+  return response.data.message;
+};

@@ -1,11 +1,5 @@
-import {
-  FaTh,
-  FaRegChartBar,
-  FaCommentAlt,
-  FaUserCog,
-  FaGasPump,
-  FaPencilAlt,
-} from "react-icons/fa";
+import { FaTh, FaCommentAlt, FaPencilAlt, FaUser } from "react-icons/fa";
+import { FaGear } from "react-icons/fa6";
 
 const menu = [
   {
@@ -20,7 +14,7 @@ const menu = [
   },
   {
     title: "Account",
-    icon: <FaUserCog />,
+    icon: <FaUser />,
     childrens: [
       {
         title: "Profile",
@@ -34,7 +28,7 @@ const menu = [
   },
   {
     title: "Admin",
-    icon: <FaGasPump />,
+    icon: <FaGear />,
     isAdmin: true, // Only accessible to admins
     childrens: [
       {
@@ -48,7 +42,7 @@ const menu = [
     ],
   },
   {
-    title: "Report Bug",
+    title: "Help",
     icon: <FaCommentAlt />,
     path: "/contact-us",
   },

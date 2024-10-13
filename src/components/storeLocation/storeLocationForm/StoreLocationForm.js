@@ -40,7 +40,9 @@ const StoreLocationForm = ({
               )}
             </Card>
           }
-          <label>Store Name:</label>
+          <label>
+            Store Name: <span className="asterisk">*</span>
+          </label>
           <input
             type="text"
             placeholder="Store Location name"
@@ -49,7 +51,9 @@ const StoreLocationForm = ({
             value={storeLocation?.name}
             onChange={handleInputChange}
           />
-          <label>Location:</label>
+          <label>
+            Location: <span className="asterisk">*</span>
+          </label>
           <input
             type="text"
             placeholder="Store Location"
@@ -58,7 +62,9 @@ const StoreLocationForm = ({
             value={storeLocation?.location}
             onChange={handleInputChange}
           />
-          <label>Number of Pumps:</label>
+          <label>
+            Number of Pumps: <span className="asterisk">*</span>
+          </label>
           <input
             type="text"
             placeholder="Number of Pumps"
@@ -67,7 +73,9 @@ const StoreLocationForm = ({
             value={storeLocation?.pumps}
             onChange={handleInputChange}
           />
-          <label>Number of Nozzles:</label>
+          <label>
+            Number of Nozzles: <span className="asterisk">*</span>
+          </label>
           <input
             type="text"
             placeholder="Number of Nozzles"
@@ -76,7 +84,9 @@ const StoreLocationForm = ({
             value={storeLocation?.nozzles}
             onChange={handleInputChange}
           />
-          <label>Number of Tanks:</label>
+          <label>
+            Number of Tanks: <span className="asterisk">*</span>
+          </label>
           <input
             type="text"
             placeholder="Number of Tanks"

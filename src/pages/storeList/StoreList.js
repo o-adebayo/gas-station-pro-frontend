@@ -83,7 +83,74 @@ const StoreList = () => {
     return <Loader />;
   }
 
-  if (!stores || stores.length === 0) {
+  return (
+    <section className="store-list-container">
+      <div className="container">
+        {isLoading && <SpinnerImg />}
+        <div className="store-list">
+          <div className="--flex-between">
+            <h3>All Stores</h3>
+            {/* Ensure the Add Store button is always displayed */}
+            {user?.role === "admin" && (
+              <Link to="/add-StoreLocation" className="add-store-link">
+                <button className="--btn --btn-primary">Add Store</button>
+              </Link>
+            )}
+          </div>
+
+          {/* Render message if no stores are available */}
+          {!stores || stores.length === 0 ? (
+            <h3>No stores found. Please try again later.</h3>
+          ) : (
+            <div className="store-cards">
+              {stores.map((store, index) => (
+                <div key={store._id} className="store-card">
+                  <div className="store-info">
+                    <h4>{store.name || store.storeName}</h4>
+                    <p>
+                      <strong>Location:</strong>{" "}
+                      {store.location || store.storeLocation}
+                    </p>
+                    <p>
+                      <strong>Pumps:</strong> {store.pumps}
+                    </p>
+                    <p>
+                      <strong>Nozzles:</strong> {store.nozzles}
+                    </p>
+                    <p>
+                      <strong>Tanks:</strong> {store.tanks}
+                    </p>
+                    <p>
+                      <strong>Manager:</strong>{" "}
+                      {getManagerName(store.managerId)}
+                    </p>
+                  </div>
+                  <div className="store-actions">
+                    {user?.role === "admin" && (
+                      <>
+                        <ChangeStoreManager storeId={store._id} />
+                        <button
+                          className="--btn --btn-delete"
+                          onClick={() => confirmDelete(store._id)}
+                        >
+                          Delete Store
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default StoreList;
+
+/*  if (!stores || stores.length === 0) {
     return (
       <div className="container">
         <div className="store-list">
@@ -154,3 +221,4 @@ const StoreList = () => {
 };
 
 export default StoreList;
+ */

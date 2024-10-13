@@ -15,6 +15,7 @@ import {
   logoutUser,
   registerUser,
   registerUserByAdmin,
+  resendActivationEmailByAdmin,
   resetPassword,
   sendActivationEmail,
   sendLoginCode,
@@ -361,6 +362,24 @@ export const changeUerStatus = createAsyncThunk(
   }
 );
 
+// resend activation email
+export const resendUerActivationEmailByAdmin = createAsyncThunk(
+  "auth/resendUerActivationEmailByAdmin",
+  async (formData, thunkAPI) => {
+    try {
+      return await resendActivationEmailByAdmin(formData);
+    } catch (error) {
+      const message =
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        error.message ||
+        error.toString();
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
 // Admin set User password
 export const adminSetUserPassword = createAsyncThunk(
   "auth/adminSetUserPassword",
@@ -524,7 +543,9 @@ const authSlice = createSlice({
         state.isSuccess = true;
         state.isLoggedIn = false;
         state.user = action.payload; // Set user data in the store
-        toast.success("Registration successful");
+        toast.success(
+          "Registration successful. Please check your email for an activation link"
+        );
       })
       .addCase(register.rejected, (state, action) => {
         state.isLoading = false;
@@ -545,7 +566,9 @@ const authSlice = createSlice({
         state.isSuccess = true;
         state.isLoggedIn = false;
         state.user = action.payload;
-        toast.success("Registration successful");
+        toast.success(
+          "Registration successful. Please advise the user to check their email for an activation link"
+        );
       })
       .addCase(registerByAdmin.rejected, (state, action) => {
         state.isLoading = false;
@@ -685,7 +708,12 @@ const authSlice = createSlice({
         state.isSuccess = true;
         state.isLoggedIn = false;
         state.message = action.payload;
-        toast.success(action.payload);
+        //toast.success(action.payload);
+        //toast.success("Account Activated Successfully, Please Login");
+        toast.success(
+          action.payload?.message ||
+            "Account Activated Successfully, Please Login"
+        );
       })
       .addCase(activateUserAccount.rejected, (state, action) => {
         state.isLoading = false;
@@ -701,7 +729,12 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.isSuccess = true;
         state.message = action.payload;
-        toast.success(action.payload);
+        //toast.success(action.payload);
+        //toast.success("Account Activated Successfully, Please Login");
+        toast.success(
+          action.payload?.message ||
+            "Account Activated Successfully, Please Login"
+        );
       })
       .addCase(activateUserAccountAddedByAdmin.rejected, (state, action) => {
         state.isLoading = false;
@@ -788,6 +821,22 @@ const authSlice = createSlice({
         toast.success(action.payload);
       })
       .addCase(changeUserRole.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+        toast.error(action.payload);
+      })
+      // Resend activation email by admin
+      .addCase(resendUerActivationEmailByAdmin.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(resendUerActivationEmailByAdmin.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.message = action.payload;
+        toast.success(action.payload);
+      })
+      .addCase(resendUerActivationEmailByAdmin.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.message = action.payload;

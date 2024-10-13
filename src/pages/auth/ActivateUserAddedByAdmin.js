@@ -13,6 +13,7 @@ import {
   SET_LOGIN,
 } from "../../redux/features/auth/authSlice";
 import Loader from "../../components/loader/Loader";
+import PasswordInput from "../../components/passwordInput/PasswordInput";
 
 const initialState = {
   password: "",
@@ -77,16 +78,14 @@ const ActivateUserAddedByAdmin = () => {
           <h2>Activate Account</h2>
 
           <form onSubmit={activate}>
-            <input
-              type="password"
+            <PasswordInput
               placeholder="New Password"
               required
               name="password"
               value={password}
               onChange={handleInputChange}
             />
-            <input
-              type="password"
+            <PasswordInput
               placeholder="Confirm New Password"
               required
               name="password2"
