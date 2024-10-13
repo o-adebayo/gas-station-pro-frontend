@@ -77,7 +77,7 @@ const ReportDetail = () => {
 
             {/* Modal for image popup */}
             {isModalOpen && selectedImage && (
-              <div className="modal">
+              <div className="modal" onClick={closeModal}>
                 <span className="close" onClick={closeModal}>
                   &times;
                 </span>
@@ -85,6 +85,7 @@ const ReportDetail = () => {
                   className="modal-content"
                   src={selectedImage}
                   alt="Large"
+                  onClick={(e) => e.stopPropagation()} // Prevent modal from closing when clicking the image
                 />
               </div>
             )}

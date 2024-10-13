@@ -1,15 +1,16 @@
 .report-detail {
   margin-bottom: 5rem;
   width: 100%;
-  max-width: 600px;
+  max-width: 1200px; /* Increase the max-width for a wider layout */
   padding: 2rem;
   background-color: #ffffff;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  margin: 0 auto; /* Center the report detail in the middle */
 
   .card {
     width: 100%;
-    padding: 1.5rem;
+    padding: 2rem; /* Adjust padding */
     border-radius: 12px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   }
@@ -38,15 +39,14 @@
 
     .report-images {
       display: flex;
-      flex-wrap: nowrap;
+      flex-wrap: wrap;
       gap: 1rem;
       margin-bottom: 1.5rem;
       overflow-x: auto;
 
       .report-image {
-        width: auto;
-        height: auto;
-        max-height: 200px;
+        max-height: 300px; /* Increase image size */
+        max-width: 400px; /* Increase image width */
         object-fit: cover;
         border-radius: 8px;
         border: 1px solid #e6e6e6;
@@ -55,7 +55,7 @@
       }
 
       .report-image:hover {
-        transform: scale(1.02);
+        transform: scale(1.05); /* Slightly increase the scale on hover */
       }
     }
 
@@ -73,7 +73,7 @@
       }
 
       h5 {
-        font-size: 1.5rem;
+        font-size: 1.7rem; /* Increase font size */
         font-weight: bold;
         color: var(--color-primary);
         margin-bottom: 1rem;
@@ -90,17 +90,17 @@
       .product-details {
         display: flex;
         flex-wrap: wrap;
-        gap: 1rem;
+        gap: 1.5rem; /* Increase the gap between details */
 
         .detail-item {
           flex: 1;
-          padding: 1rem;
+          padding: 1.5rem;
           border-radius: 8px;
           background-color: #ffffff;
           box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 
           p {
-            font-size: 1.4rem;
+            font-size: 1.6rem; /* Increase font size */
             margin: 0.5rem 0;
           }
         }
@@ -108,31 +108,19 @@
     }
   }
 
-  .group {
-    border: 1px solid var(--dark-blue);
-    padding: 1rem;
-    border-radius: 8px;
-    background-color: #f9f9f9;
-    margin-bottom: 1.5rem;
-    transition: box-shadow 0.3s ease-in-out;
-
-    &:hover {
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    }
-  }
-
   .notes-box {
     border: 1px solid var(--light-blue);
-    padding: 1.5rem;
+    padding: 2rem; /* Increase padding */
     border-radius: 8px;
     background-color: #f9f9f9;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    margin-top: 1.5rem;
+    margin-top: 2rem;
 
     h4 {
       margin-bottom: 1rem;
       color: var(--dark-blue);
       font-weight: 600;
+      font-size: 1.8rem; /* Increase font size */
     }
 
     div {
@@ -148,12 +136,12 @@
   }
 
   h4 {
-    font-size: 1.6rem;
+    font-size: 1.8rem; /* Increase font size */
   }
 
   h5,
   h6 {
-    font-size: 1.4rem;
+    font-size: 1.6rem; /* Increase font size */
   }
 
   hr {
@@ -165,15 +153,13 @@
   code {
     display: block;
     background-color: #f1f4f8;
-    padding: 0.75rem;
+    padding: 1rem; /* Increase padding */
     border-radius: 8px;
-    font-size: 1.2rem;
+    font-size: 1.3rem; /* Increase font size */
     color: var(--color-dark);
     margin-top: 1.5rem;
   }
 }
-
-/* Modal styling */
 .modal {
   display: flex;
   position: fixed;
@@ -185,11 +171,14 @@
   background-color: rgba(0, 0, 0, 0.8); /* Dark background */
   align-items: center;
   justify-content: center;
+  transition: opacity 0.3s ease-in-out; /* Add a transition for fade-in effect */
 }
 
 .modal-content {
   max-width: 80%;
   max-height: 80%;
+  border-radius: 8px;
+  object-fit: contain;
 }
 
 .close {
