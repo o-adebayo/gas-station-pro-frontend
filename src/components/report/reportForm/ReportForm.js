@@ -5,7 +5,7 @@ import "./ReportForm.scss";
 import Card from "../../card/Card";
 import { v4 as uuidv4 } from "uuid";
 import { confirmAlert } from "react-confirm-alert"; // Import
-import "react-confirm-alert/src/react-confirm-alert.css"; // Import CSS
+import "react-confirm-alert/src/react-confirm-alert.css"; // Import CSS new file
 
 const ReportForm = ({
   report,
