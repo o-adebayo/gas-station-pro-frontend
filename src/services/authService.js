@@ -72,14 +72,14 @@ export const resetPassword = async (userData, resetToken) => {
 // Activate User once they click the link from their email
 //export const activateUser = async (userData, activationToken) => {
 export const activateUser = async (activationToken) => {
-  const response = await axios.put(`${API_URL}/activate/${activationToken}`);
+  const response = await axios.put(`${API_URL}activate/${activationToken}`);
   return response.data.message;
 };
 
 // Activate User once they click the link from their email
 export const activateUserByAdmin = async (userData, activationToken) => {
   const response = await axios.put(
-    `${API_URL}/activateaddedbyadmin/${activationToken}`,
+    `${API_URL}activateaddedbyadmin/${activationToken}`,
     userData
   );
   return response.data.message;
