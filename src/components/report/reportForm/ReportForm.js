@@ -39,18 +39,28 @@ const ReportForm = ({
   const handleAddField = (product, type) => {
     if (type === "pumps") {
       const newPump = { id: uuidv4(), nozzles: [] };
+
+      // Create two nozzles by default
+      const nozzle1 = { id: uuidv4(), opening: "", closing: "" };
+      const nozzle2 = { id: uuidv4(), opening: "", closing: "" };
+
+      // Add the new pump with two nozzles to the report state
       setReport((prevState) => ({
         ...prevState,
         products: {
           ...prevState.products,
           [product]: {
             ...prevState.products[product],
-            [type]: [...(prevState.products[product][type] || []), newPump],
+            [type]: [
+              ...(prevState.products[product][type] || []),
+              {
+                ...newPump,
+                nozzles: [nozzle1, nozzle2], // Add two nozzles by default
+              },
+            ],
           },
         },
       }));
-      handleAddNozzle(product, newPump.id);
-      handleAddNozzle(product, newPump.id);
     } else {
       const newField = { id: uuidv4(), opening: "", closing: "" };
       setReport((prevState) => ({
@@ -65,6 +75,37 @@ const ReportForm = ({
       }));
     }
   };
+
+  /*   const handleAddField = (product, type) => {
+    const newId = uuidv4();
+
+    if (type === "pumps") {
+      const newPump = { id: newId, nozzles: [] };
+      setReport((prevState) => ({
+        ...prevState,
+        products: {
+          ...prevState.products,
+          [product]: {
+            ...prevState.products[product],
+            [type]: [...(prevState.products[product][type] || []), newPump],
+          },
+        },
+      }));
+      handleAddNozzle(product, newPump.id);
+    } else {
+      const newField = { id: newId, opening: "", closing: "" };
+      setReport((prevState) => ({
+        ...prevState,
+        products: {
+          ...prevState.products,
+          [product]: {
+            ...prevState.products[product],
+            [type]: [...(prevState.products[product][type] || []), newField],
+          },
+        },
+      }));
+    }
+  }; */
 
   const handleAddNozzle = (product, pumpId) => {
     const newNozzle = { id: uuidv4(), opening: "", closing: "" };
@@ -196,7 +237,6 @@ const ReportForm = ({
         product.dippingTanks && product.dippingTanks.length > 0;
       const pumpsAdded = product.pumps && product.pumps.length > 0;
 
-      // If DippingTanks is added, but Pumps is not, show validation error
       if (dippingTanksAdded && !pumpsAdded) {
         setValidationError(
           `Please add Pumps for ${productKey} if DippingTanks is added.`
@@ -204,7 +244,6 @@ const ReportForm = ({
         return false;
       }
 
-      // If Pumps is added, but DippingTanks is not, show validation error
       if (pumpsAdded && !dippingTanksAdded) {
         setValidationError(
           `Please add DippingTanks for ${productKey} if Pumps is added.`
@@ -212,7 +251,6 @@ const ReportForm = ({
         return false;
       }
 
-      // If both fields are added, validate the fields
       if (dippingTanksAdded || pumpsAdded) {
         for (const type of ["dippingTanks", "pumps"]) {
           const fields = product[type] || [];
@@ -271,7 +309,6 @@ const ReportForm = ({
           return false;
         }
 
-        // Mark this product as complete if all checks pass
         atLeastOneProductComplete = true;
       }
     }
@@ -292,7 +329,6 @@ const ReportForm = ({
 
     if (formIsValid) {
       if (!dateIsValid) {
-        // If the date is not today's date, show the confirmation window
         confirmSubmit(
           "The selected date is not today. Do you still want to proceed?"
         );
@@ -307,7 +343,7 @@ const ReportForm = ({
   const calculateActualTotal = (pos, cash, expenses) => {
     const actualTotal =
       parseFloat(pos) + parseFloat(cash) - parseFloat(expenses);
-    return isNaN(actualTotal) ? 0 : actualTotal; // Return 0 if the calculation results in NaN
+    return isNaN(actualTotal) ? 0 : actualTotal; // Return 0 if NaN
   };
 
   const getNozzlePlaceholder = (product, pumpIndex, nozzleIndex, field) => {
@@ -356,7 +392,7 @@ const ReportForm = ({
             </>
           )}
 
-          {/* Add dynamic fields for products */}
+          {/* Dynamic fields for products */}
           {Object.keys(report.products).map((product) => (
             <div key={product}>
               <h4>{product}</h4>

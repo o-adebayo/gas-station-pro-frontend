@@ -30,7 +30,6 @@ const EditReport = () => {
 
   const [report, setReport] = useState(null);
   const [notes, setNotes] = useState("");
-  const [products, setProducts] = useState(null);
   const [imagePreviews, setImagePreviews] = useState([]); // To store the displayable previews
   const [newImages, setNewImages] = useState([]); // To store newly uploaded images
   const [existingImages, setExistingImages] = useState([]); // To track already existing images
@@ -49,7 +48,6 @@ const EditReport = () => {
     if (reportEdit) {
       setReport(reportEdit);
       setNotes(reportEdit.notes || "");
-      setProducts({ ...reportEdit.products });
 
       // Ensure that existing images are stored and no duplicates are added
       const uniqueExistingImages = Array.from(new Set(reportEdit.images || []));
@@ -58,9 +56,27 @@ const EditReport = () => {
     }
   }, [reportEdit]);
 
+  // Function to dynamically handle field updates
+  const handleFieldChange = (path, value) => {
+    setReport((prevReport) => {
+      const updatedReport = { ...prevReport };
+      const keys = path.split("."); // Split the path to navigate to the field
+
+      // Traverse to the right property using the path
+      keys.reduce((acc, key, index) => {
+        if (index === keys.length - 1) {
+          acc[key] = value; // Set the final key's value
+        }
+        return acc[key];
+      }, updatedReport);
+
+      return updatedReport;
+    });
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setReport({ ...report, [name]: value });
+    handleFieldChange(name, value); // Use the dynamic field change function
   };
 
   const handleImageChange = (e) => {
@@ -81,7 +97,7 @@ const EditReport = () => {
     let updatedImages = [...existingImages];
 
     // Only upload new images if they exist
-    console.log("new images lenght", newImages.length);
+    console.log("new images length", newImages.length);
     if (newImages.length > 0) {
       for (const image of newImages) {
         if (
@@ -119,7 +135,6 @@ const EditReport = () => {
     const updatedData = {
       ...report,
       notes,
-      products,
       images: uniqueImages, // Ensure only unique images
     };
 
@@ -138,7 +153,7 @@ const EditReport = () => {
     <div>
       {isLoading && <Loader />}
       <h3 className="--mt">Edit Report</h3>
-      {report && products && (
+      {report && (
         <ReportForm
           report={report}
           notes={notes}
@@ -147,8 +162,6 @@ const EditReport = () => {
           handleImageChange={handleImageChange}
           saveReport={saveReport}
           setReport={setReport}
-          products={products}
-          setProducts={setProducts}
           imagePreviews={imagePreviews} // Show previews (both new and existing)
           isEditMode={true}
         />

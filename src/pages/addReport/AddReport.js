@@ -86,18 +86,20 @@ const AddReport = () => {
     }
   }, [dispatch, user]);
 
+  // Handle input field changes for date, store, etc.
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setReport({ ...report, [name]: value });
   };
 
+  // Handle image selection and previews
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
-    setNewImages(files); // Update only new images
+    setNewImages((prev) => [...prev, ...files]); // Append new images
 
-    // Generate image preview for new images
+    // Generate previews and append them without overwriting existing previews
     const previews = files.map((file) => URL.createObjectURL(file));
-    setImagePreviews((prev) => [...prev, ...previews]); // Append to existing previews
+    setImagePreviews((prev) => [...prev, ...previews]);
   };
 
   const saveReport = async () => {
@@ -113,28 +115,28 @@ const AddReport = () => {
         totalSalesLiters: 0,
         totalSalesDollars: 0,
       },
-      notes: notes || "", // Ensure notes is provided
-      images: [], // Handle images separately
+      notes: notes || "", // Ensure notes are provided
+      images: [], // Images will be handled separately after Cloudinary upload
       storeId: report.storeId, // Use the storeId from the report object
     };
 
-    // Iterate over each product to calculate sales and totals
+    // Process product sales data for PMS, DPK, AGO
     for (const product in report.products) {
       const {
         dippingTanks,
         pumps,
         rate = 1,
         totalSalesBreakdown = { pos: 0, cash: 0, expenses: 0 },
-      } = report.products[product]; // Default rate and breakdown values
+      } = report.products[product];
 
       let productTotalLiters = 0;
       let productTotalDollars = 0;
 
-      // Calculate sales for tanks (dippingTanks)
+      // Calculate sales for dippingTanks
       const formattedDippingTanks = dippingTanks.map((tank) => {
         const opening = parseFloat(tank.opening) || 0;
         const closing = parseFloat(tank.closing) || 0;
-        const sales = opening - closing; // Tanks decrease over time
+        const sales = opening - closing;
         productTotalLiters += sales;
         return {
           opening: tank.opening || "0",
@@ -148,7 +150,7 @@ const AddReport = () => {
         const formattedNozzles = pump.nozzles.map((nozzle) => {
           const opening = parseFloat(nozzle.opening) || 0;
           const closing = parseFloat(nozzle.closing) || 0;
-          const sales = closing - opening; // Pumps increase over time
+          const sales = closing - opening;
           productTotalLiters += sales;
           return {
             opening: nozzle.opening || "0",
@@ -159,14 +161,14 @@ const AddReport = () => {
         return { nozzles: formattedNozzles };
       });
 
-      // Calculate total sales in dollars
+      // Calculate total sales in currency
       productTotalDollars = productTotalLiters * rate;
 
-      // Add product totals to overall store totals
+      // Update overall store totals
       storeTotalLiters += productTotalLiters;
       storeTotalDollars += productTotalDollars;
 
-      // Add the calculated product data to the formatted data
+      // Add the product data to the formatted data object
       formattedData.products[product] = {
         dippingTanks: formattedDippingTanks,
         pumps: formattedPumps,
@@ -182,12 +184,12 @@ const AddReport = () => {
       };
     }
 
-    // Add store totals and ensure they are correctly set
+    // Final store total calculations
     formattedData.storeTotalSales.totalSalesLiters = storeTotalLiters || 0;
     formattedData.storeTotalSales.totalSalesDollars = storeTotalDollars || 0;
 
     try {
-      // Handle image upload to Cloudinary if there are new images
+      // Upload new images to Cloudinary if available
       let uploadedImages = [];
       if (newImages.length > 0) {
         for (const image of newImages) {
@@ -201,7 +203,6 @@ const AddReport = () => {
             formData.append("cloud_name", cloud_name);
             formData.append("upload_preset", upload_preset);
 
-            // Upload to Cloudinary
             const response = await fetch(
               `https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`,
               { method: "post", body: formData }
@@ -214,11 +215,11 @@ const AddReport = () => {
 
       formattedData.images = uploadedImages;
 
-      // Dispatch the JSON data directly
-      await dispatch(createReport(formattedData)); // Await the response from createReport
-      navigate("/dashboard"); // Redirect after submission if needed
+      // Dispatch the formatted data
+      await dispatch(createReport(formattedData));
+      navigate("/dashboard"); // Redirect to dashboard
     } catch (error) {
-      toast.error("Failed to submit report: " + error.message); // Show error toast
+      toast.error("Failed to submit report: " + error.message);
     } finally {
       setIsLoading(false);
     }
@@ -256,9 +257,9 @@ const AddReport = () => {
         handleImageChange={handleImageChange}
         saveReport={saveReport}
         setReport={setReport}
-        imagePreviews={imagePreviews}
-        stores={stores} // Pass fetched stores to the form for dropdown
-        user={user} // Pass the user to check for admin role
+        imagePreviews={imagePreviews} // Image preview feature
+        stores={stores} // Pass stores for admin selection
+        user={user} // Pass user data for admin check
       />
     </div>
   );
