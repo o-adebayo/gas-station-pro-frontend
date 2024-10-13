@@ -163,7 +163,9 @@ const reportSlice = createSlice({
         state.isSuccess = true;
         state.isError = false;
         //console.log(action.payload);
-        toast.success("Report deleted successfully");
+        toast.success(
+          "Sales Report and associated images deleted successfully"
+        );
       })
       .addCase(deleteReport.rejected, (state, action) => {
         state.isLoading = false;

@@ -73,38 +73,99 @@ const EditReport = () => {
   const handleProductFieldChange = (
     productType,
     fieldType,
-    id,
+    itemId,
     field,
     value
   ) => {
-    // Update specific product (dippingTanks, pumps, etc.) data
+    // Update specific product (dippingTanks, pumps, etc.) data using _id to identify the right item
     setProducts((prevProducts) => {
-      const updatedField = prevProducts[productType][fieldType].map((item) =>
-        item._id === id ? { ...item, [field]: value } : item
-      );
+      // Find the nested field to update using itemId
+      const updatedField = prevProducts[productType][fieldType].map((item) => {
+        console.log("item id", item._id);
+        if (item._id === itemId) {
+          return { ...item, [field]: value }; // Update the specific field (e.g., opening or closing)
+        }
+        return item; // Return unchanged item if it's not the one we're updating
+      });
+
       return {
         ...prevProducts,
         [productType]: {
           ...prevProducts[productType],
-          [fieldType]: updatedField,
+          [fieldType]: updatedField, // Update the specific fieldType (dippingTanks, pumps, etc.)
         },
       };
     });
   };
 
+  // Function to handle rate change for a product
   const handleRateChange = (productType, value) => {
     setProducts((prevProducts) => ({
       ...prevProducts,
       [productType]: {
         ...prevProducts[productType],
-        rate: value,
+        rate: value, // Update the rate for the specific product
       },
     }));
   };
 
+  // Save the report after updating products and other fields
+  const saveReport = async () => {
+    // Create a new copy of the `updatedImages` array
+    let updatedImages = [...reportEdit.images]; // Use existing images from reportEdit
+
+    // Handle image upload to Cloudinary for new images
+    if (newImages.length > 0) {
+      for (const image of newImages) {
+        if (
+          image.type === "image/jpeg" ||
+          image.type === "image/jpg" ||
+          image.type === "image/png"
+        ) {
+          const formData = new FormData();
+          formData.append("file", image);
+          formData.append("cloud_name", cloud_name);
+          formData.append("upload_preset", upload_preset);
+
+          // Upload to Cloudinary
+          try {
+            const response = await fetch(
+              `https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`,
+              { method: "post", body: formData }
+            );
+            const imgData = await response.json();
+            updatedImages.push(imgData.url.toString()); // Append only new image URLs
+          } catch (error) {
+            console.error("Image upload failed:", error);
+            toast.error("Failed to upload some images. Please try again.");
+          }
+        }
+      }
+    }
+
+    // Prepare the updated data
+    const updatedData = {
+      ...report,
+      notes,
+      products, // Include products (dippingTanks, pumps, etc.)
+      images: updatedImages, // Combine existing and newly uploaded images
+    };
+
+    console.log("Updated data:", updatedData);
+
+    try {
+      await dispatch(updateReport({ id, formData: updatedData }));
+      //toast.success("Report updated successfully");
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Failed to update report:", error);
+      toast.error("Failed to update report. Please try again.");
+    }
+  };
+
   //const saveReport = async (e) => {
   //e.preventDefault();
-  const saveReport = async () => {
+  /*   const saveReport = async () => {
     // Create a new copy of the `updatedImages` array
     let updatedImages = reportEdit.images ? [...reportEdit.images] : [];
 
@@ -158,7 +219,7 @@ const EditReport = () => {
       console.error("Failed to update report:", error);
       toast.error("Failed to update report. Please try again.");
     }
-  };
+  }; */
 
   return (
     <div>
