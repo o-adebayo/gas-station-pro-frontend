@@ -1,176 +1,67 @@
 .contact {
-  .section {
+  display: flex;
+  justify-content: center; // Center the card within the page
+  align-items: center;
+  padding: 2rem;
+
+  .card {
+    width: 100%;
+    max-width: 600px; // Adjust the max width of the card
+    padding: 2rem;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  }
+
+  form {
     display: flex;
-    align-items: flex-start;
-    gap: 3rem;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 1.5rem; // Add spacing between form elements
 
-    form {
-      flex: 1;
-      max-width: 700px; // Make form wider
-      background: #fff;
-      padding: 3rem;
-      border-radius: 15px;
-      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-
-      label {
-        display: block;
-        font-size: 1.6rem; // Larger font size for labels
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-        color: #333;
-      }
-
-      input[type="text"],
-      input[type="email"],
-      textarea {
-        display: block;
-        font-size: 1.4rem; // Increased font size for inputs
-        font-weight: 400;
-        padding: 1.2rem; // More padding for a bigger input box
-        margin-bottom: 2rem;
-        width: 100%;
-        border: 1px solid #ddd;
-        border-radius: 10px;
-        outline: none;
-        transition: border 0.3s ease, box-shadow 0.3s ease;
-
-        &:focus {
-          border-color: #007bff;
-          box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.2);
-        }
-      }
-
-      button {
-        display: block;
-        margin-top: 2rem; // Add space above the button
-        background-color: #007bff;
-        color: #fff;
-        padding: 1.2rem 2rem; // Increase padding for bigger button
-        border: none;
-        border-radius: 10px;
-        font-size: 1.6rem; // Larger button font size
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-
-        &:hover {
-          background-color: #0056b3;
-        }
-      }
-    }
-  }
-
-  .card2 {
-    padding: 3rem;
-    background-color: #007bff; // Updated to modern blue color
-    color: #fff;
-    border-radius: 15px;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-
-    h3,
-    p {
-      color: #f9f9f9;
-      margin-bottom: 1.5rem;
-      font-size: 1.8rem; // Increased size for better readability
+    label {
+      font-size: 1.4rem;
+      font-weight: 500;
+      color: #333;
     }
 
-    .icons {
-      margin: 4rem 0;
+    input[type="text"],
+    textarea,
+    select {
+      font-size: 1.6rem;
+      padding: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      width: 100%;
+      background-color: #f9f9f9;
+      transition: all 0.3s ease;
 
-      span {
-        display: flex;
-        justify-content: flex-start;
-        align-items: center;
-        margin-bottom: 2rem;
-
-        svg {
-          font-size: 3rem; // Larger icon size
-          color: #fff;
-        }
-
-        a,
-        p {
-          margin-left: 15px;
-          color: #fff;
-          font-size: 1.6rem; // Increased text size for better visibility
-          transition: color 0.3s ease;
-
-          &:hover {
-            color: #dcdcdc; // Lighter hover effect
-          }
-        }
-      }
-    }
-  }
-}
-
-@media screen and (max-width: 768px) {
-  .contact {
-    .section {
-      flex-direction: column;
-
-      form {
-        width: 100%;
-        margin-bottom: 2rem;
-        padding: 2rem; // Reduce padding for smaller screens
-      }
-
-      .card2 {
-        padding: 2.5rem;
-      }
-    }
-  }
-}
-
-@media screen and (max-width: 480px) {
-  .contact {
-    .card2 {
-      padding: 2rem;
-
-      h3 {
-        font-size: 1.6rem; // Reduce size for smaller screens
-      }
-
-      p {
-        font-size: 1.2rem; // Reduce size for smaller screens
-      }
-
-      .icons {
-        margin: 3rem 0;
-
-        span {
-          svg {
-            font-size: 2rem; // Reduce icon size for smaller screens
-          }
-
-          a,
-          p {
-            font-size: 1.2rem;
-          }
-        }
+      &:focus {
+        border-color: var(--light-blue);
+        background-color: #fff;
+        box-shadow: 0 0 5px rgba(31, 147, 255, 0.2);
       }
     }
 
-    .section {
-      form {
-        padding: 2rem;
+    button {
+      background-color: var(--light-blue);
+      color: #fff;
+      padding: 1rem;
+      border-radius: 8px;
+      font-size: 1.6rem;
+      cursor: pointer;
+      border: none;
+      transition: all 0.3s ease;
 
-        label {
-          font-size: 1.4rem; // Keep label font large enough to read easily
-        }
-
-        input[type="text"],
-        input[type="email"],
-        textarea {
-          font-size: 1.2rem;
-          padding: 1rem; // Adjust padding for smaller screens
-        }
-
-        button {
-          padding: 1rem 1.5rem;
-          font-size: 1.4rem; // Adjust button size for smaller screens
-        }
+      &:hover {
+        background-color: #1e7acb;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
       }
+    }
+
+    // Add a wrapper to center the button
+    .button-wrapper {
+      display: flex;
+      justify-content: center; // Center the button horizontally
     }
   }
 }
