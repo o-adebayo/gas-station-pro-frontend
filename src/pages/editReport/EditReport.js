@@ -30,29 +30,31 @@ const EditReport = () => {
 
   const [report, setReport] = useState(null);
   const [notes, setNotes] = useState("");
-  const [products, setProducts] = useState(null); // State to handle tanks and other products
-  const [imagePreviews, setImagePreviews] = useState([]);
-  const [newImages, setNewImages] = useState([]); // Separate state to handle new images
+  const [products, setProducts] = useState(null);
+  const [imagePreviews, setImagePreviews] = useState([]); // To store the displayable previews
+  const [newImages, setNewImages] = useState([]); // To store newly uploaded images
+  const [existingImages, setExistingImages] = useState([]); // To track already existing images
 
   useEffect(() => {
     if (isLoggedIn && !user) {
-      // Fetch user data if not available
       dispatch(fetchUser());
     }
 
     if (isLoggedIn) {
-      // Fetch the report detail when the user is logged in
       dispatch(getReport(id));
     }
   }, [isLoggedIn, user, dispatch, id]);
 
   useEffect(() => {
     if (reportEdit) {
-      // Set report data and initialize other states
       setReport(reportEdit);
       setNotes(reportEdit.notes || "");
-      setProducts({ ...reportEdit.products }); // Make a shallow copy to ensure mutability
-      setImagePreviews(reportEdit.images ? [...reportEdit.images] : []); // Make a copy of the array
+      setProducts({ ...reportEdit.products });
+
+      // Ensure that existing images are stored and no duplicates are added
+      const uniqueExistingImages = Array.from(new Set(reportEdit.images || []));
+      setExistingImages(uniqueExistingImages); // Store existing images
+      setImagePreviews(uniqueExistingImages); // Set image previews to existing images
     }
   }, [reportEdit]);
 
@@ -63,58 +65,23 @@ const EditReport = () => {
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
-    setNewImages(files);
+    const newPreviews = files.map((file) => URL.createObjectURL(file));
 
-    // Generate image preview for new images
-    const previews = files.map((file) => URL.createObjectURL(file));
-    setImagePreviews((prev) => [...prev, ...previews]);
+    setNewImages((prevNewImages) => [...prevNewImages, ...files]);
+
+    // Add new previews to imagePreviews while ensuring no duplicates with existing images
+    setImagePreviews((prevPreviews) => [
+      ...prevPreviews,
+      ...newPreviews, // Add new image previews
+    ]);
   };
 
-  const handleProductFieldChange = (
-    productType,
-    fieldType,
-    itemId,
-    field,
-    value
-  ) => {
-    // Update specific product (dippingTanks, pumps, etc.) data using _id to identify the right item
-    setProducts((prevProducts) => {
-      // Find the nested field to update using itemId
-      const updatedField = prevProducts[productType][fieldType].map((item) => {
-        console.log("item id", item._id);
-        if (item._id === itemId) {
-          return { ...item, [field]: value }; // Update the specific field (e.g., opening or closing)
-        }
-        return item; // Return unchanged item if it's not the one we're updating
-      });
-
-      return {
-        ...prevProducts,
-        [productType]: {
-          ...prevProducts[productType],
-          [fieldType]: updatedField, // Update the specific fieldType (dippingTanks, pumps, etc.)
-        },
-      };
-    });
-  };
-
-  // Function to handle rate change for a product
-  const handleRateChange = (productType, value) => {
-    setProducts((prevProducts) => ({
-      ...prevProducts,
-      [productType]: {
-        ...prevProducts[productType],
-        rate: value, // Update the rate for the specific product
-      },
-    }));
-  };
-
-  // Save the report after updating products and other fields
   const saveReport = async () => {
-    // Create a new copy of the `updatedImages` array
-    let updatedImages = [...reportEdit.images]; // Use existing images from reportEdit
+    // Start with the existing images from the database (unchanged)
+    let updatedImages = [...existingImages];
 
-    // Handle image upload to Cloudinary for new images
+    // Only upload new images if they exist
+    console.log("new images lenght", newImages.length);
     if (newImages.length > 0) {
       for (const image of newImages) {
         if (
@@ -127,14 +94,16 @@ const EditReport = () => {
           formData.append("cloud_name", cloud_name);
           formData.append("upload_preset", upload_preset);
 
-          // Upload to Cloudinary
           try {
             const response = await fetch(
               `https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`,
               { method: "post", body: formData }
             );
             const imgData = await response.json();
-            updatedImages.push(imgData.url.toString()); // Append only new image URLs
+            // Only add the new image URL if it doesn't already exist in updatedImages
+            if (!updatedImages.includes(imgData.url)) {
+              updatedImages.push(imgData.url);
+            }
           } catch (error) {
             console.error("Image upload failed:", error);
             toast.error("Failed to upload some images. Please try again.");
@@ -143,83 +112,27 @@ const EditReport = () => {
       }
     }
 
-    // Prepare the updated data
+    // Ensure there are no duplicate images
+    const uniqueImages = [...new Set(updatedImages)];
+
+    // Prepare the updated report data
     const updatedData = {
       ...report,
       notes,
-      products, // Include products (dippingTanks, pumps, etc.)
-      images: updatedImages, // Combine existing and newly uploaded images
+      products,
+      images: uniqueImages, // Ensure only unique images
     };
 
-    console.log("Updated data:", updatedData);
+    console.log("Final updated data:", updatedData);
 
     try {
       await dispatch(updateReport({ id, formData: updatedData }));
-      //toast.success("Report updated successfully");
       navigate("/dashboard");
     } catch (error) {
       console.error("Failed to update report:", error);
       toast.error("Failed to update report. Please try again.");
     }
   };
-
-  //const saveReport = async (e) => {
-  //e.preventDefault();
-  /*   const saveReport = async () => {
-    // Create a new copy of the `updatedImages` array
-    let updatedImages = reportEdit.images ? [...reportEdit.images] : [];
-
-    // Handle image upload to Cloudinary for new images
-    if (newImages.length > 0) {
-      for (const image of newImages) {
-        if (
-          image.type === "image/jpeg" ||
-          image.type === "image/jpg" ||
-          image.type === "image/png"
-        ) {
-          const formData = new FormData();
-          formData.append("file", image);
-          //formData.append("cloud_name", "cloud name here");
-          //formData.append("upload_preset", "upload preset value here");
-          formData.append("cloud_name", cloud_name);
-          formData.append("upload_preset", upload_preset);
-
-          // Upload to Cloudinary
-          try {
-            const response = await fetch(
-              `https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`,
-              { method: "post", body: formData }
-            );
-            const imgData = await response.json();
-            updatedImages = [...updatedImages, imgData.url.toString()]; // Update the copy with new image URL
-          } catch (error) {
-            console.error("Image upload failed:", error);
-            toast.error("Failed to upload some images. Please try again.");
-          }
-        }
-      }
-    }
-
-    // Prepare the updated data - now we are sending JSON instead of FormData
-    const updatedData = {
-      ...report,
-      notes,
-      products, // Include products (dippingTanks, pumps, etc.) data
-      images: updatedImages, // Combine existing and newly uploaded images
-    };
-
-    console.log(updatedData);
-
-    try {
-      // Send updatedData as a JSON object instead of FormData
-      await dispatch(updateReport({ id, formData: updatedData }));
-      toast.success("Report updated successfully");
-      navigate("/dashboard");
-    } catch (error) {
-      console.error("Failed to update report:", error);
-      toast.error("Failed to update report. Please try again.");
-    }
-  }; */
 
   return (
     <div>
@@ -232,14 +145,12 @@ const EditReport = () => {
           setNotes={setNotes}
           handleInputChange={handleInputChange}
           handleImageChange={handleImageChange}
-          handleProductFieldChange={handleProductFieldChange}
           saveReport={saveReport}
           setReport={setReport}
           products={products}
           setProducts={setProducts}
-          imagePreviews={imagePreviews}
-          isEditMode={true} // Ensure the date picker is in read-only mode because we don't want users to change the date
-          handleRateChange={handleRateChange} // Added handleRateChange to update rate properly
+          imagePreviews={imagePreviews} // Show previews (both new and existing)
+          isEditMode={true}
         />
       )}
     </div>

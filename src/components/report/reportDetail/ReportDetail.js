@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import useRedirectLoggedOutUser from "../../../customHook/useRedirectLoggedOutUser";
@@ -27,17 +27,28 @@ const ReportDetail = () => {
   const report = useSelector(selectReport);
   const isLoading = useSelector(selectIsLoading);
 
+  const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
+  const [selectedImage, setSelectedImage] = useState(null); // Selected image
+
   useEffect(() => {
     if (isLoggedIn && !user) {
-      // Fetch user data if not available
       dispatch(fetchUser());
     }
 
     if (isLoggedIn) {
-      // Fetch the report detail when the user is logged in
       dispatch(getReport(id));
     }
   }, [isLoggedIn, user, dispatch, id]);
+
+  const openModal = (image) => {
+    setSelectedImage(image);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedImage(null);
+  };
 
   return (
     <div className="report-detail">
@@ -46,20 +57,38 @@ const ReportDetail = () => {
         {isLoading && <SpinnerImg />}
         {report && (
           <div className="detail">
+            {/* Image preview stays at the top */}
             <div className="report-images">
               {report?.images?.length > 0 ? (
-                report.images.map((image, index) => (
+                [...new Set(report.images)].map((image, index) => (
                   <img
                     key={index}
                     src={image}
                     alt={`Report Image ${index + 1}`}
                     className="report-image"
+                    onClick={() => openModal(image)} // Open modal on click
+                    style={{ cursor: "pointer" }} // Change cursor to indicate clickable
                   />
                 ))
               ) : (
                 <p>No images available for this report</p>
               )}
             </div>
+
+            {/* Modal for image popup */}
+            {isModalOpen && selectedImage && (
+              <div className="modal">
+                <span className="close" onClick={closeModal}>
+                  &times;
+                </span>
+                <img
+                  className="modal-content"
+                  src={selectedImage}
+                  alt="Large"
+                />
+              </div>
+            )}
+
             <hr />
             <h4>
               <span className="badge">Store Name: </span> &nbsp;{" "}
@@ -79,6 +108,7 @@ const ReportDetail = () => {
               <b>&rarr; Total Sales (₦) : </b> ₦
               {report.storeTotalSales?.totalSalesDollars || 0}
             </p>
+
             <hr />
             <h4>Sales Summary</h4>
             {report.products ? (
@@ -112,6 +142,7 @@ const ReportDetail = () => {
                         <p>No dipping tank details available.</p>
                       )}
                     </div>
+
                     <div className="detail-item">
                       <h6>Pumps:</h6>
                       {report.products[product]?.pumps?.length > 0 ? (
@@ -133,6 +164,7 @@ const ReportDetail = () => {
                         <p>No pump details available.</p>
                       )}
                     </div>
+
                     <div className="detail-item">
                       <h6>Total Sales Breakdown:</h6>
                       <p>
@@ -161,7 +193,9 @@ const ReportDetail = () => {
             ) : (
               <p>No product details available</p>
             )}
+
             <hr />
+
             <div className="notes-box">
               <h4>Note</h4>
               <div
@@ -170,7 +204,9 @@ const ReportDetail = () => {
                 }}
               ></div>
             </div>
+
             <hr />
+
             <code className="--color-dark --fs-larger">
               Created on: {new Date(report.createdAt).toLocaleString("en-US")}
             </code>

@@ -60,7 +60,6 @@
     }
 
     button {
-      background-color: var(--light-blue);
       color: #fff;
       border: none;
       padding: 1rem;
@@ -70,19 +69,45 @@
       transition: all 0.3s ease;
 
       &.add-tanks {
-        background-color: #1f93ff; // Blue for "Add Tanks"
+        background-color: darken(#ff661f, 10%);
 
         &:hover {
-          background-color: darken(#1f93ff, 10%); // Darken blue on hover
+          background-color: #ff661f; // Orange for Add and Remove Tanks// Darken orange on hover
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+      }
+
+      &.remove-dippingTanks {
+        background-color: #ff661f; // Orange for Add and Remove Tanks
+
+        &:hover {
+          background-color: darken(#ff661f, 10%); // Darken orange on hover
           box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
       }
 
       &.add-pumps {
-        background-color: #f4d03f; // Yellow for "Add Pumps"
+        background-color: darken(#f4d03f, 10%);
+
+        &:hover {
+          background-color: #f4d03f; // Yellow for Add and Remove Pumps
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+      }
+      &.remove-pumps {
+        background-color: #f4d03f; // Yellow for Add and Remove Pumps
 
         &:hover {
           background-color: darken(#f4d03f, 10%); // Darken yellow on hover
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+      }
+
+      &.remove-nozzle {
+        background-color: red; // Red for Remove Nozzle
+
+        &:hover {
+          background-color: darken(red, 10%); // Darken red on hover
           box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
       }

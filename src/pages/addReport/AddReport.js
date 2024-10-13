@@ -10,9 +10,13 @@ import ReportForm from "../../components/report/reportForm/ReportForm";
 import { toast } from "react-toastify";
 import {
   selectUser,
-  fetchUser, // Import the thunk action for fetching user data
+  fetchUser,
   selectIsLoggedIn,
 } from "../../redux/features/auth/authSlice";
+import {
+  fetchStoreLocations,
+  selectStores,
+} from "../../redux/features/storeLocation/storeLocationSlice";
 
 const cloud_name = process.env.REACT_APP_CLOUDINARY_CLOUD_NAME;
 const upload_preset = process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET;
@@ -41,7 +45,8 @@ const initialState = {
   },
   storeTotalSales: { totalSalesLiters: 0, totalSalesDollars: 0 },
   notes: "",
-  images: [],
+  images: [], // Handle images separately
+  storeId: "", // Store ID for associating report with a store
 };
 
 const AddReport = () => {
@@ -50,11 +55,16 @@ const AddReport = () => {
   const [report, setReport] = useState(initialState);
   const [notes, setNotes] = useState("");
   const [imagePreviews, setImagePreviews] = useState([]); // For image preview
+  const [newImages, setNewImages] = useState([]); // Separate state for new image uploads
   const [isLoading, setIsLoading] = useState(false);
 
   const loadingState = useSelector(selectIsLoading);
   const user = useSelector(selectUser);
   const isLoggedIn = useSelector(selectIsLoggedIn);
+
+  // Fetch stores for dropdown selection
+  const storesData = useSelector(selectStores);
+  const stores = storesData?.stores || [];
 
   const [isCollapsed, setIsCollapsed] = useState(true);
 
@@ -69,6 +79,13 @@ const AddReport = () => {
     }
   }, [isLoggedIn, user, dispatch]);
 
+  // Fetch store locations based on company code if logged in
+  useEffect(() => {
+    if (user?.companyCode) {
+      dispatch(fetchStoreLocations(user.companyCode)); // Fetch stores for this company
+    }
+  }, [dispatch, user]);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setReport({ ...report, [name]: value });
@@ -76,16 +93,13 @@ const AddReport = () => {
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
-    setReport({ ...report, images: files });
+    setNewImages(files); // Update only new images
 
-    // Generate image preview
+    // Generate image preview for new images
     const previews = files.map((file) => URL.createObjectURL(file));
-    setImagePreviews(previews);
+    setImagePreviews((prev) => [...prev, ...previews]); // Append to existing previews
   };
 
-  //const saveReport = async (e) => {
-  // e.preventDefault();
-  //setIsLoading(true);
   const saveReport = async () => {
     setIsLoading(true);
 
@@ -101,6 +115,7 @@ const AddReport = () => {
       },
       notes: notes || "", // Ensure notes is provided
       images: [], // Handle images separately
+      storeId: report.storeId, // Use the storeId from the report object
     };
 
     // Iterate over each product to calculate sales and totals
@@ -172,10 +187,10 @@ const AddReport = () => {
     formattedData.storeTotalSales.totalSalesDollars = storeTotalDollars || 0;
 
     try {
-      // Handle image upload to Cloudinary if there are images
+      // Handle image upload to Cloudinary if there are new images
       let uploadedImages = [];
-      if (report.images && report.images.length > 0) {
-        for (const image of report.images) {
+      if (newImages.length > 0) {
+        for (const image of newImages) {
           if (
             image.type === "image/jpeg" ||
             image.type === "image/jpg" ||
@@ -183,8 +198,6 @@ const AddReport = () => {
           ) {
             const formData = new FormData();
             formData.append("file", image);
-            //formData.append("cloud_name", "cloud name here");
-            //formData.append("upload_preset", "preset value here");
             formData.append("cloud_name", cloud_name);
             formData.append("upload_preset", upload_preset);
 
@@ -198,6 +211,7 @@ const AddReport = () => {
           }
         }
       }
+
       formattedData.images = uploadedImages;
 
       // Dispatch the JSON data directly
@@ -213,9 +227,6 @@ const AddReport = () => {
   return (
     <div>
       {(isLoading || loadingState) && <Loader />}
-      {/* <h3 className="text-large primary-100">Add New Sales Report</h3> */}
-
-      {/* Step-by-step instructions for the user */}
       <div className="instructions">
         <h4 onClick={toggleInstructions} className="instructions__toggle">
           Instructions (Click to expand/collapse)
@@ -246,6 +257,8 @@ const AddReport = () => {
         saveReport={saveReport}
         setReport={setReport}
         imagePreviews={imagePreviews}
+        stores={stores} // Pass fetched stores to the form for dropdown
+        user={user} // Pass the user to check for admin role
       />
     </div>
   );

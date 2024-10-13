@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import "./ReportForm.scss";
@@ -17,9 +17,24 @@ const ReportForm = ({
   setReport,
   imagePreviews,
   isEditMode,
+  user, // Add user prop to check if the user is Admin
+  stores, // Pass stores as prop for the Admin to select
 }) => {
   const [validationError, setValidationError] = useState("");
   const [dateMismatch, setDateMismatch] = useState(false);
+  const [selectedStore, setSelectedStore] = useState(""); // State for store selection
+
+  useEffect(() => {
+    if (isEditMode) {
+      // If editing an existing report, set the selected store (if any)
+      setSelectedStore(report.storeId || "");
+    }
+  }, [isEditMode, report]);
+
+  const handleStoreSelect = (e) => {
+    setSelectedStore(e.target.value);
+    setReport({ ...report, storeId: e.target.value }); // Update report with selected store ID
+  };
 
   const handleAddField = (product, type) => {
     if (type === "pumps") {
@@ -304,6 +319,27 @@ const ReportForm = ({
     <div className="add-report">
       <Card cardClass={"card"}>
         <form onSubmit={handleSaveReport}>
+          {/* Show store selection for Admin users */}
+          {user?.role === "admin" && (
+            <>
+              <label>
+                Select Store: <span className="asterisk">*</span>
+              </label>
+              <select
+                name="storeId"
+                value={report.storeId}
+                onChange={handleInputChange}
+                required
+              >
+                <option value="">Select Store</option>
+                {stores.map((store) => (
+                  <option key={store._id} value={store._id}>
+                    {store.name}
+                  </option>
+                ))}
+              </select>
+            </>
+          )}
           {!isEditMode && (
             <>
               <label>
@@ -316,6 +352,7 @@ const ReportForm = ({
                 onChange={handleInputChange}
                 required
               />
+              <hr />
             </>
           )}
 
@@ -378,6 +415,7 @@ const ReportForm = ({
                                 />
                                 <button
                                   type="button"
+                                  className="remove-nozzle"
                                   onClick={() =>
                                     handleRemoveNozzle(
                                       product,
@@ -429,6 +467,7 @@ const ReportForm = ({
                         )}
                         <button
                           type="button"
+                          className={`remove-${type}`}
                           onClick={() =>
                             handleRemoveField(product, type, field.id)
                           }
@@ -439,6 +478,9 @@ const ReportForm = ({
                     ))}
                     <button
                       type="button"
+                      className={
+                        type === "dippingTanks" ? "add-tanks" : "add-pumps"
+                      }
                       onClick={() => handleAddField(product, type)}
                     >
                       Add {type.charAt(0).toUpperCase() + type.slice(1)}
@@ -638,7 +680,7 @@ const ReportForm = ({
           )}
 
           <div className="--my">
-            <button type="submit" className="--btn --btn-primary">
+            <button type="submit" className="text-reg navigation__cta">
               Save Report
             </button>
           </div>
