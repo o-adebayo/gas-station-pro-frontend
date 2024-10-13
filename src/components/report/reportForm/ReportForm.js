@@ -174,9 +174,6 @@ const ReportForm = ({
 
   const validateForm = () => {
     let atLeastOneProductComplete = false;
-    let allProductComplete = true;
-    let errors = [];
-    let warnings = [];
 
     for (const productKey in report.products) {
       const product = report.products[productKey];
@@ -184,51 +181,66 @@ const ReportForm = ({
         product.dippingTanks && product.dippingTanks.length > 0;
       const pumpsAdded = product.pumps && product.pumps.length > 0;
 
-      // Error: If DippingTanks is added, but Pumps are not added
+      // If DippingTanks is added, but Pumps is not, show validation error
       if (dippingTanksAdded && !pumpsAdded) {
-        errors.push(
-          `Please add Pumps for ${productKey} if DippingTanks are added.`
+        setValidationError(
+          `Please add Pumps for ${productKey} if DippingTanks is added.`
         );
+        return false;
       }
 
-      // Error: If Pumps are added, but DippingTanks are not added
+      // If Pumps is added, but DippingTanks is not, show validation error
       if (pumpsAdded && !dippingTanksAdded) {
-        errors.push(
-          `Please add DippingTanks for ${productKey} if Pumps are added.`
+        setValidationError(
+          `Please add DippingTanks for ${productKey} if Pumps is added.`
         );
+        return false;
       }
 
-      // Error: DippingTanks closing value must be less than opening value
-      if (dippingTanksAdded) {
-        product.dippingTanks.forEach((tank) => {
-          if (parseFloat(tank.closing) > parseFloat(tank.opening)) {
-            errors.push(
-              `${productKey}: DippingTank closing value must be less than opening value.`
-            );
-          }
-        });
-      }
-
-      // Error: Pump Nozzle opening value must be less than closing value
-      if (pumpsAdded) {
-        product.pumps.forEach((pump) => {
-          pump.nozzles?.forEach((nozzle) => {
-            if (parseFloat(nozzle.opening) > parseFloat(nozzle.closing)) {
-              errors.push(
-                `${productKey}: Nozzle opening value must be less than closing value.`
-              );
-            }
-          });
-        });
-      }
-
-      // **Validate product rate**: Rate must be a positive value
+      // If both fields are added, validate the fields
       if (dippingTanksAdded || pumpsAdded) {
-        if (!product.rate || product.rate <= 0) {
-          errors.push(`Please enter a valid rate for ${productKey}.`);
+        for (const type of ["dippingTanks", "pumps"]) {
+          const fields = product[type] || [];
+          for (const field of fields) {
+            if (type === "pumps") {
+              for (const nozzle of field.nozzles) {
+                if (!nozzle.opening || !nozzle.closing) {
+                  setValidationError(
+                    "All nozzle fields must have opening and closing values."
+                  );
+                  return false;
+                }
+                if (parseFloat(nozzle.opening) > parseFloat(nozzle.closing)) {
+                  setValidationError(
+                    `For ${productKey}, each nozzle's closing must be greater than its opening.`
+                  );
+                  return false;
+                }
+              }
+            } else {
+              if (!field.opening || !field.closing) {
+                setValidationError(
+                  "All tank fields must have opening and closing values."
+                );
+                return false;
+              }
+              if (parseFloat(field.closing) > parseFloat(field.opening)) {
+                setValidationError(
+                  `For ${productKey}, the closing value for tanks must be less than the opening value.`
+                );
+                return false;
+              }
+            }
+          }
         }
 
-        // **Validate total sales breakdown (POS, cash, expenses)**
+        // Validate product rate
+        if (!product.rate) {
+          setValidationError(`Please enter the rate for ${productKey}.`);
+          return false;
+        }
+
+        // Validate total sales breakdown (POS, cash, expenses)
         const breakdown = product.totalSalesBreakdown || {};
         if (
           !breakdown.pos ||
@@ -238,105 +250,43 @@ const ReportForm = ({
           breakdown.cash === "" ||
           breakdown.expenses === ""
         ) {
-          errors.push(
-            `POS, Cash, Expenses details are missing or invalid for ${productKey}.`
+          setValidationError(
+            `Please enter POS, cash, and expenses for ${productKey}.`
           );
+          return false;
         }
 
-        // Mark at least one product as complete if all critical data is provided
-        if (
-          product.rate > 0 &&
-          breakdown.pos > 0 &&
-          breakdown.cash > 0 &&
-          breakdown.expenses >= 0
-        ) {
-          atLeastOneProductComplete = true;
-        } else {
-          allProductComplete = false; // If any product is missing complete data
-        }
+        // Mark this product as complete if all checks pass
+        atLeastOneProductComplete = true;
       }
     }
 
-    // Prevent submission if no complete product exists
     if (!atLeastOneProductComplete) {
-      errors.push("At least one product sales detail is required.");
+      setValidationError("At least one product sales detail is required.");
+      return false;
     }
 
-    // Return errors if any exist, otherwise return warnings
-    if (errors.length > 0) {
-      return { isValid: false, errors };
-    }
-
-    return { isValid: true, warnings, allProductComplete };
+    setValidationError("");
+    return true;
   };
 
   const handleSaveReport = (e) => {
     e.preventDefault();
-    const validationResult = validateForm();
+    const formIsValid = validateForm();
     const dateIsValid = validateDate();
 
-    if (!validationResult.isValid) {
-      // Handle form validation errors: prevent submission
-      confirmAlert({
-        title: "Form Errors",
-        message: validationResult.errors.join("\n"),
-        buttons: [
-          {
-            label: "OK",
-          },
-        ],
-      });
-    } else {
-      // Show warnings if any, but allow submission
-      const warnings = validationResult.warnings;
-      const allProductComplete = validationResult.allProductComplete;
-      const dateWarning = !dateIsValid
-        ? "Warning: The selected date is not today's date.\n"
-        : "";
-
-      // If all products are complete and date is valid, confirm submission without warnings
-      if (allProductComplete && dateIsValid) {
-        confirmFinalSave();
-      } else if (warnings.length > 0 || !dateIsValid) {
-        // Show warning for incomplete products or incorrect date
-        confirmAlert({
-          title: "Incomplete Product Data",
-          message: `${dateWarning}${warnings.join(
-            "\n"
-          )}\n\nDo you still want to save the report?`,
-          buttons: [
-            {
-              label: "Yes, Save",
-              onClick: () => confirmFinalSave(), // Allow saving despite warnings
-            },
-            {
-              label: "Cancel",
-            },
-          ],
-        });
+    if (formIsValid) {
+      if (!dateIsValid) {
+        // If the date is not today's date, show the confirmation window
+        confirmSubmit(
+          "The selected date is not today. Do you still want to proceed?"
+        );
       } else {
-        // Proceed to final confirmation if there's no warning but at least one product is complete
-        confirmFinalSave();
+        confirmSubmit(
+          "Please confirm that you have entered all your sales data correctly?"
+        );
       }
     }
-  };
-
-  // Final confirmation before saving the report
-  const confirmFinalSave = () => {
-    confirmAlert({
-      title: "Final Confirmation",
-      message:
-        "Please confirm that you have entered all your sales data correctly.",
-      buttons: [
-        {
-          label: "Yes, Save",
-          onClick: () => saveReport(), // Proceed with saving the report
-        },
-        {
-          label: "Cancel",
-        },
-      ],
-    });
   };
 
   const calculateActualTotal = (pos, cash, expenses) => {
