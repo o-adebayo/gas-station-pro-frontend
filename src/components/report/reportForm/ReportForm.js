@@ -3,9 +3,9 @@ import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import "./ReportForm.scss";
 import Card from "../../card/Card";
-import { v4 as uuidv4 } from "uuid";
 import { confirmAlert } from "react-confirm-alert"; // Import
-import "react-confirm-alert/src/react-confirm-alert.css"; // Import CSS new file
+import "react-confirm-alert/src/react-confirm-alert.css"; // Import CSS
+import { v4 as uuidv4 } from "uuid";
 
 const ReportForm = ({
   report,
@@ -23,7 +23,7 @@ const ReportForm = ({
 
   const handleAddField = (product, type) => {
     if (type === "pumps") {
-      const newPump = { id: uuidv4(), nozzles: [] };
+      const newPump = { _id: uuidv4(), nozzles: [] }; // Using _id instead of id to be consistent
       setReport((prevState) => ({
         ...prevState,
         products: {
@@ -34,10 +34,10 @@ const ReportForm = ({
           },
         },
       }));
-      handleAddNozzle(product, newPump.id);
-      handleAddNozzle(product, newPump.id);
+      handleAddNozzle(product, newPump._id);
+      handleAddNozzle(product, newPump._id);
     } else {
-      const newField = { id: uuidv4(), opening: "", closing: "" };
+      const newField = { _id: uuidv4(), opening: "", closing: "" }; // Using _id instead of id
       setReport((prevState) => ({
         ...prevState,
         products: {
@@ -52,7 +52,7 @@ const ReportForm = ({
   };
 
   const handleAddNozzle = (product, pumpId) => {
-    const newNozzle = { id: uuidv4(), opening: "", closing: "" };
+    const newNozzle = { _id: uuidv4(), opening: "", closing: "" }; // Using _id instead of id
     setReport((prevState) => ({
       ...prevState,
       products: {
@@ -60,7 +60,7 @@ const ReportForm = ({
         [product]: {
           ...prevState.products[product],
           pumps: prevState.products[product].pumps?.map((pump) =>
-            pump.id === pumpId
+            pump._id === pumpId
               ? { ...pump, nozzles: [...(pump.nozzles || []), newNozzle] }
               : pump
           ),
@@ -77,7 +77,7 @@ const ReportForm = ({
         [product]: {
           ...prevState.products[product],
           [type]: prevState.products[product][type]?.filter(
-            (field) => field.id !== id
+            (field) => field._id !== id
           ),
         },
       },
@@ -92,11 +92,11 @@ const ReportForm = ({
         [product]: {
           ...prevState.products[product],
           pumps: prevState.products[product].pumps?.map((pump) =>
-            pump.id === pumpId
+            pump._id === pumpId
               ? {
                   ...pump,
                   nozzles: pump.nozzles?.filter(
-                    (nozzle) => nozzle.id !== nozzleId
+                    (nozzle) => nozzle._id !== nozzleId
                   ),
                 }
               : pump
@@ -114,7 +114,7 @@ const ReportForm = ({
         [product]: {
           ...prevState.products[product],
           [type]: prevState.products[product][type]?.map((fieldItem) =>
-            fieldItem.id === id ? { ...fieldItem, [field]: value } : fieldItem
+            fieldItem._id === id ? { ...fieldItem, [field]: value } : fieldItem
           ),
         },
       },
@@ -129,11 +129,11 @@ const ReportForm = ({
         [product]: {
           ...prevState.products[product],
           pumps: prevState.products[product].pumps?.map((pump) =>
-            pump.id === pumpId
+            pump._id === pumpId
               ? {
                   ...pump,
                   nozzles: pump.nozzles?.map((nozzle) =>
-                    nozzle.id === nozzleId
+                    nozzle._id === nozzleId
                       ? { ...nozzle, [field]: value }
                       : nozzle
                   ),
@@ -282,10 +282,12 @@ const ReportForm = ({
           "The selected date is not today. Do you still want to proceed?"
         );
       } else {
-        confirmSubmit(
-          "Some products do not have sales data. Do you still want to save the report?"
-        );
+        // Proceed without confirmation since everything is valid
+        saveReport();
       }
+    } else {
+      // Handle form validation errors (optional step if needed)
+      console.log("Form is invalid. Please check the required fields.");
     }
   };
 
@@ -306,7 +308,9 @@ const ReportForm = ({
         <form onSubmit={handleSaveReport}>
           {!isEditMode && (
             <>
-              <label>Date:</label>
+              <label>
+                Date: <span className="asterisk">*</span>
+              </label>
               <input
                 type="date"
                 name="date"
@@ -330,12 +334,12 @@ const ReportForm = ({
                       {fields.length})
                     </label>
                     {fields.map((field, pumpIndex) => (
-                      <div key={field.id}>
+                      <div key={field._id}>
                         {type === "pumps" ? (
                           <>
                             <h5>Pump</h5>
                             {field.nozzles?.map((nozzle, nozzleIndex) => (
-                              <div key={nozzle.id}>
+                              <div key={nozzle._id}>
                                 <input
                                   type="text"
                                   placeholder={getNozzlePlaceholder(
@@ -348,8 +352,8 @@ const ReportForm = ({
                                   onChange={(e) =>
                                     handleNozzleChange(
                                       product,
-                                      field.id,
-                                      nozzle.id,
+                                      field._id,
+                                      nozzle._id,
                                       "opening",
                                       e.target.value
                                     )
@@ -367,8 +371,8 @@ const ReportForm = ({
                                   onChange={(e) =>
                                     handleNozzleChange(
                                       product,
-                                      field.id,
-                                      nozzle.id,
+                                      field._id,
+                                      nozzle._id,
                                       "closing",
                                       e.target.value
                                     )
@@ -379,8 +383,8 @@ const ReportForm = ({
                                   onClick={() =>
                                     handleRemoveNozzle(
                                       product,
-                                      field.id,
-                                      nozzle.id
+                                      field._id,
+                                      nozzle._id
                                     )
                                   }
                                 >
@@ -401,7 +405,7 @@ const ReportForm = ({
                                 handleFieldChange(
                                   product,
                                   type,
-                                  field.id,
+                                  field._id,
                                   "opening",
                                   e.target.value
                                 )
@@ -417,7 +421,7 @@ const ReportForm = ({
                                 handleFieldChange(
                                   product,
                                   type,
-                                  field.id,
+                                  field._id,
                                   "closing",
                                   e.target.value
                                 )
@@ -428,7 +432,7 @@ const ReportForm = ({
                         <button
                           type="button"
                           onClick={() =>
-                            handleRemoveField(product, type, field.id)
+                            handleRemoveField(product, type, field._id)
                           }
                         >
                           Remove {type.charAt(0).toUpperCase() + type.slice(1)}
