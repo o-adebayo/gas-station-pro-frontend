@@ -43,6 +43,15 @@
     rgba(1, 115, 115, 1) 0%,
     rgba(170, 217, 209, 1) 100%
   );
+
+  /* use the below if we want the gradient to use blue instead but we need to update image colours too for the landing page */
+  /*   --gradient-bg: rgb(0, 123, 255);
+  --gradient: linear-gradient(
+    25deg,
+    rgba(0, 123, 255, 1) 0%, 
+    rgba(170, 217, 209, 1) 100%  
+  );
+ */
 }
 
 /* General reset and smooth scroll */

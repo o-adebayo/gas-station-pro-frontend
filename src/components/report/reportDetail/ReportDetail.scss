@@ -1,16 +1,16 @@
 .report-detail {
   margin-bottom: 5rem;
   width: 100%;
-  max-width: 1200px; /* Increase the max-width for a wider layout */
+  max-width: 1200px;
   padding: 2rem;
   background-color: #ffffff;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  margin: 0 auto; /* Center the report detail in the middle */
+  margin: 0 auto;
 
   .card {
     width: 100%;
-    padding: 2rem; /* Adjust padding */
+    padding: 2rem;
     border-radius: 12px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   }
@@ -45,17 +45,18 @@
       overflow-x: auto;
 
       .report-image {
-        max-height: 300px; /* Increase image size */
-        max-width: 400px; /* Increase image width */
+        max-height: 100px; /* Set smaller initial height */
+        max-width: 150px; /* Set smaller initial width */
         object-fit: cover;
         border-radius: 8px;
         border: 1px solid #e6e6e6;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s;
-      }
+        transition: transform 0.3s, box-shadow 0.3s;
 
-      .report-image:hover {
-        transform: scale(1.05); /* Slightly increase the scale on hover */
+        &:hover {
+          transform: scale(1.1); /* Slight zoom on hover */
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Slight shadow on hover */
+        }
       }
     }
 
@@ -73,7 +74,7 @@
       }
 
       h5 {
-        font-size: 1.7rem; /* Increase font size */
+        font-size: 1.7rem;
         font-weight: bold;
         color: var(--color-primary);
         margin-bottom: 1rem;
@@ -90,7 +91,7 @@
       .product-details {
         display: flex;
         flex-wrap: wrap;
-        gap: 1.5rem; /* Increase the gap between details */
+        gap: 1.5rem;
 
         .detail-item {
           flex: 1;
@@ -100,7 +101,7 @@
           box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 
           p {
-            font-size: 1.6rem; /* Increase font size */
+            font-size: 1.6rem;
             margin: 0.5rem 0;
           }
         }
@@ -110,7 +111,7 @@
 
   .notes-box {
     border: 1px solid var(--light-blue);
-    padding: 2rem; /* Increase padding */
+    padding: 2rem;
     border-radius: 8px;
     background-color: #f9f9f9;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -120,7 +121,7 @@
       margin-bottom: 1rem;
       color: var(--dark-blue);
       font-weight: 600;
-      font-size: 1.8rem; /* Increase font size */
+      font-size: 1.8rem;
     }
 
     div {
@@ -136,12 +137,12 @@
   }
 
   h4 {
-    font-size: 1.8rem; /* Increase font size */
+    font-size: 1.8rem;
   }
 
   h5,
   h6 {
-    font-size: 1.6rem; /* Increase font size */
+    font-size: 1.6rem;
   }
 
   hr {
@@ -153,13 +154,14 @@
   code {
     display: block;
     background-color: #f1f4f8;
-    padding: 1rem; /* Increase padding */
+    padding: 1rem;
     border-radius: 8px;
-    font-size: 1.3rem; /* Increase font size */
+    font-size: 1.3rem;
     color: var(--color-dark);
     margin-top: 1.5rem;
   }
 }
+
 .modal {
   display: flex;
   position: fixed;
@@ -168,32 +170,54 @@
   top: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.8); /* Dark background */
+  background-color: rgba(0, 0, 0, 0.8);
   align-items: center;
   justify-content: center;
-  transition: opacity 0.3s ease-in-out; /* Add a transition for fade-in effect */
+  transition: opacity 0.3s ease-in-out;
+
+  .modal-content {
+    max-width: 80%;
+    max-height: 80%;
+    border-radius: 8px;
+    object-fit: contain;
+  }
+
+  .close {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    color: #fff;
+    font-size: 40px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .close:hover,
+  .close:focus {
+    color: #ccc;
+    text-decoration: none;
+    cursor: pointer;
+  }
 }
 
-.modal-content {
-  max-width: 80%;
-  max-height: 80%;
-  border-radius: 8px;
-  object-fit: contain;
+.button-group {
+  display: flex;
+  justify-content: flex-start;
+  gap: 1rem;
+  margin-top: 2rem;
 }
 
-.close {
-  position: absolute;
-  top: 20px;
-  right: 30px;
-  color: #fff;
-  font-size: 40px;
-  font-weight: bold;
+.cancel-btn {
+  background-color: #f44336;
+  color: white;
+  height: 56px;
+  width: 167px;
+  padding: 10px 20px;
+  border: none;
   cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
 }
 
-.close:hover,
-.close:focus {
-  color: #ccc;
-  text-decoration: none;
-  cursor: pointer;
+.cancel-btn:hover {
+  background-color: #e53935;
 }

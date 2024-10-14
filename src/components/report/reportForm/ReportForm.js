@@ -6,6 +6,7 @@ import Card from "../../card/Card";
 import { v4 as uuidv4 } from "uuid";
 import { confirmAlert } from "react-confirm-alert"; // Import
 import "react-confirm-alert/src/react-confirm-alert.css"; // Import CSS
+import { Link, Navigate, useNavigate } from "react-router-dom";
 
 const ReportForm = ({
   report,
@@ -23,6 +24,8 @@ const ReportForm = ({
   const [validationError, setValidationError] = useState("");
   const [dateMismatch, setDateMismatch] = useState(false);
   const [selectedStore, setSelectedStore] = useState(""); // State for store selection
+
+  const navigate = useNavigate(); // Initialize useNavigate
 
   useEffect(() => {
     if (isEditMode) {
@@ -349,6 +352,10 @@ const ReportForm = ({
   const getNozzlePlaceholder = (product, pumpIndex, nozzleIndex, field) => {
     const letter = String.fromCharCode(65 + nozzleIndex); // Convert 0 -> A, 1 -> B, etc.
     return `${product} Nozzle ${pumpIndex + 1}${letter} ${field}`;
+  };
+
+  const handleCancel = () => {
+    navigate("/dashboard"); // Navigate to dashboard on cancel
   };
 
   return (
@@ -715,9 +722,16 @@ const ReportForm = ({
             </div>
           )}
 
-          <div className="--my">
+          <div className="button-group">
             <button type="submit" className="text-reg navigation__cta">
               Save Report
+            </button>
+            <button
+              type="button"
+              className="text-reg cancel-btn"
+              onClick={handleCancel}
+            >
+              Cancel
             </button>
           </div>
         </form>

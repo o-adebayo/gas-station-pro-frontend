@@ -62,7 +62,7 @@ const ChangeStatus = ({ _id, email }) => {
           <option value="inactive">Inactive</option>
           <option value="suspended">Suspended</option>
         </select>
-        <button className="--btn --btn-primary">
+        <button className="--btn --btn-primary" title="Save">
           <FaCheck size={15} />
         </button>
       </form>

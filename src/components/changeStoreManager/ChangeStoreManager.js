@@ -67,6 +67,7 @@ const ChangeStoreManager = ({ storeId }) => {
         <button
           className="--btn --btn-primary"
           style={{ height: "40px" }} // Ensure button height matches the input field
+          title="Save"
         >
           <FaCheck size={15} />
         </button>

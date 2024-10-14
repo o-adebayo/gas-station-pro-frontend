@@ -15,15 +15,18 @@ const SidebarItem = ({ item, isOpen }) => {
           expandMenu ? "sidebar-item s-parent open" : "sidebar-item s-parent"
         }
       >
-        <div className="sidebar-title">
+        {/* Make the whole title clickable to expand/collapse */}
+        <div
+          className="sidebar-title"
+          onClick={() => setExpandMenu(!expandMenu)}
+        >
           <span>
             {item.icon && <div className="icon">{item.icon}</div>}
             {isOpen && <div>{item.title}</div>}
           </span>
           <MdKeyboardArrowRight
             size={25}
-            className="arrow-icon"
-            onClick={() => setExpandMenu(!expandMenu)}
+            className={`arrow-icon ${expandMenu ? "open" : ""}`}
           />
         </div>
         <div className="sidebar-content">

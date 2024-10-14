@@ -59,7 +59,7 @@ const AdminSetPassword = ({ _id, email }) => {
           value={userPassword}
           onChange={(e) => setUserPassword(e.target.value)}
         />
-        <button className="--btn --btn-primary">
+        <button className="--btn --btn-primary" title="Save">
           <FaCheck size={15} />
         </button>
       </form>

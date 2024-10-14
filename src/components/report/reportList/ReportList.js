@@ -95,6 +95,28 @@ const ReportList = ({ reports, isLoading }) => {
           <span>
             <h3>Sales Reports</h3>
           </span>
+
+          {/* Date range filter */}
+          <div className="date-filter --flex-between">
+            <div className="--flex-dir-row --align-center">
+              <label htmlFor="startDate">Start Date:</label>
+              <input
+                type="date"
+                id="startDate"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+              />
+            </div>
+            <div className="--flex-dir-row --align-center">
+              <label htmlFor="endDate">End Date:</label>
+              <input
+                type="date"
+                id="endDate"
+                value={endDate || startDate} // Default to the start date if no end date
+                onChange={(e) => setEndDate(e.target.value)}
+              />
+            </div>
+          </div>
           <span>
             <Search
               value={search}
@@ -102,28 +124,6 @@ const ReportList = ({ reports, isLoading }) => {
               onChange={(e) => setSearch(e.target.value)}
             />
           </span>
-        </div>
-
-        {/* Date range filter */}
-        <div className="date-filter --flex-between">
-          <div className="--flex-dir-row --align-center">
-            <label htmlFor="startDate">Start Date:</label>
-            <input
-              type="date"
-              id="startDate"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-            />
-          </div>
-          <div className="--flex-dir-row --align-center">
-            <label htmlFor="endDate">End Date:</label>
-            <input
-              type="date"
-              id="endDate"
-              value={endDate || startDate} // Default to the start date if no end date
-              onChange={(e) => setEndDate(e.target.value)}
-            />
-          </div>
         </div>
 
         {isLoading && <SpinnerImg />}
@@ -183,17 +183,17 @@ const ReportList = ({ reports, isLoading }) => {
                           0}
                       </td>
                       <td className="icons">
-                        <span>
+                        <span title="View Report">
                           <Link to={`/report-detail/${_id}`}>
                             <AiOutlineEye size={25} color={"purple"} />
                           </Link>
                         </span>
-                        <span>
+                        <span title="Edit Report">
                           <Link to={`/edit-report/${_id}`}>
                             <FaEdit size={20} color={"green"} />
                           </Link>
                         </span>
-                        <span>
+                        <span title="Delete Report">
                           <FaTrashAlt
                             size={20}
                             color={"red"}

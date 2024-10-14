@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import useRedirectLoggedOutUser from "../../../customHook/useRedirectLoggedOutUser";
 import {
   selectIsLoggedIn,
@@ -21,6 +21,7 @@ const ReportDetail = () => {
   useRedirectLoggedOutUser("/login");
   const dispatch = useDispatch();
   const { id } = useParams();
+  const navigate = useNavigate(); // Initialize useNavigate
 
   const isLoggedIn = useSelector(selectIsLoggedIn);
   const user = useSelector(selectUser);
@@ -48,6 +49,14 @@ const ReportDetail = () => {
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedImage(null);
+  };
+
+  const handleBack = () => {
+    navigate("/dashboard");
+  };
+
+  const handleEdit = () => {
+    navigate(`/edit-report/${id}`); // Navigate to edit report page with the report ID
   };
 
   return (
@@ -215,6 +224,23 @@ const ReportDetail = () => {
             <code className="--color-dark --fs-larger">
               Last Updated: {new Date(report.updatedAt).toLocaleString("en-US")}
             </code>
+            {/* Back and Edit buttons */}
+            <div className="button-group">
+              <button
+                type="button"
+                className="text-reg cancel-btn"
+                onClick={handleBack}
+              >
+                Back
+              </button>
+              <button
+                type="button"
+                className="text-reg navigation__cta"
+                onClick={handleEdit}
+              >
+                Edit Report
+              </button>
+            </div>
           </div>
         )}
       </Card>

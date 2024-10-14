@@ -60,7 +60,7 @@ const ChangeRole = ({ _id, email }) => {
           <option value="user">User</option>
           <option value="admin">Admin</option>
         </select>
-        <button className="--btn --btn-primary">
+        <button className="--btn --btn-primary" title="Save">
           <FaCheck size={15} />
         </button>
       </form>

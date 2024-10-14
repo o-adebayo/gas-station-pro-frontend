@@ -101,7 +101,7 @@ export const UserName = () => {
 
   return (
     <h3>
-      <span className="--fw-thin">Hi, </span>
+      <span className="--color-white">Hi, </span>
       <span className="--color-danger">{shortenText(username, 10)}</span>
     </h3>
   );

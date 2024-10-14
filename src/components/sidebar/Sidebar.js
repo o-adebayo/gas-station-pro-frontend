@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./Sidebar.scss";
-import { HiMenuAlt3 } from "react-icons/hi";
 import { MdOutlineGasMeter } from "react-icons/md";
+import { RiExpandLeftFill, RiExpandRightFill } from "react-icons/ri"; // Import new icons
 import menu from "../../data/sidebar";
 import SidebarItem from "./SidebarItem";
 import { useNavigate } from "react-router-dom";
@@ -18,7 +18,9 @@ const Sidebar = ({ children }) => {
 
   return (
     <div className="layout">
-      <div className="sidebar" style={{ width: isOpen ? "260px" : "60px" }}>
+      <div className="sidebar" style={{ width: isOpen ? "270px" : "60px" }}>
+        {" "}
+        {/* always update line 60 padding left to be same value as side bar open */}
         <div className="top_section">
           <div className="logo" style={{ display: isOpen ? "block" : "none" }}>
             <MdOutlineGasMeter
@@ -31,10 +33,16 @@ const Sidebar = ({ children }) => {
           <div
             className="bars"
             style={{ marginLeft: isOpen ? "100px" : "0px" }}
+            onClick={toggle} // Click to toggle sidebar
           >
-            <HiMenuAlt3 onClick={toggle} />
+            {isOpen ? (
+              <RiExpandLeftFill size={35} /> // Left arrow when sidebar is open
+            ) : (
+              <RiExpandRightFill size={35} /> // Right arrow when sidebar is collapsed
+            )}
           </div>
         </div>
+        {/* Render all non-Help menu items */}
         {menu.map((item, index) => {
           // Check if the item is admin-specific and wrap it with AdminMenu
           if (item.isAdmin) {
@@ -50,7 +58,7 @@ const Sidebar = ({ children }) => {
       </div>
       <main
         style={{
-          paddingLeft: isOpen ? "230px" : "60px",
+          paddingLeft: isOpen ? "270px" : "60px",
           transition: "all .5s",
         }}
       >
