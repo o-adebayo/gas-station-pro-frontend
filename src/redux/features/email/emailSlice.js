@@ -53,7 +53,7 @@ const emailSlice = createSlice({
         state.sendingEmail = false;
         state.emailSent = false;
         state.msg = action.payload;
-        toast.success(action.payload);
+        toast.error(action.payload);
       });
   },
 });

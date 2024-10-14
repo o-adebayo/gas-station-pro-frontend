@@ -14,6 +14,14 @@ import {
   fetchUser,
   selectUser,
 } from "../../redux/features/auth/authSlice";
+import {
+  getCompanyByCode,
+  selectCompany,
+} from "../../redux/features/company/companySlice";
+import {
+  EMAIL_RESET,
+  sendAutomatedEmail,
+} from "../../redux/features/email/emailSlice";
 import { toast } from "react-toastify";
 
 const cloud_name = process.env.REACT_APP_CLOUDINARY_CLOUD_NAME;
@@ -27,6 +35,8 @@ const EditReport = () => {
   const isLoggedIn = useSelector(selectIsLoggedIn);
   const user = useSelector(selectUser);
   const reportEdit = useSelector(selectReport);
+  //const company = useSelector(selectCompany);
+  const companyResponse = useSelector(selectCompany); // Get the company from the state
 
   const [report, setReport] = useState(null);
   const [notes, setNotes] = useState("");
@@ -34,15 +44,23 @@ const EditReport = () => {
   const [newImages, setNewImages] = useState([]); // To store newly uploaded images
   const [existingImages, setExistingImages] = useState([]); // To track already existing images
 
+  // Fetch user and company data when component mounts
   useEffect(() => {
     if (isLoggedIn && !user) {
       dispatch(fetchUser());
     }
 
+    if (user?.companyCode) {
+      dispatch(getCompanyByCode(user.companyCode)); // Fetch company by user's company code
+    }
+  }, [isLoggedIn, user, dispatch]);
+
+  // Fetch the report to be edited
+  useEffect(() => {
     if (isLoggedIn) {
       dispatch(getReport(id));
     }
-  }, [isLoggedIn, user, dispatch, id]);
+  }, [isLoggedIn, dispatch, id]);
 
   useEffect(() => {
     if (reportEdit) {
@@ -55,6 +73,9 @@ const EditReport = () => {
       setImagePreviews(uniqueExistingImages); // Set image previews to existing images
     }
   }, [reportEdit]);
+
+  // Get the company details from the response
+  const company = companyResponse?.company || {};
 
   // Function to dynamically handle field updates
   const handleFieldChange = (path, value) => {
@@ -97,7 +118,6 @@ const EditReport = () => {
     let updatedImages = [...existingImages];
 
     // Only upload new images if they exist
-    console.log("new images length", newImages.length);
     if (newImages.length > 0) {
       for (const image of newImages) {
         if (
@@ -138,11 +158,45 @@ const EditReport = () => {
       images: uniqueImages, // Ensure only unique images
     };
 
-    console.log("Final updated data:", updatedData);
-
     try {
-      await dispatch(updateReport({ id, formData: updatedData }));
-      navigate("/dashboard");
+      const resultAction = await dispatch(
+        updateReport({ id, formData: updatedData })
+      );
+
+      if (updateReport.fulfilled.match(resultAction)) {
+        const updatedReport = resultAction.payload; // Access the updated report
+
+        // Send an automated email notification to the company owner
+        if (company && company.ownerEmail && company.ownerName) {
+          //console.log("company", company);
+          //console.log("comp owner email", company?.ownerEmail);
+
+          const updatedDate = new Date(updatedReport.date)
+            .toISOString()
+            .split("T")[0]; // Ensure report date is in UTC and matches format
+
+          const emailData = {
+            subject: `${company.name} - Sales Report Updated`,
+            send_to: company.ownerEmail, // Use the owner’s email from the company details
+            reply_to: "noreply@gasstationpro.com",
+            template: "salesReportUpdatedEmail",
+            name: user?.name, // name from the logged-in user
+            companyCode: null,
+            url: `/report-detail/${updatedReport._id}`, // Report link
+            ownerName: company.ownerName,
+            companyName: company.name,
+            storeName: updatedReport.storeName || "Unknown Store", // Store name (if available)
+            managerName: user?.name, // Manager name from the logged-in user
+            reportDate: null,
+            updatedDate: updatedDate,
+          };
+
+          await dispatch(sendAutomatedEmail(emailData));
+          dispatch(EMAIL_RESET());
+        }
+
+        navigate("/dashboard");
+      }
     } catch (error) {
       console.error("Failed to update report:", error);
       toast.error("Failed to update report. Please try again.");

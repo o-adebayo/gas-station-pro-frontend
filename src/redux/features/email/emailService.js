@@ -3,7 +3,7 @@ import { API_URL } from "../../../services/authService";
 
 // Send Automated Email
 const sendAutomatedEmail = async (emailData) => {
-  const response = await axios.post(API_URL + "/sendAutomatedEmail", emailData);
+  const response = await axios.post(API_URL + "sendAutomatedEmail", emailData);
   return response.data.message;
 };
 

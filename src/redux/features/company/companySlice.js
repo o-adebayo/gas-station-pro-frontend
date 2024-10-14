@@ -47,12 +47,30 @@ export const fetchCompanies = createAsyncThunk(
   }
 );
 
-// Get a Company
+// Get a Company by ID
 export const getCompany = createAsyncThunk(
   "companies/getCompany",
   async (id, thunkAPI) => {
     try {
       return await companyService.getCompany(id);
+    } catch (error) {
+      const message =
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        error.message ||
+        error.toString();
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
+// Get a Company by Code
+export const getCompanyByCode = createAsyncThunk(
+  "companies/getCompanyByCode",
+  async (companyCode, thunkAPI) => {
+    try {
+      return await companyService.getCompanyByCode(companyCode);
     } catch (error) {
       const message =
         (error.response &&
@@ -152,6 +170,21 @@ const companySlice = createSlice({
         state.company = action.payload;
       })
       .addCase(getCompany.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+        toast.error(action.payload);
+      })
+      // get company by code
+      .addCase(getCompanyByCode.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(getCompanyByCode.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.company = action.payload;
+      })
+      .addCase(getCompanyByCode.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.message = action.payload;

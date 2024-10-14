@@ -17,6 +17,14 @@ import {
   fetchStoreLocations,
   selectStores,
 } from "../../redux/features/storeLocation/storeLocationSlice";
+import {
+  getCompanyByCode,
+  selectCompany,
+} from "../../redux/features/company/companySlice";
+import {
+  EMAIL_RESET,
+  sendAutomatedEmail,
+} from "../../redux/features/email/emailSlice";
 
 const cloud_name = process.env.REACT_APP_CLOUDINARY_CLOUD_NAME;
 const upload_preset = process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET;
@@ -61,6 +69,8 @@ const AddReport = () => {
   const loadingState = useSelector(selectIsLoading);
   const user = useSelector(selectUser);
   const isLoggedIn = useSelector(selectIsLoggedIn);
+  //const company = useSelector(selectCompany);
+  const companyResponse = useSelector(selectCompany); // Get the company from the state
 
   // Fetch stores for dropdown selection
   const storesData = useSelector(selectStores);
@@ -83,6 +93,7 @@ const AddReport = () => {
   useEffect(() => {
     if (user?.companyCode) {
       dispatch(fetchStoreLocations(user.companyCode)); // Fetch stores for this company
+      dispatch(getCompanyByCode(user.companyCode)); // Fetch company by user's company code
     }
   }, [dispatch, user]);
 
@@ -91,6 +102,9 @@ const AddReport = () => {
     const { name, value } = e.target;
     setReport({ ...report, [name]: value });
   };
+
+  // Get the company details from the response
+  const company = companyResponse?.company || {};
 
   // Handle image selection and previews
   const handleImageChange = (e) => {
@@ -215,9 +229,39 @@ const AddReport = () => {
 
       formattedData.images = uploadedImages;
 
-      // Dispatch the formatted data
-      await dispatch(createReport(formattedData));
-      navigate("/dashboard"); // Redirect to dashboard
+      // Dispatch the formatted data and get the response with report ID
+      const resultAction = await dispatch(createReport(formattedData));
+
+      if (createReport.fulfilled.match(resultAction)) {
+        const createdReport = resultAction.payload; // Access the created report
+        const reportId = createdReport._id; // Get the report ID from the response
+
+        // Send an automated email notification to the company owner
+        if (company && company.ownerEmail && company.ownerName) {
+          const reportDate = new Date(report.date).toISOString().split("T")[0]; // Ensure report date is in UTC and matches format
+
+          const emailData = {
+            subject: `${company.name} - Daily Sales Report Submitted`,
+            send_to: company.ownerEmail, // Use the owner’s email from the company details
+            reply_to: "noreply@gasstationpro.com",
+            template: "salesReportSubmittedEmail",
+            name: user?.name, // Owner name from company details
+            companyCode: null,
+            url: `/report-detail/${reportId}`,
+            ownerName: company.ownerName,
+            companyName: company.name,
+            storeName: stores.find((store) => store._id === report.storeId)
+              ?.name, // Store name
+            managerName: user?.name, // Manager name from the logged-in user
+            reportDate: reportDate,
+          };
+
+          await dispatch(sendAutomatedEmail(emailData));
+          dispatch(EMAIL_RESET());
+        }
+
+        navigate("/dashboard"); // Redirect to dashboard
+      }
     } catch (error) {
       toast.error("Failed to submit report: " + error.message);
     } finally {

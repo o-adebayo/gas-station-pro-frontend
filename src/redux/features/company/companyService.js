@@ -16,9 +16,15 @@ const getCompanies = async () => {
   return response.data;
 };
 
-// Get a Company
+// Get a Company by ID
 const getCompany = async (id) => {
   const response = await axios.get(API_URL + id);
+  return response.data;
+};
+
+// Get a Company by Company Code
+const getCompanyByCode = async (companyCode) => {
+  const response = await axios.get(`${API_URL}code/${companyCode}`);
   return response.data;
 };
 
@@ -38,6 +44,7 @@ const companyService = {
   createCompany,
   getCompanies,
   getCompany,
+  getCompanyByCode,
   updateCompany,
   deleteCompany,
 };
