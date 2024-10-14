@@ -195,3 +195,29 @@
 .cancel-btn:hover {
   background-color: #e53935;
 }
+
+.image-preview {
+  display: inline-block;
+  position: relative;
+  margin: 10px;
+}
+
+.remove-image-btn {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #ff4d4d;
+  border: none;
+  border-radius: 50%;
+  color: #fff;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.remove-image-btn:hover {
+  background: #ff3333;
+}
+
+.remove-image-icon {
+  font-size: 14px;
+}

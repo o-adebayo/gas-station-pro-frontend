@@ -163,7 +163,7 @@ const EditProfile = () => {
             <br />
             <code>Disabled fields cannot be changed</code>
             <div className="">
-              <button className="--btn --btn-primary">Save Changes</button>
+              <button className="text-med navigation__cta">Save Changes</button>
             </div>
           </span>
         </form>

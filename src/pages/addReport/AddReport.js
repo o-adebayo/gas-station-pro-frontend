@@ -258,6 +258,9 @@ const AddReport = () => {
         saveReport={saveReport}
         setReport={setReport}
         imagePreviews={imagePreviews} // Image preview feature
+        setImagePreviews={setImagePreviews} // Pass state setter for previews
+        newImages={newImages} // Pass the new image uploads
+        setNewImages={setNewImages} // Pass the setter for new images
         stores={stores} // Pass stores for admin selection
         user={user} // Pass user data for admin check
       />

@@ -156,14 +156,18 @@ const ReportList = ({ reports, isLoading }) => {
                     storeTotalSales = {}, // Default empty object for storeTotalSales
                   } = report;
 
+                  // Format the date in UTC to "YYYY-MM-DD" (similar to validateDate function)
+                  const reportDate = new Date(date).toISOString().split("T")[0]; // Ensures the date is in UTC and without time
+
                   return (
                     <tr key={_id}>
                       <td>{index + 1}</td>
-                      <td>
+                      <td>{reportDate}</td> {/* Display formatted date */}
+                      {/* <td>
                         {new Date(date).toLocaleDateString("en-US", {
                           timeZone: "UTC",
                         })}
-                      </td>
+                      </td> */}
                       <td>{storeName || "N/A"}</td> {/* Use storeName field */}
                       <td>{managerName || "N/A"}</td>{" "}
                       {/* Use managerName field */}

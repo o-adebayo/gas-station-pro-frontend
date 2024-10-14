@@ -82,7 +82,9 @@ const Profile = () => {
             </p>
             <div className="">
               <Link to="/edit-profile">
-                <button className="--btn --btn-primary">Edit Profile</button>
+                <button className="text-med navigation__cta">
+                  Edit Profile
+                </button>
               </Link>
             </div>
           </span>

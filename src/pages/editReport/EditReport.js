@@ -162,7 +162,12 @@ const EditReport = () => {
           handleImageChange={handleImageChange}
           saveReport={saveReport}
           setReport={setReport}
-          imagePreviews={imagePreviews} // Show previews (both new and existing)
+          imagePreviews={imagePreviews} // Pass previews (new and existing)
+          setImagePreviews={setImagePreviews} // Pass setter for previews
+          newImages={newImages} // Pass new images
+          setNewImages={setNewImages} // Pass setter for new images
+          existingImages={existingImages} // Pass existing images
+          setExistingImages={setExistingImages} // Pass setter for existing images
           isEditMode={true}
         />
       )}

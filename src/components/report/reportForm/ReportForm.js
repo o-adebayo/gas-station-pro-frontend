@@ -6,7 +6,8 @@ import Card from "../../card/Card";
 import { v4 as uuidv4 } from "uuid";
 import { confirmAlert } from "react-confirm-alert"; // Import
 import "react-confirm-alert/src/react-confirm-alert.css"; // Import CSS
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { FaTimes } from "react-icons/fa"; // Import FaTimes for the "X" icon
 
 const ReportForm = ({
   report,
@@ -17,6 +18,11 @@ const ReportForm = ({
   saveReport,
   setReport,
   imagePreviews,
+  setImagePreviews, // Make sure this is passed as a prop
+  newImages, // Add newImages for uploaded images
+  setNewImages, // Add setter for newImages
+  existingImages,
+  setExistingImages,
   isEditMode,
   user, // Add user prop to check if the user is Admin
   stores, // Pass stores as prop for the Admin to select
@@ -33,6 +39,52 @@ const ReportForm = ({
       setSelectedStore(report.storeId || "");
     }
   }, [isEditMode, report]);
+
+  // Function to remove an image from the imagePreviews array
+  const handleRemoveImage = (indexToRemove) => {
+    // Ensure the array exists and is not undefined
+    if (imagePreviews?.length > 0) {
+      // Filter out the image at the index to remove
+      setImagePreviews((prevPreviews) =>
+        prevPreviews.filter((_, index) => index !== indexToRemove)
+      );
+
+      // Also update the newImages array accordingly if you want to remove it from there
+      setNewImages((prevImages) =>
+        prevImages.filter((_, index) => index !== indexToRemove)
+      );
+    }
+  };
+
+  // Remove new image
+  // Remove new image safely
+  const handleRemoveNewImage = (index) => {
+    if (imagePreviews?.length > 0) {
+      const updatedPreviews = imagePreviews.filter((_, i) => i !== index);
+      setImagePreviews(updatedPreviews); // Update previews
+    }
+
+    if (newImages?.length > 0) {
+      const updatedNewImages = newImages.filter((_, i) => i !== index); // Remove from newImages
+      setNewImages(updatedNewImages); // Update newImages state
+    }
+  };
+
+  // Remove existing image
+  // Remove existing image safely
+  const handleRemoveExistingImage = (index) => {
+    if (existingImages?.length > 0) {
+      const updatedExistingImages = existingImages.filter(
+        (_, i) => i !== index
+      );
+      setExistingImages(updatedExistingImages); // Update existing images
+    }
+
+    if (imagePreviews?.length > 0) {
+      const updatedPreviews = imagePreviews.filter((_, i) => i !== index);
+      setImagePreviews(updatedPreviews); // Update imagePreviews
+    }
+  };
 
   const handleStoreSelect = (e) => {
     setSelectedStore(e.target.value);
@@ -221,12 +273,35 @@ const ReportForm = ({
     });
   };
 
-  const validateDate = () => {
+  /*   const validateDate = () => {
     const today = new Date().toISOString().split("T")[0];
+    console.log("todays date is", today);
+    console.log("report date is", report.date);
+
     if (report.date && report.date !== today) {
       setDateMismatch(true);
       return false;
     }
+    setDateMismatch(false);
+    return true;
+  }; */
+
+  // this is better as it uses UTC
+  const validateDate = () => {
+    // Get today's date in UTC without time information
+    const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD in UTC
+
+    // Convert report.date to UTC and extract date part (YYYY-MM-DD)
+    const reportDate = new Date(report.date).toISOString().split("T")[0]; // Ensure report date is in UTC and matches format
+
+    //console.log("todays date is", today);
+    //console.log("report date is", reportDate);
+
+    if (report.date && reportDate !== today) {
+      setDateMismatch(true);
+      return false;
+    }
+
     setDateMismatch(false);
     return true;
   };
@@ -706,12 +781,27 @@ const ReportForm = ({
             <div>
               <h4>Image Previews:</h4>
               {imagePreviews.map((preview, index) => (
-                <img
-                  key={index}
-                  src={preview}
-                  alt={`Preview ${index + 1}`}
-                  style={{ width: "150px", margin: "10px" }}
-                />
+                <div key={index} className="image-preview">
+                  <img
+                    src={preview}
+                    alt={`Preview ${index + 1}`}
+                    style={{ width: "150px", margin: "10px" }}
+                  />
+                  <button
+                    type="button"
+                    className="remove-image-btn"
+                    onClick={
+                      () =>
+                        index < (existingImages?.length || 0)
+                          ? handleRemoveExistingImage(index) // Remove existing image
+                          : handleRemoveNewImage(
+                              index - (existingImages?.length || 0)
+                            ) // Remove new image
+                    }
+                  >
+                    <FaTimes className="remove-image-icon" /> {/* "X" icon */}
+                  </button>
+                </div>
               ))}
             </div>
           )}
