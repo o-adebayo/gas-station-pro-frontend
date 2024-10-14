@@ -11,6 +11,10 @@ import { toast } from "react-toastify";
 import ChangePassword from "../../components/changePassword/ChangePassword";
 import "./EditProfile.scss";
 import useRedirectLoggedOutUser from "../../customHook/useRedirectLoggedOutUser";
+import {
+  fetchStoreLocations,
+  selectStores,
+} from "../../redux/features/storeLocation/storeLocationSlice";
 
 const cloud_name = process.env.REACT_APP_CLOUDINARY_CLOUD_NAME;
 const upload_preset = process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET;
@@ -19,6 +23,7 @@ const EditProfile = () => {
   useRedirectLoggedOutUser("/login");
   const dispatch = useDispatch();
   const { isLoading, user } = useSelector((state) => state.auth);
+  const storeLocations = useSelector(selectStores); // Fetch store locations
 
   const initialState = {
     name: user?.name || "",
@@ -34,11 +39,12 @@ const EditProfile = () => {
   const [profileImage, setProfileImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
 
-  // Fetch user data when component mounts
+  // Fetch user and store data when component mounts
   useEffect(() => {
     if (!user) {
       dispatch(fetchUser());
     }
+    dispatch(fetchStoreLocations()); // Fetch store details
   }, [dispatch, user]);
 
   // Update profile state whenever user data is updated
@@ -108,6 +114,9 @@ const EditProfile = () => {
     }
   };
 
+  // Get store name from storeLocations
+  const storeName = storeLocations?.store?.name || "N/A";
+
   return (
     <div className="edit-profile --my2">
       {isLoading && <Loader />}
@@ -148,11 +157,11 @@ const EditProfile = () => {
               <input type="text" name="role" value={profile?.role} disabled />
             </p>
             <p>
-              <label>Store ID: </label>
+              <label>Store: </label>
               <input
                 type="text"
-                name="storeId"
-                value={profile?.storeId}
+                name="store"
+                value={storeName} // Display store name instead of store ID
                 disabled
               />
             </p>

@@ -6,6 +6,12 @@ import { fetchUser, selectUser } from "../../redux/features/auth/authSlice";
 import { SpinnerImg } from "../../components/loader/Loader";
 import Card from "../../components/card/Card";
 import { Link } from "react-router-dom";
+import {
+  // Import the action to get store by user
+  selectStores,
+  selectIsLoading as selectStoreLoading,
+  fetchStoreLocations, // Select store loading state
+} from "../../redux/features/storeLocation/storeLocationSlice";
 
 export const shortenText = (text, n) => {
   if (text.length > n) {
@@ -18,9 +24,15 @@ const Profile = () => {
   useRedirectLoggedOutUser("/login");
   const dispatch = useDispatch();
 
-  const { isLoading, isLoggedIn, isSuccess, message, user } = useSelector(
-    (state) => state.auth
-  );
+  const {
+    isLoading: isUserLoading,
+    isLoggedIn,
+    user,
+  } = useSelector((state) => state.auth);
+
+  const storeLocations = useSelector(selectStores); // Select the store location from Redux
+  const isStoreLoading = useSelector(selectStoreLoading); // Select store loading state
+  //console.log("store location", storeLocations);
 
   const initialState = {
     name: user?.name || "",
@@ -34,12 +46,15 @@ const Profile = () => {
 
   const [profile, setProfile] = useState(initialState);
 
+  // Fetch user and store data when the component mounts
   useEffect(() => {
     if (isLoggedIn) {
-      dispatch(fetchUser());
+      dispatch(fetchUser()); // Fetch user data on mount
+      dispatch(fetchStoreLocations()); // Fetch store details based on logged-in user
     }
   }, [isLoggedIn, dispatch]);
 
+  // Update profile state when user data changes
   useEffect(() => {
     if (user) {
       setProfile({
@@ -56,8 +71,9 @@ const Profile = () => {
 
   return (
     <div className="profile --my2">
-      {isLoading && <SpinnerImg />}
-      {!isLoading && !user ? (
+      {(isUserLoading || isStoreLoading) && <SpinnerImg />}{" "}
+      {/* Show spinner while loading */}
+      {!isUserLoading && !user ? (
         <p>Something went wrong, please reload the page...</p>
       ) : (
         <Card cardClass={"card --flex-dir-column"}>
@@ -78,7 +94,8 @@ const Profile = () => {
               <b>Role: </b> {profile?.role}
             </p>
             <p>
-              <b>Store: </b> {profile?.storeId}
+              <b>Store: </b> {storeLocations?.store?.name || "N/A"}{" "}
+              {/* Display the fetched store name */}
             </p>
             <div className="">
               <Link to="/edit-profile">
@@ -94,8 +111,7 @@ const Profile = () => {
   );
 };
 
-//get the user and grab the user's name
-// then just use the UserName on the Header.js file
+// Get the user's name and display it in the Header component
 export const UserName = () => {
   const user = useSelector(selectUser);
 
@@ -108,4 +124,5 @@ export const UserName = () => {
     </h3>
   );
 };
+
 export default Profile;

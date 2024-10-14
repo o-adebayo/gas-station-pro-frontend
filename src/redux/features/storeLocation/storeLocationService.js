@@ -27,6 +27,11 @@ const getStoreLocation = async (id) => {
   const response = await axios.get(API_URL + id);
   return response.data;
 };
+// Get the store associated with the logged-in user
+/* const getStoreByUserId = async () => {
+  const response = await axios.get(`${API_URL}/user-store`);
+  return response.data;
+}; */
 // Update Store Location
 const updateStoreLocation = async (id, formData) => {
   const response = await axios.patch(`${API_URL}${id}`, formData);
@@ -46,6 +51,7 @@ const storeLocationService = {
   deleteStoreLocation,
   updateStoreLocation,
   updateStoreLocationManager,
+  //getStoreByUserId,
 };
 
 export default storeLocationService;

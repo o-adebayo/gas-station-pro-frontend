@@ -91,6 +91,26 @@ export const getStoreLocation = createAsyncThunk(
   }
 );
 
+// Get a Store by User's StoreId
+export const getStoreByUserId = createAsyncThunk(
+  "stores/getStoreByUserId",
+  async (_, thunkAPI) => {
+    // No need to pass an 'id'
+    try {
+      return await storeLocationService.getStoreByUserId();
+    } catch (error) {
+      const message =
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        error.message ||
+        error.toString();
+      console.log(message);
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
 // Update Store Location
 export const updateStoreLocation = createAsyncThunk(
   "stores/updateStoreLocation",
@@ -212,6 +232,21 @@ const storeLocationSlice = createSlice({
         state.message = action.payload;
         toast.error(action.payload);
       })
+      /* // get store by user id of the logged in user
+      .addCase(getStoreByUserId.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(getStoreByUserId.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.storeLocation = action.payload;
+      })
+      .addCase(getStoreByUserId.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+        toast.error(action.payload);
+      }) */
       .addCase(updateStoreLocation.pending, (state) => {
         state.isLoading = true;
       })
