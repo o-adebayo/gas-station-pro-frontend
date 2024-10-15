@@ -1,9 +1,21 @@
-import React from "react";
+import React, { useState } from "react";
 import "./Hero.css";
 import arrow from "../../assets/arrow.svg";
 import abstractShapes from "../../assets/abstract-shapes.png";
+import { Link, useNavigate } from "react-router-dom"; // Import useNavigate
 
 const Hero = () => {
+  const [email, setEmail] = useState("");
+  const navigate = useNavigate(); // Use navigate to programmatically navigate
+
+  const handleEmailChange = (e) => {
+    setEmail(e.target.value);
+  };
+
+  const handleSignUpClick = () => {
+    navigate("/company-signup", { state: { email } }); // Pass email as state
+  };
+
   return (
     <section className="hero">
       <div className="hero__column">
@@ -22,8 +34,10 @@ const Hero = () => {
             className="hero__input"
             type="email"
             placeholder="Enter your email"
+            value={email}
+            onChange={handleEmailChange}
           />
-          <button className="text-reg hero__submit">
+          <button className="text-reg hero__submit" onClick={handleSignUpClick}>
             Sign up
             <img className="hero__arrow" src={arrow} alt="arrow" />
           </button>

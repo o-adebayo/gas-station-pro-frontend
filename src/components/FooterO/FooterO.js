@@ -1,9 +1,23 @@
-import React from "react";
+import React, { useState } from "react";
 import "./FooterO.css";
 import logo from "../../assets/logo.svg";
 import arrow from "../../assets/colored-arrow.svg";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 const FooterO = () => {
+  const [email, setEmail] = useState(""); // State to store email
+  const navigate = useNavigate(); // Hook to navigate programmatically
+
+  // Handle email input change
+  const handleEmailChange = (e) => {
+    setEmail(e.target.value);
+  };
+
+  // Function to handle Sign Up button click
+  const handleSignUpClick = () => {
+    navigate("/company-signup", { state: { email } }); // Navigate and pass the email
+  };
+
   return (
     <footer className="footer">
       <div className="footer__container">
@@ -17,8 +31,15 @@ const FooterO = () => {
               className="footer__input"
               type="email"
               placeholder="Enter email"
+              value={email} // Bind email input to state
+              onChange={handleEmailChange} // Handle input changes
             />
-            <img className="footer__input-icon" src={arrow} alt="arrow" />
+            <img
+              className="footer__input-icon"
+              src={arrow}
+              alt="arrow"
+              onClick={handleSignUpClick} // Navigate to sign-up with email on click
+            />
           </div>
         </div>
         <div className="footer__content-right">

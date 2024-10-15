@@ -139,7 +139,7 @@ const companySlice = createSlice({
         state.isLoading = false;
         state.isSuccess = true;
         state.companies.push(action.payload);
-        toast.success("Company created successfully");
+        toast.success("Company created successfully. Please check your email.");
       })
       .addCase(createCompany.rejected, (state, action) => {
         state.isLoading = false;

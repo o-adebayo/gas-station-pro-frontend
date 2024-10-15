@@ -32,6 +32,7 @@ import UserList from "./pages/userList/UserList";
 import StoreList from "./pages/storeList/StoreList";
 import ActivateUserAddedByAdmin from "./pages/auth/ActivateUserAddedByAdmin";
 import AddCompany from "./pages/addCompany/AddCompany";
+import CompanySignUp from "./pages/auth/CompanySignUp";
 
 axios.defaults.withCredentials = true;
 
@@ -56,6 +57,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/company-signup" element={<CompanySignUp />} />
         <Route path="/forgotpassword" element={<Forgot />} />
         <Route path="/resetpassword/:resetToken" element={<Reset />} />
         <Route path="/activate/:activationToken" element={<Activate />} />
