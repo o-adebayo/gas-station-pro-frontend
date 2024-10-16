@@ -146,7 +146,14 @@ export const sendLoginCode = async (email) => {
   return response.data.message;
 };
 
-// Send Login Code
+// Send report Delete Code
+export const sendReportDeleteCode = async (email) => {
+  const response = await axios.post(API_URL + "sendReportDeleteCode", email);
+
+  return response.data.message;
+};
+
+// user Login with Code
 export const loginWithCode = async (code, email) => {
   const response = await axios.post(API_URL + `loginWithCode/${email}`, code);
 

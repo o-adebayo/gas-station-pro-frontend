@@ -53,7 +53,7 @@ export const getReports = createAsyncThunk(
 
 // Delete a Report
 // we will pass the id as a parameter
-export const deleteReport = createAsyncThunk(
+/* export const deleteReport = createAsyncThunk(
   "reports/delete",
   async (id, thunkAPI) => {
     try {
@@ -66,6 +66,23 @@ export const deleteReport = createAsyncThunk(
         error.message ||
         error.toString();
       console.log(message);
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+); */
+export const deleteReport = createAsyncThunk(
+  "reports/delete",
+  async ({ id, deleteCode }, thunkAPI) => {
+    try {
+      // Pass both id and deleteCode to the service function
+      return await reportService.deleteReport({ id, deleteCode });
+    } catch (error) {
+      const message =
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        error.message ||
+        error.toString();
       return thunkAPI.rejectWithValue(message);
     }
   }

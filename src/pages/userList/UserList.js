@@ -12,6 +12,7 @@ import {
   fetchUsers,
   removeUser,
   resendUerActivationEmailByAdmin,
+  sendUserReportDeleteCode,
 } from "../../redux/features/auth/authSlice";
 import Loader, { SpinnerImg } from "../../components/loader/Loader";
 import useRedirectLoggedOutUser from "../../customHook/useRedirectLoggedOutUser";
@@ -23,6 +24,7 @@ import {
   selectUsers,
 } from "../../redux/features/auth/userFilterSlice";
 import ReactPaginate from "react-paginate";
+import { SiKeepassxc } from "react-icons/si";
 
 const UserList = () => {
   useRedirectLoggedOutUser("/login"); //use this at the very top of all pages that require a user to be logged so it doesnt try to fetch data on a loggedOut state
@@ -72,6 +74,17 @@ const UserList = () => {
       //console.log(email);
 
       await dispatch(resendUerActivationEmailByAdmin({ email }));
+      //alert("Activation link sent!");
+    } catch (error) {
+      alert("Failed to resend activation email");
+    }
+  };
+
+  const handleSendReportDeleteCode = async (email) => {
+    try {
+      //console.log(email);
+
+      await dispatch(sendUserReportDeleteCode({ email }));
       //alert("Activation link sent!");
     } catch (error) {
       alert("Failed to resend activation email");
@@ -173,6 +186,17 @@ const UserList = () => {
                           style={{ cursor: "pointer", marginLeft: "10px" }}
                         >
                           <FaEnvelope size={20} color="green" />
+                        </span>
+                      )}
+                      {/* Show send delete code icon if the user is inactive */}
+
+                      {user.status === "active" && (
+                        <span
+                          title="Send Report Delete Code"
+                          onClick={() => handleSendReportDeleteCode(user.email)}
+                          style={{ cursor: "pointer", marginLeft: "10px" }}
+                        >
+                          <SiKeepassxc size={20} color="black" />
                         </span>
                       )}
                     </td>

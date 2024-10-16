@@ -17,8 +17,24 @@ const getReports = async () => {
 
 // Delete a Report
 // we need to add a id to the URL when we want to delete
-const deleteReport = async (id) => {
+/* const deleteReport = async (id) => {
   const response = await axios.delete(API_URL + id);
+  return response.data;
+};
+ */
+// Delete report service function
+// Delete a Report with deleteCode
+// Delete a Report with deleteCode
+const deleteReport = async ({ id, deleteCode }) => {
+  // Send the deleteCode as part of the headers or query params
+  const response = await axios.delete(`${API_URL}${id}`, {
+    headers: {
+      "Content-Type": "application/json", // Specify JSON as the content type
+    },
+    data: { deleteCode }, // Include the deleteCode in the request body as 'data'
+  });
+  console.log(response);
+
   return response.data;
 };
 

@@ -17,13 +17,20 @@ import {
   deleteReport,
   getReports,
 } from "../../../redux/features/report/reportSlice";
+import { selectUser } from "../../../redux/features/auth/authSlice";
+import Popup from "reactjs-popup"; // Import reactjs-popup
+import "reactjs-popup/dist/index.css"; // Import css for popup
+import { toast } from "react-toastify";
 
 const ReportList = ({ reports, isLoading }) => {
   const [search, setSearch] = useState("");
   const [startDate, setStartDate] = useState(""); // Start date for filtering
   const [endDate, setEndDate] = useState(""); // End date for filtering
+  const [deleteCode, setDeleteCode] = useState(""); // Store delete code
+  const [selectedReportId, setSelectedReportId] = useState(null); // Store selected report ID for delete
   const filteredReports = useSelector(selectFilteredReports);
   const dispatch = useDispatch();
+  const user = useSelector(selectUser);
 
   const shortenText = (text, n) => {
     if (text.length > n) {
@@ -33,34 +40,43 @@ const ReportList = ({ reports, isLoading }) => {
     return text;
   };
 
-  // actual function that dispatches the delete action
-  // we need to call the function from reportSlice so we will use useDispatch
+  // Function to delete the report without a code (for admins)
   const delReport = async (id) => {
-    await dispatch(deleteReport(id));
-    // Now get the latest reports again from the database so we call it from redux reportSlice
+    await dispatch(deleteReport({ id })); // Pass the id as an object
     await dispatch(getReports());
   };
 
-  //function to add confirm delete alert dialog
-  // we need to send the id of the report
-  const confirmDelete = (id) => {
-    confirmAlert({
-      title: "Delete Report",
-      message: "Are you sure you want to delete this report.",
-      buttons: [
-        {
-          label: "Delete",
-          onClick: () => delReport(id),
-        },
-        {
-          label: "Cancel",
-          //onClick: () => alert('Click No')
-        },
-      ],
-    });
+  // Function to delete the report with a code (for non-admins)
+  // Function to delete the report with a code (for non-admins)
+  const delReportWithCode = async (id, deleteCode) => {
+    await dispatch(deleteReport({ id, deleteCode })); // Pass both id and deleteCode
+    await dispatch(getReports()); // Refresh the report list
   };
 
-  //   Begin Pagination
+  // Function to handle the delete action with reactjs-popup
+  const handleDeleteClick = (id) => {
+    if (user.role === "admin") {
+      // Admins do not need a delete code
+      confirmAlert({
+        title: "Delete Report",
+        message: "Are you sure you want to delete this report?",
+        buttons: [
+          {
+            label: "Delete",
+            onClick: () => delReport(id),
+          },
+          {
+            label: "Cancel",
+          },
+        ],
+      });
+    } else {
+      // For non-admins, show the popup
+      setSelectedReportId(id); // Store the ID of the selected report
+    }
+  };
+
+  // Begin Pagination
   const [currentItems, setCurrentItems] = useState([]);
   const [pageCount, setPageCount] = useState(0);
   const [itemOffset, setItemOffset] = useState(0);
@@ -68,7 +84,6 @@ const ReportList = ({ reports, isLoading }) => {
 
   useEffect(() => {
     const endOffset = itemOffset + itemsPerPage;
-
     setCurrentItems(filteredReports.slice(itemOffset, endOffset));
     setPageCount(Math.ceil(filteredReports.length / itemsPerPage));
   }, [itemOffset, itemsPerPage, filteredReports]);
@@ -77,11 +92,8 @@ const ReportList = ({ reports, isLoading }) => {
     const newOffset = (event.selected * itemsPerPage) % filteredReports.length;
     setItemOffset(newOffset);
   };
-  //   End Pagination
+  // End Pagination
 
-  //configure for changes in the search  box
-  // and then we add dependencies with [ , ] which means any time they change
-  // trigger this function
   // Trigger filtering on search, date range, or reports change
   useEffect(() => {
     dispatch(FILTER_REPORTS({ reports, search, startDate, endDate }));
@@ -156,18 +168,13 @@ const ReportList = ({ reports, isLoading }) => {
                     storeTotalSales = {}, // Default empty object for storeTotalSales
                   } = report;
 
-                  // Format the date in UTC to "YYYY-MM-DD" (similar to validateDate function)
+                  // Format the date in UTC to "YYYY-MM-DD"
                   const reportDate = new Date(date).toISOString().split("T")[0]; // Ensures the date is in UTC and without time
 
                   return (
                     <tr key={_id}>
                       <td>{index + 1}</td>
                       <td>{reportDate}</td> {/* Display formatted date */}
-                      {/* <td>
-                        {new Date(date).toLocaleDateString("en-US", {
-                          timeZone: "UTC",
-                        })}
-                      </td> */}
                       <td>{storeName || "N/A"}</td> {/* Use storeName field */}
                       <td>{managerName || "N/A"}</td>{" "}
                       {/* Use managerName field */}
@@ -201,7 +208,7 @@ const ReportList = ({ reports, isLoading }) => {
                           <FaTrashAlt
                             size={20}
                             color={"red"}
-                            onClick={() => confirmDelete(_id)}
+                            onClick={() => handleDeleteClick(_id)} // Handle delete click
                           />
                         </span>
                       </td>
@@ -212,6 +219,51 @@ const ReportList = ({ reports, isLoading }) => {
             </table>
           )}
         </div>
+
+        {/* Reactjs-popup for asking delete code */}
+        <Popup
+          open={!!selectedReportId}
+          onClose={() => setSelectedReportId(null)}
+        >
+          <div className="popup-content">
+            <h4>Enter Delete Code</h4>
+            <input
+              type="text"
+              value={deleteCode}
+              onChange={(e) => setDeleteCode(e.target.value)}
+              placeholder="Delete Code"
+            />
+            <div className="popup-actions">
+              <button
+                className="--btn --btn-primary"
+                onClick={() => {
+                  if (deleteCode) {
+                    console.log("report id", selectedReportId);
+                    console.log("delete code", deleteCode);
+
+                    delReportWithCode(selectedReportId, deleteCode);
+                    setSelectedReportId(null); // Close popup
+                    setDeleteCode(""); // Reset delete code input
+                  } else {
+                    toast.info("Delete code is required.");
+                  }
+                }}
+              >
+                Submit
+              </button>
+              <button
+                className="--btn --btn-secondary"
+                onClick={() => {
+                  setSelectedReportId(null); // Close popup
+                  setDeleteCode(""); // Reset delete code input
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </Popup>
+
         <ReactPaginate
           breakLabel="..."
           nextLabel="Next"

@@ -19,6 +19,7 @@ import {
   resetPassword,
   sendActivationEmail,
   sendLoginCode,
+  sendReportDeleteCode,
   updateUser,
   upgradeUser,
 } from "../../../services/authService";
@@ -416,7 +417,25 @@ export const sendUserLoginCode = createAsyncThunk(
   }
 );
 
-// Send Login Code
+// Send Delete Code
+export const sendUserReportDeleteCode = createAsyncThunk(
+  "auth/sendUserReportDeleteCode",
+  async (email, thunkAPI) => {
+    try {
+      return await sendReportDeleteCode(email);
+    } catch (error) {
+      const message =
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        error.message ||
+        error.toString();
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
+// user Login with Code
 export const userLoginWithCode = createAsyncThunk(
   "auth/loginWithCode",
   async ({ code, email }, thunkAPI) => {
@@ -875,6 +894,22 @@ const authSlice = createSlice({
         toast.error(action.payload);
       })
       // Send login code
+      .addCase(sendUserReportDeleteCode.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(sendUserReportDeleteCode.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.message = action.payload;
+        toast.success(action.payload);
+      })
+      .addCase(sendUserReportDeleteCode.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+        toast.error(action.payload);
+      })
+      // Send report delete code
       .addCase(sendUserLoginCode.pending, (state) => {
         state.isLoading = true;
       })
