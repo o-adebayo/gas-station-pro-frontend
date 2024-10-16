@@ -12,7 +12,7 @@ const initialState = {
   address: "",
   ownerName: "",
   ownerEmail: "", // Email will be prefilled from Hero.js or PricingTile.js
-  ownerPhone: "",
+  phone: "",
   planType: "Gold", // Default to Gold
   planCycle: "Monthly", // Default to Monthly
 };
@@ -22,15 +22,8 @@ const CompanySignUp = () => {
   const location = useLocation(); // Access location to get the planType and planCycle
 
   const [formData, setFormData] = useState(initialState);
-  const {
-    name,
-    address,
-    ownerName,
-    ownerEmail,
-    ownerPhone,
-    planType,
-    planCycle,
-  } = formData;
+  const { name, address, ownerName, ownerEmail, phone, planType, planCycle } =
+    formData;
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -60,7 +53,7 @@ const CompanySignUp = () => {
   const handleCompanySignUp = async (e) => {
     e.preventDefault();
 
-    if (!name || !address || !ownerName || !ownerEmail || !ownerPhone) {
+    if (!name || !address || !ownerName || !ownerEmail || !phone) {
       return toast.error("All fields are required.");
     }
 
@@ -75,7 +68,7 @@ const CompanySignUp = () => {
       address,
       ownerName,
       ownerEmail,
-      ownerPhone,
+      phone,
       planType,
       planCycle,
     };
@@ -135,8 +128,8 @@ const CompanySignUp = () => {
             <input
               type="text"
               placeholder="Owner Phone"
-              name="ownerPhone"
-              value={ownerPhone}
+              name="phone"
+              value={phone}
               onChange={handleInputChange}
               required
             />
