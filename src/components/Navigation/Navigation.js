@@ -35,7 +35,7 @@ const Navigation = () => {
       </ul>
       <ShowOnLogout>
         <div className="navigation__auth-buttons">
-          <Link to="/register">
+          <Link to="/company-signup">
             <button className="text-reg navigation__cta">
               Get Started
               <img className="navigation__arrow" src={arrow} alt="arrow" />
