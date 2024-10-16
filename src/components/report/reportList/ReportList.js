@@ -139,6 +139,12 @@ const ReportList = ({ reports, isLoading }) => {
     }
   };
 
+  const handleOnClickEdit = () => {
+    toast.info(
+      "Edit feature coming soon, please delete and recreate in the meantime"
+    );
+  };
+
   // Function to handle the delete action with reactjs-popup
   const handleDeleteClick = (id) => {
     if (user.role === "admin") {
@@ -285,10 +291,17 @@ const ReportList = ({ reports, isLoading }) => {
                             <AiOutlineEye size={25} color={"purple"} />
                           </Link>
                         </span>
-                        <span title="Edit Report">
+                        {/* <span title="Edit Report">
                           <Link to={`/edit-report/${_id}`}>
                             <FaEdit size={20} color={"green"} />
                           </Link>
+                        </span> */}
+                        <span title="Edit Report">
+                          <FaEdit
+                            size={20}
+                            color={"green"}
+                            onClick={() => handleOnClickEdit()} // Handle delete click. Once we fix issue with edit report sharing values with multiple fields, use the commented one above
+                          />
                         </span>
                         <span title="Delete Report">
                           <FaTrashAlt
