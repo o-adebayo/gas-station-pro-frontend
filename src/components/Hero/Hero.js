@@ -37,8 +37,11 @@ const Hero = () => {
             value={email}
             onChange={handleEmailChange}
           />
-          <button className="text-reg hero__submit" onClick={handleSignUpClick}>
-            Sign up
+          <button
+            className="text-large hero__submit"
+            onClick={handleSignUpClick}
+          >
+            Start Free Trial
             <img className="hero__arrow" src={arrow} alt="arrow" />
           </button>
         </div>

@@ -52,8 +52,9 @@ const ActivateUserAddedByAdmin = () => {
     };
 
     try {
+      // Dispatch the activation action with both userData and token
       const data = await dispatch(
-        activateUserAccountAddedByAdmin(userData, activationToken)
+        activateUserAccountAddedByAdmin({ userData, activationToken })
       );
       await dispatch(RESET(userData));
       //await dispatch(SET_LOGIN(false));

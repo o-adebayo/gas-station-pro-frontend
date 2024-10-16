@@ -237,9 +237,10 @@ export const activateUserAccount = createAsyncThunk(
 );
 
 // Activate User Account added by Admin
+// Activate User Account added by Admin
 export const activateUserAccountAddedByAdmin = createAsyncThunk(
   "auth/activateUserByAdmin",
-  async (userData, activationToken, thunkAPI) => {
+  async ({ userData, activationToken }, thunkAPI) => {
     try {
       return await activateUserByAdmin(userData, activationToken);
     } catch (error) {

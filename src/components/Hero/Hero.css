@@ -30,7 +30,7 @@
 .hero__input-container {
   position: relative;
   overflow: hidden;
-  width: 434px;
+  width: 450px;
   height: 68px;
   border-radius: 8px;
 }
@@ -60,7 +60,7 @@
   top: 6px;
   right: 6px;
   height: 56px;
-  width: 135px;
+  width: 180px;
   border-radius: 8px;
   background: var(--gradient);
   display: flex;

@@ -3,6 +3,7 @@ import "./CTA.css";
 import ctaShapes from "../../assets/cta-shapes.png";
 import arrow from "../../assets/arrow.svg";
 import circleGradient from "../../assets/circle-gradient.png";
+import { Link } from "react-router-dom";
 
 const CTA = () => {
   return (
@@ -17,10 +18,13 @@ const CTA = () => {
             your free trial of GasStationPro today and experience the power of
             cloud-based sales reporting tool.
           </p>
-          <button className="cta__button">
-            <p className="cta__button-text">Sign Up for Free</p>
-            <img className="cta__button-icon" src={arrow} alt="arrow" />
-          </button>
+          <Link to={"/company-signup"}>
+            {" "}
+            <button className="cta__button">
+              <p className="cta__button-text">Sign Up for Free</p>
+              <img className="cta__button-icon" src={arrow} alt="arrow" />
+            </button>
+          </Link>
         </div>
         <div className="cta-content__right">
           <img className="cta__shapes" src={ctaShapes} alt="graphic shapes" />

@@ -173,8 +173,8 @@ const CompanySignUp = () => {
           </form>
           <span className={styles.register}>
             <Link to="/">Home</Link>
-            <p> &nbsp; Already have an account? &nbsp;</p>
-            <Link to="/login">Login</Link>
+            <p> &nbsp; Already have a company code? &nbsp;</p>
+            <Link to="/register">Register</Link>
           </span>
         </div>
       </Card>
