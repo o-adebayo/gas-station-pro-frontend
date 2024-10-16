@@ -21,6 +21,14 @@ import { selectUser } from "../../../redux/features/auth/authSlice";
 import Popup from "reactjs-popup"; // Import reactjs-popup
 import "reactjs-popup/dist/index.css"; // Import css for popup
 import { toast } from "react-toastify";
+import {
+  getCompanyByCode,
+  selectCompany,
+} from "../../../redux/features/company/companySlice";
+import {
+  EMAIL_RESET,
+  sendAutomatedEmail,
+} from "../../../redux/features/email/emailSlice";
 
 const ReportList = ({ reports, isLoading }) => {
   const [search, setSearch] = useState("");
@@ -31,6 +39,8 @@ const ReportList = ({ reports, isLoading }) => {
   const filteredReports = useSelector(selectFilteredReports);
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
+  const companyResponse = useSelector(selectCompany); // Fetch company details
+  const company = companyResponse?.company || {}; // Destructure company details
 
   const shortenText = (text, n) => {
     if (text.length > n) {
@@ -40,17 +50,93 @@ const ReportList = ({ reports, isLoading }) => {
     return text;
   };
 
+  useEffect(() => {
+    // Fetch company details by user's company code when the component mounts
+    if (user?.companyCode) {
+      dispatch(getCompanyByCode(user.companyCode));
+    }
+  }, [dispatch, user]);
+
   // Function to delete the report without a code (for admins)
-  const delReport = async (id) => {
+  /*   const delReport = async (id) => {
     await dispatch(deleteReport({ id })); // Pass the id as an object
     await dispatch(getReports());
+  }; */
+  // Function to delete the report without a code (for admins)
+  const delReport = async (id) => {
+    try {
+      const reportToDelete = reports.find((report) => report._id === id); // Get report details
+
+      await dispatch(deleteReport({ id })); // Pass the id as an object
+      await dispatch(getReports()); // Refresh report list
+
+      // Send email to company owner after deletion
+      if (company && company.ownerEmail) {
+        const emailData = {
+          subject: `${company.name} - Sales Report Deleted`,
+          send_to: company.ownerEmail,
+          reply_to: "noreply@gasstationpro.com",
+          template: "reportDeleted", // Use the "reportDeleted" template you created
+          name: user?.name, // The user who deleted the report
+          companyCode: null,
+          url: null,
+          ownerName: company.ownerName,
+          companyName: company.name,
+          storeName: reportToDelete.storeName, // Store name
+          managerName: null,
+          reportDate: new Date(reportToDelete.date).toISOString().split("T")[0], // Format the date
+          updatedDate: new Date().toISOString().split("T")[0], // updatedDate used as Deletion date as today's date
+        };
+
+        await dispatch(sendAutomatedEmail(emailData));
+        dispatch(EMAIL_RESET());
+        toast.success("Email notification sent to the owner.");
+      }
+    } catch (error) {
+      toast.error("Error deleting report or sending email: " + error.message);
+    }
   };
 
   // Function to delete the report with a code (for non-admins)
   // Function to delete the report with a code (for non-admins)
-  const delReportWithCode = async (id, deleteCode) => {
+  /*   const delReportWithCode = async (id, deleteCode) => {
     await dispatch(deleteReport({ id, deleteCode })); // Pass both id and deleteCode
     await dispatch(getReports()); // Refresh the report list
+  };
+ */
+  // Function to delete the report with a code (for non-admins)
+  const delReportWithCode = async (id, deleteCode) => {
+    try {
+      const reportToDelete = reports.find((report) => report._id === id);
+
+      await dispatch(deleteReport({ id, deleteCode })); // Pass both id and deleteCode
+      await dispatch(getReports()); // Refresh report list
+
+      // Send email to company owner after deletion
+      if (company && company.ownerEmail) {
+        const emailData = {
+          subject: `${company.name} - Sales Report Deleted`,
+          send_to: company.ownerEmail,
+          reply_to: "noreply@gasstationpro.com",
+          template: "reportDeleted",
+          name: user?.name,
+          companyCode: null,
+          ownerName: company.ownerName,
+          storeName: reportToDelete.storeName,
+          reportCreationDate: new Date(reportToDelete.date)
+            .toISOString()
+            .split("T")[0],
+          deletionDate: new Date().toISOString().split("T")[0],
+          deletedBy: user?.name,
+        };
+
+        await dispatch(sendAutomatedEmail(emailData));
+        dispatch(EMAIL_RESET());
+        toast.success("Email notification sent to the owner.");
+      }
+    } catch (error) {
+      toast.error("Error deleting report or sending email: " + error.message);
+    }
   };
 
   // Function to handle the delete action with reactjs-popup
@@ -238,8 +324,8 @@ const ReportList = ({ reports, isLoading }) => {
                 className="--btn --btn-primary"
                 onClick={() => {
                   if (deleteCode) {
-                    console.log("report id", selectedReportId);
-                    console.log("delete code", deleteCode);
+                    //console.log("report id", selectedReportId);
+                    //console.log("delete code", deleteCode);
 
                     delReportWithCode(selectedReportId, deleteCode);
                     setSelectedReportId(null); // Close popup
