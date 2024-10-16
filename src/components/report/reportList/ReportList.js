@@ -291,18 +291,21 @@ const ReportList = ({ reports, isLoading }) => {
                             <AiOutlineEye size={25} color={"purple"} />
                           </Link>
                         </span>
+                        {
+                          <span title="Edit Report">
+                            <Link to={`/edit-report/${_id}`}>
+                              <FaEdit size={20} color={"green"} />
+                            </Link>
+                          </span>
+                        }
+
                         {/* <span title="Edit Report">
-                          <Link to={`/edit-report/${_id}`}>
-                            <FaEdit size={20} color={"green"} />
-                          </Link>
-                        </span> */}
-                        <span title="Edit Report">
                           <FaEdit
                             size={20}
                             color={"green"}
                             onClick={() => handleOnClickEdit()} // Handle delete click. Once we fix issue with edit report sharing values with multiple fields, use the commented one above
                           />
-                        </span>
+                        </span> */}
                         <span title="Delete Report">
                           <FaTrashAlt
                             size={20}
