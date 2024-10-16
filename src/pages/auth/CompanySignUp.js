@@ -103,7 +103,7 @@ const CompanySignUp = () => {
             <input
               type="text"
               placeholder="Company Name"
-              name="companyName"
+              name="name"
               value={name}
               onChange={handleInputChange}
               required
