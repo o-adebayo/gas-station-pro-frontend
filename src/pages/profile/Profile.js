@@ -62,7 +62,8 @@ const Profile = () => {
         email: user?.email,
         phone: user?.phone,
         storeId: user?.storeId,
-        photo: user?.photo,
+        //photo: user?.photo,
+        photo: user?.photo?.filePath, // Access filePath from photo object
         role: user?.role,
         status: user?.status,
       });
