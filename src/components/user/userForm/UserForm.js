@@ -65,7 +65,7 @@ const UserForm = ({
               name="storeName"
               value={user?.storeName}
               onChange={handleInputChange}
-              required
+              /* required */
             >
               <option value="">Select Store</option>
               {stores.map((store) => (
