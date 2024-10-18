@@ -180,6 +180,10 @@ const storeLocationSlice = createSlice({
       .addCase(createStoreLocation.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
+        // Ensure 'storeLocations' is always an array before pushing
+        if (!Array.isArray(state.storeLocations)) {
+          state.storeLocations = [];
+        }
         state.storeLocations.push(action.payload);
         toast.success("Store added successfully");
       })
