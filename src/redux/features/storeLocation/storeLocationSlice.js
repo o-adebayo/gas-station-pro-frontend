@@ -180,7 +180,13 @@ const storeLocationSlice = createSlice({
       .addCase(createStoreLocation.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
-        state.storeLocations.push(action.payload);
+        // Ensure storeLocations is always an array before pushing
+        if (Array.isArray(state.storeLocations)) {
+          state.storeLocations.push(action.payload);
+        } else {
+          // If somehow state.storeLocations is not an array, reset it to an array
+          state.storeLocations = [action.payload];
+        }
         toast.success("Store added successfully");
       })
       .addCase(createStoreLocation.rejected, (state, action) => {
