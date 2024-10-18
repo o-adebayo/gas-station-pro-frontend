@@ -16,9 +16,6 @@ import {
   selectStores,
 } from "../../redux/features/storeLocation/storeLocationSlice";
 
-const cloud_name = process.env.REACT_APP_CLOUDINARY_CLOUD_NAME;
-const upload_preset = process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET;
-
 const EditProfile = () => {
   useRedirectLoggedOutUser("/login");
   const dispatch = useDispatch();
@@ -76,41 +73,22 @@ const EditProfile = () => {
     e.preventDefault();
 
     try {
-      let imageURL = profile.photo;
+      // Prepare form data
+      const formData = new FormData();
+      formData.append("name", profile.name);
+      formData.append("phone", profile.phone);
 
-      // Handle image upload to Cloudinary if there's an image
-      if (
-        profileImage &&
-        (profileImage.type === "image/jpg" ||
-          profileImage.type === "image/jpeg" ||
-          profileImage.type === "image/png")
-      ) {
-        const image = new FormData();
-        image.append("file", profileImage);
-        image.append("cloud_name", cloud_name);
-        image.append("upload_preset", upload_preset);
-
-        // Upload image to Cloudinary and get the URL
-        const response = await fetch(
-          `https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`,
-          { method: "post", body: image }
-        );
-
-        const imgData = await response.json();
-        imageURL = imgData.url.toString();
+      // Append the image if a new one is selected
+      if (profileImage) {
+        formData.append("photo", profileImage);
       }
 
-      // Save profile data including image URL to DB
-      const userData = {
-        name: profile.name,
-        phone: profile.phone,
-        photo: imageURL,
-      };
+      // Dispatch the updateUserProfile action with the form data
+      await dispatch(updateUserProfile(formData)).unwrap();
 
-      dispatch(updateUserProfile(userData));
-      toast.success("Profile updated successfully");
+      toast.success("Profile updated successfully!");
     } catch (error) {
-      toast.error(error.message);
+      toast.error("Failed to update profile. Please try again.");
     }
   };
 

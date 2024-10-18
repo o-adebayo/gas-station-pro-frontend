@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import UserForm from "../../components/user/userForm/UserForm";
 import { useDispatch, useSelector } from "react-redux";
-
 import {
   fetchStoreLocations,
   selectStores,
@@ -12,6 +11,7 @@ import {
   registerByAdmin,
   selectIsLoading,
 } from "../../redux/features/auth/authSlice";
+import { toast } from "react-toastify";
 
 const initialState = {
   name: "", // Name of the user
@@ -25,8 +25,11 @@ const initialState = {
 const AddUser = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
   // Let's create our user initial states
   const [user, setUser] = useState(initialState);
+  const [userImage, setUserImage] = useState(null); // For the user profile image
+  const [imagePreview, setImagePreview] = useState(null);
 
   // Select isLoading from the manageUserSlice
   const isLoading = useSelector(selectIsLoading);
@@ -53,25 +56,41 @@ const AddUser = () => {
     setUser({ ...user, [name]: value });
   };
 
+  // Handle image file selection
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    setUserImage(file); // Store the image file in state
+    setImagePreview(URL.createObjectURL(file)); // Create a preview for the image
+  };
+
   // Function to save user into the DB
   const saveUser = async (e) => {
     e.preventDefault();
 
-    // Prepare the user data to be saved
-    const userData = {
-      name,
-      email,
-      password,
-      role,
-      storeName,
-      phone,
-    };
+    try {
+      // Prepare the user data in a FormData object for file upload
+      const formData = new FormData();
+      formData.append("name", name);
+      formData.append("email", email);
+      formData.append("password", password);
+      formData.append("role", role);
+      formData.append("storeName", storeName);
+      formData.append("phone", phone);
 
-    // Dispatch the createUser action with the user data
-    await dispatch(registerByAdmin(userData));
+      // Append the user image if available
+      if (userImage) {
+        formData.append("photo", userImage);
+      }
 
-    // Navigate to the dashboard or the all users page
-    navigate("/users");
+      // Dispatch the registerByAdmin action with the form data
+      await dispatch(registerByAdmin(formData)).unwrap();
+
+      //toast.success("User added successfully!");
+      navigate("/users"); // Redirect to the users page
+    } catch (error) {
+      console.error("Failed to add user:", error);
+      toast.error("Failed to add user. Please try again.");
+    }
   };
 
   return (
@@ -83,6 +102,8 @@ const AddUser = () => {
         handleInputChange={handleInputChange} // Pass the function that handles input change
         saveUser={saveUser} // Pass the function to save the user
         stores={stores} // Pass the stores list for the dropdown
+        handleImageChange={handleImageChange} // Handle image file selection
+        imagePreview={imagePreview} // Pass image preview to the form
       />
     </div>
   );

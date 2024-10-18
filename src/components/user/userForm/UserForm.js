@@ -3,7 +3,14 @@ import "./UserForm.scss";
 import Card from "../../card/Card";
 
 // Destructure props passed into the UserForm from the AddUser file
-const UserForm = ({ user, handleInputChange, saveUser, stores }) => {
+const UserForm = ({
+  user,
+  handleInputChange,
+  handleImageChange, // For handling image changes
+  imagePreview, // For previewing the selected image
+  saveUser,
+  stores,
+}) => {
   return (
     <div className="add-user">
       <Card cardClass={"card form-card"}>
@@ -79,6 +86,26 @@ const UserForm = ({ user, handleInputChange, saveUser, stores }) => {
               onChange={handleInputChange}
               required
             />
+          </div>
+
+          <div className="form-group">
+            <label>User Profile Picture</label>
+            <code className="--color-dark">
+              Supported Formats: jpg, jpeg, png
+            </code>
+            <input
+              type="file"
+              name="image"
+              accept="image/*"
+              onChange={handleImageChange}
+            />
+            {imagePreview != null ? (
+              <div className="image-preview">
+                <img src={imagePreview} alt="User profile" />
+              </div>
+            ) : (
+              <p>No image set for this user.</p>
+            )}
           </div>
 
           <div className="form-actions">
