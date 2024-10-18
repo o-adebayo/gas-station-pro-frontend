@@ -25,9 +25,10 @@ const AddStoreLocation = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [storeLocation, setStoreLocation] = useState(initialState);
-  const [storeLocationImage, setStoreLocationImage] = useState(null);
+  const [storeLocationImage, setStoreLocationImage] = useState("");
   const [imagePreview, setImagePreview] = useState(null);
   const [description, setDescription] = useState("");
+
   const [isLoading, setIsLoading] = useState(false);
 
   const user = useSelector(selectUser);
@@ -59,51 +60,27 @@ const AddStoreLocation = () => {
     setIsLoading(true);
 
     try {
-      // Handle Image upload to Cloudinary if there's an image
-      let imageURL = "";
-      if (
-        storeLocationImage &&
-        (storeLocationImage.type === "image/jpeg" ||
-          storeLocationImage.type === "image/jpg" ||
-          storeLocationImage.type === "image/png")
-      ) {
-        const image = new FormData();
-        image.append("file", storeLocationImage);
-        image.append("cloud_name", cloud_name);
-        image.append("upload_preset", upload_preset);
+      // Prepare form data to send to the backend
+      const formData = new FormData();
+      formData.append("companyCode", storeLocation.companyCode);
+      formData.append("name", storeLocation.name);
+      formData.append("location", storeLocation.location);
+      formData.append("pumps", storeLocation.pumps);
+      formData.append("nozzles", storeLocation.nozzles);
+      formData.append("tanks", storeLocation.tanks);
+      formData.append("managerEmail", storeLocation.managerEmail);
+      formData.append("description", description);
 
-        // Upload the image to Cloudinary
-        const response = await fetch(
-          `https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`,
-          { method: "post", body: image }
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to upload image to Cloudinary");
-        }
-
-        const imgData = await response.json();
-        imageURL = imgData.url.toString();
+      // Append the image if it exists
+      if (storeLocationImage) {
+        formData.append("image", storeLocationImage);
       }
 
-      // Prepare data to save to the database
-      const formData = {
-        companyCode: storeLocation.companyCode,
-        name: storeLocation.name,
-        location: storeLocation.location,
-        pumps: storeLocation.pumps,
-        nozzles: storeLocation.nozzles,
-        tanks: storeLocation.tanks,
-        managerEmail: storeLocation.managerEmail,
-        description,
-        image: imageURL, // Assign image URL after successful upload
-      };
-
-      // Dispatch the form data to create store location
-      await dispatch(createStoreLocation(formData));
+      // Dispatch the form data to create the store location
+      await dispatch(createStoreLocation(formData)).unwrap();
 
       toast.success("Store Location created successfully!");
-      navigate("/stores"); // Redirect to the appropriate page
+      navigate("/stores"); // Redirect to the stores page after success
     } catch (error) {
       console.error("Failed to save store location:", error);
       toast.error("Failed to save store location. Please try again.");
