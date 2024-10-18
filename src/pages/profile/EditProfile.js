@@ -102,7 +102,9 @@ const EditProfile = () => {
       <Card cardClass={"card --flex-dir-column"}>
         <span className="profile-photo">
           <img
-            src={imagePreview === null ? profile?.photo : imagePreview}
+            src={
+              imagePreview === null ? profile?.photo?.filepath : imagePreview
+            }
             alt="Profileimg"
           />
         </span>

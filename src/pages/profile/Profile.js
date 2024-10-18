@@ -78,7 +78,10 @@ const Profile = () => {
       ) : (
         <Card cardClass={"card --flex-dir-column"}>
           <span className="profile-photo">
-            <img src={profile?.photo} alt="Profilepic" />
+            <img
+              src={profile?.photo?.filePath || "/default-profile.png"}
+              alt="Profile"
+            />
           </span>
           <span className="profile-data">
             <p>
