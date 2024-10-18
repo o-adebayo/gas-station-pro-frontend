@@ -62,8 +62,7 @@ const Profile = () => {
         email: user?.email,
         phone: user?.phone,
         storeId: user?.storeId,
-        //photo: user?.photo,
-        photo: user?.photo?.filePath, // Access filePath from photo object
+        photo: user?.photo || "", // Access filePath from photo object
         role: user?.role,
         status: user?.status,
       });
@@ -80,7 +79,7 @@ const Profile = () => {
         <Card cardClass={"card --flex-dir-column"}>
           <span className="profile-photo">
             <img
-              src={profile?.photo?.filePath || "/default-profile.png"}
+              src={profile?.photo || "/default-profile.png"} // Use profile.photo directly
               alt="Profile"
             />
           </span>

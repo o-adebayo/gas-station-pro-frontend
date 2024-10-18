@@ -102,10 +102,8 @@ const EditProfile = () => {
       <Card cardClass={"card --flex-dir-column"}>
         <span className="profile-photo">
           <img
-            src={
-              imagePreview === null ? profile?.photo?.filepath : imagePreview
-            }
-            alt="Profileimg"
+            src={imagePreview || profile?.photo || "/default-profile.png"} // Use imagePreview if a new image is selected, otherwise use photo URL
+            alt="Profile"
           />
         </span>
         <form className="--form-control --m" onSubmit={saveProfile}>
