@@ -4,6 +4,7 @@ import { BiCategory } from "react-icons/bi";
 import { FaGasPump, FaStore, FaUserTie } from "react-icons/fa";
 import InfoBox from "../../infoBox/InfoBox";
 import { TbCurrencyNaira } from "react-icons/tb";
+import { Link } from "react-router-dom";
 
 // Icons
 const earningIcon = <TbCurrencyNaira size={40} color="#fff" />;
@@ -49,43 +50,49 @@ const ReportSummary = ({ reports = [], userRole }) => {
   // Determine whether to show "Company Stats" or "Store Stats"
   const title = userRole === "admin" ? "Company Stats" : "Store Stats";
 
+  // Conditionally render Link or static InfoBox based on userRole
+  const renderInfoBox = (icon, title, count, bgColor, link) => {
+    if (userRole === "admin") {
+      return (
+        <Link to={link}>
+          <InfoBox icon={icon} title={title} count={count} bgColor={bgColor} />
+        </Link>
+      );
+    }
+    return (
+      <InfoBox icon={icon} title={title} count={count} bgColor={bgColor} />
+    );
+  };
+
   // Return the final summary display
   return (
     <div className="report-summary">
       <h3 className="--mt">{title}</h3>
       <div className="info-summary">
-        {userRole === "admin" && (
-          <InfoBox
-            icon={storeIcon}
-            title={"Stores"}
-            count={uniqueStores}
-            bgColor="card1"
-          />
+        {userRole === "admin" &&
+          renderInfoBox(storeIcon, "Stores", uniqueStores, "card1", "/stores")}
+        {renderInfoBox(
+          managerIcon,
+          "Managers",
+          uniqueManagers,
+          "card5",
+          "/users"
         )}
-        <InfoBox
-          icon={managerIcon}
-          title={"Managers"}
-          count={uniqueManagers}
-          bgColor="card5"
-        />
-        <InfoBox
-          icon={categoryIcon}
-          title={"Products"}
-          count={uniqueProducts}
-          bgColor="card3"
-        />
-        <InfoBox
-          icon={pumpIcon}
-          title={"Total Sales (Litres)"}
-          count={totalSalesLiters.toLocaleString()} // Formatting liters
-          bgColor="card4"
-        />
-        <InfoBox
-          icon={earningIcon}
-          title={"Total Sales"}
-          count={`₦${totalSalesDollars.toLocaleString()}`} // Formatting money
-          bgColor="card2"
-        />
+        {renderInfoBox(categoryIcon, "Products", uniqueProducts, "card3")}
+        {renderInfoBox(
+          pumpIcon,
+          "Total Sales (Litres)",
+          totalSalesLiters.toLocaleString(),
+          "card4",
+          "/sales-list"
+        )}
+        {renderInfoBox(
+          earningIcon,
+          "Total Sales",
+          `₦${totalSalesDollars.toLocaleString()}`,
+          "card2",
+          "/sales-list"
+        )}
       </div>
     </div>
   );

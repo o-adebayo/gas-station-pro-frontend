@@ -1,7 +1,12 @@
-import React from "react";
+import React, { useEffect } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import Card from "../../card/Card";
+import { useDispatch, useSelector } from "react-redux"; // Import Redux hooks
+import {
+  fetchUsers,
+  selectUsers,
+} from "../../../redux/features/auth/authSlice"; // Import fetchUsers and selectUsers
 
 import "./StoreLocationForm.scss";
 
@@ -15,6 +20,15 @@ const StoreLocationForm = ({
   handleImageChange,
   saveStoreLocation,
 }) => {
+  const dispatch = useDispatch();
+
+  // Fetch users on component mount
+  useEffect(() => {
+    dispatch(fetchUsers()); // Fetch all users when the form loads
+  }, [dispatch]);
+
+  const users = useSelector(selectUsers) || []; // Get the list of users
+
   return (
     <div className="add-storeLocation">
       <Card cardClass={"card"}>
@@ -95,14 +109,22 @@ const StoreLocationForm = ({
             value={storeLocation?.tanks}
             onChange={handleInputChange}
           />
+          {/* Manager Email Dropdown */}
           <label>Store Manager Email:</label>
-          <input
-            type="text"
-            placeholder="Store Manager Email"
-            name="managerEmail" // Make sure this matches the property in the state
-            value={storeLocation?.managerEmail} // Accessing value from storeLocation state
-            onChange={handleInputChange} // Updating state on input change
-          />
+          <select
+            name="managerEmail"
+            value={storeLocation?.managerEmail}
+            onChange={handleInputChange}
+          >
+            <option value="">Select Manager Email</option>
+            {users
+              .filter((user) => user.role === "manager") // Only show managers
+              .map((manager) => (
+                <option key={manager._id} value={manager.email}>
+                  {manager.email}
+                </option>
+              ))}
+          </select>
           <label>Store Description:</label>
           {
             <ReactQuill
