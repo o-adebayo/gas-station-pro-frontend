@@ -1,0 +1,169 @@
+.detailed-sales-report {
+  padding: 20px;
+  background-color: #fff; /* Ensure the background is light */
+
+  .filter-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    background-color: #f9f9f9; /* Light background for filters */
+    padding: 10px;
+    border-radius: 5px;
+
+    .input-fields input {
+      margin-right: 10px;
+      padding: 8px; /* Add padding for better spacing */
+      border: 1px solid #ccc; /* Light border for inputs */
+      border-radius: 4px;
+      background-color: #fff; /* Ensure input background is white */
+    }
+
+    .date-range {
+      display: flex;
+      align-items: center;
+
+      label {
+        margin-right: 5px;
+        color: #333; /* Dark text for labels */
+      }
+
+      .react-datepicker-wrapper {
+        input {
+          padding: 8px;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          background-color: #fff;
+        }
+      }
+    }
+
+    .btn-fetch {
+      background-color: #4caf50;
+      color: white;
+      padding: 10px 15px;
+      cursor: pointer;
+      border: none;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+
+      &:hover {
+        background-color: #45a049; /* Slightly darker on hover */
+      }
+    }
+  }
+
+  .table-container {
+    margin-top: 20px;
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      font-size: 1.4rem;
+      border-radius: 12px;
+      overflow: hidden;
+
+      thead {
+        border-top: 2px solid var(--light-blue);
+        border-bottom: 2px solid var(--light-blue);
+        background-color: #f5f7fa;
+        text-transform: uppercase;
+        font-weight: bold;
+      }
+
+      th,
+      td {
+        vertical-align: middle;
+        text-align: left;
+        padding: 12px 15px;
+        border-bottom: 1px solid #eee;
+
+        &.icons {
+          display: flex;
+          justify-content: flex-start;
+          align-items: center;
+          > * {
+            margin-right: 7px;
+            cursor: pointer;
+            vertical-align: middle;
+            transition: transform 0.2s ease;
+            &:hover {
+              transform: scale(1.1);
+            }
+          }
+        }
+      }
+
+      th {
+        background-color: #f1f4f8;
+        border-bottom: 2px solid #ddd;
+        color: #333;
+      }
+
+      tbody tr {
+        border-bottom: 1px solid #ddd;
+        transition: background-color 0.3s ease;
+      }
+
+      tr:nth-child(even) {
+        background-color: #f9f9f9;
+      }
+
+      tbody tr:hover {
+        cursor: pointer;
+        background-color: rgba(31, 147, 255, 0.1);
+      }
+
+      td {
+        color: #555;
+      }
+    }
+  }
+
+  .export-button {
+    margin-top: 20px;
+
+    .btn-export {
+      background-color: #007bff;
+      color: white;
+      padding: 10px 15px;
+      text-decoration: none;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+
+      &:hover {
+        background-color: #0056b3;
+      }
+    }
+    .btn-export.disabled {
+      color: black; /* Keep the text black */
+      cursor: not-allowed;
+      opacity: 0.6; /* Make the button look disabled with reduced opacity */
+    }
+  }
+}
+
+.input-fields {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  input,
+  select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    background-color: #fff;
+    width: 200px; /* You can adjust the width */
+    transition: border-color 0.3s ease;
+
+    &:focus {
+      border-color: #007bff; /* Add focus color for better UX */
+    }
+
+    option {
+      background-color: #fff;
+      color: #333;
+    }
+  }
+}

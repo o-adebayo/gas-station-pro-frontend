@@ -181,7 +181,7 @@ const ReportList = ({ reports, isLoading }) => {
   }, [itemOffset, itemsPerPage, filteredReports]);
 
   const handlePageClick = (event) => {
-    const newOffset = (event.selected * itemsPerPage) % filteredReports.length;
+    const newOffset = (event.selected * itemsPerPage) % filteredReports?.length;
     setItemOffset(newOffset);
   };
   // End Pagination
@@ -233,7 +233,7 @@ const ReportList = ({ reports, isLoading }) => {
         {isLoading && <SpinnerImg />}
 
         <div className="table">
-          {!isLoading && reports.length === 0 ? (
+          {!isLoading && reports?.length === 0 ? (
             <p>-- No reports found...</p>
           ) : (
             <table>

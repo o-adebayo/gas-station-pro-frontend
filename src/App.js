@@ -33,6 +33,7 @@ import StoreList from "./pages/storeList/StoreList";
 import ActivateUserAddedByAdmin from "./pages/auth/ActivateUserAddedByAdmin";
 import AddCompany from "./pages/addCompany/AddCompany";
 import CompanySignUp from "./pages/auth/CompanySignUp";
+import SalesList from "./pages/salesList/SalesList";
 
 axios.defaults.withCredentials = true;
 
@@ -174,6 +175,16 @@ function App() {
             <Sidebar>
               <Layout>
                 <StoreList />
+              </Layout>
+            </Sidebar>
+          }
+        />
+        <Route
+          path="/sales-list"
+          element={
+            <Sidebar>
+              <Layout>
+                <SalesList />
               </Layout>
             </Sidebar>
           }

@@ -39,6 +39,10 @@ const menu = [
         title: "Stores",
         path: "/stores",
       },
+      {
+        title: "Sales",
+        path: "/sales-list",
+      },
     ],
   },
   {

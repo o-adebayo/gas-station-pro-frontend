@@ -128,6 +128,31 @@ export const updateReport = createAsyncThunk(
   }
 );
 
+// Get Detailed Sales Reports with query parameters (filters)
+export const getDetailedSalesReports = createAsyncThunk(
+  "reports/getDetailedSalesReports",
+  async (queryParams, thunkAPI) => {
+    try {
+      // Construct query string from the queryParams object
+      const queryString = new URLSearchParams(queryParams).toString();
+
+      // Make GET request with query string
+      const response = await reportService.getDetailedSalesReports(queryString);
+
+      return response.data;
+    } catch (error) {
+      const message =
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        error.message ||
+        error.toString();
+      console.log(message);
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
 const reportSlice = createSlice({
   name: "report",
   initialState,
@@ -162,11 +187,30 @@ const reportSlice = createSlice({
         state.isLoading = false;
         state.isSuccess = true;
         state.isError = false;
-        //console.log(action.payload);
-        state.reports.push(action.payload);
-        state.reports = action.payload;
+        // Check if action.payload is an array before pushing or assigning it
+        if (Array.isArray(action.payload)) {
+          state.reports = action.payload; // Directly replace the array with payload
+        } else {
+          state.reports = []; // Fallback to an empty array
+        }
       })
       .addCase(getReports.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+        toast.error(action.payload);
+      })
+      // get detailed sales report
+      .addCase(getDetailedSalesReports.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(getDetailedSalesReports.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.isError = false;
+        state.reports = action.payload; // Assign the fetched reports to the state
+      })
+      .addCase(getDetailedSalesReports.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.message = action.payload;

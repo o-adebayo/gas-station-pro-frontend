@@ -56,12 +56,33 @@ const updateReport = async (id, formData) => {
   return response.data;
 };
 
+// Helper function to build query parameters
+const buildQueryParams = (params) => {
+  const query = new URLSearchParams();
+  Object.keys(params).forEach((key) => {
+    if (params[key]) {
+      query.append(key, params[key]);
+    }
+  });
+  return query.toString();
+};
+
+// Service function for fetching detailed sales reports with query params
+const getDetailedSalesReports = async (params) => {
+  const queryParams = buildQueryParams(params); // Convert params into query string
+  const response = await axios.get(
+    `${API_URL}/detailed-sales-report?${queryParams}`
+  ); // Attach query string to API URL
+  return response.data;
+};
+
 const reportService = {
   createReport,
   getReports,
   deleteReport,
   getReport,
   updateReport,
+  getDetailedSalesReports,
 };
 
 export default reportService;
