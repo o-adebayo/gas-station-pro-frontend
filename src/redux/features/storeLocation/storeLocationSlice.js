@@ -149,6 +149,24 @@ export const updateStoreLocationManager = createAsyncThunk(
   }
 );
 
+// Import stores via CSV
+export const importStores = createAsyncThunk(
+  "stores/import",
+  async (csvFile, thunkAPI) => {
+    try {
+      return await storeLocationService.importStores(csvFile);
+    } catch (error) {
+      const message =
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        error.message ||
+        error.toString();
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
 const storeLocationSlice = createSlice({
   name: "storeLocation",
   initialState,
@@ -276,6 +294,28 @@ const storeLocationSlice = createSlice({
         toast.success(action.payload.message);
       })
       .addCase(updateStoreLocationManager.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+        toast.error(action.payload);
+      })
+      // Import stores
+      .addCase(importStores.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(importStores.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        // If the response contains an array of stores, append them to the storeLocations state
+        if (Array.isArray(action.payload.stores)) {
+          state.storeLocations = [
+            ...state.storeLocations,
+            ...action.payload.stores,
+          ];
+        }
+        //toast.success("Stores imported successfully");
+      })
+      .addCase(importStores.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.message = action.payload;

@@ -44,6 +44,16 @@ const updateStoreLocationManager = async (formData) => {
   return response.data;
 };
 
+// Import stores via CSV file
+const importStores = async (formData) => {
+  const response = await axios.post(`${API_URL}import-stores`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data", // Ensure multipart content type
+    },
+  });
+  return response.data;
+};
+
 const storeLocationService = {
   createStoreLocation,
   getStoreLocations,
@@ -51,6 +61,7 @@ const storeLocationService = {
   deleteStoreLocation,
   updateStoreLocation,
   updateStoreLocationManager,
+  importStores,
   //getStoreByUserId,
 };
 

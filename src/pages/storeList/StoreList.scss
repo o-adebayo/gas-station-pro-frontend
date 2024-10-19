@@ -132,3 +132,12 @@
     }
   }
 }
+.store-actions {
+  display: flex;
+  gap: 10px; // Add spacing between Add Store and Import Stores buttons
+
+  .--btn {
+    padding: 10px 15px;
+    font-size: 1.4rem;
+  }
+}

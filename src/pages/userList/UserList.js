@@ -9,6 +9,7 @@ import ChangeStatus from "../../components/changeStatus/ChangeStatus";
 import AdminSetPassword from "../../components/adminSetPassword/AdminSetPassword";
 import { Link } from "react-router-dom";
 import {
+  adminImportUsers,
   fetchUsers,
   removeUser,
   resendUerActivationEmailByAdmin,
@@ -25,6 +26,7 @@ import {
 } from "../../redux/features/auth/userFilterSlice";
 import ReactPaginate from "react-paginate";
 import { SiKeepassxc } from "react-icons/si";
+import { toast } from "react-toastify";
 
 const UserList = () => {
   useRedirectLoggedOutUser("/login"); //use this at the very top of all pages that require a user to be logged so it doesnt try to fetch data on a loggedOut state
@@ -95,6 +97,63 @@ const UserList = () => {
     dispatch(FILTER_USERS({ users, search }));
   }, [dispatch, users, search]);
 
+  const handleUserCSVUpload = (file) => {
+    if (file) {
+      const formData = new FormData();
+      formData.append("csvFile", file);
+
+      dispatch(adminImportUsers(formData))
+        .unwrap()
+        .then((response) => {
+          // Ensure the response structure is as expected
+          if (!response) {
+            toast.error(
+              "Unexpected response from the server. Please try again."
+            );
+            return;
+          }
+
+          const { count, existingUsers, invalidRows } = response;
+
+          // Notify user of successful imports
+          if (count > 0) {
+            toast.success(`${count} users imported successfully.`);
+          } else {
+            toast.warn("No new users were imported.");
+          }
+
+          // Show skipped existing users
+          if (existingUsers && existingUsers.length > 0) {
+            const skippedUsers = existingUsers
+              .map((user) => user.email)
+              .join(", ");
+            toast.info(
+              `Skipped ${existingUsers.length} existing users: ${skippedUsers}`
+            );
+          }
+
+          // Show invalid rows
+          if (invalidRows && invalidRows.length > 0) {
+            const invalidRowMessages = invalidRows
+              .map((row) => `Row ${row.row}: ${row.message}`)
+              .join("; ");
+            toast.warn(
+              `${invalidRows.length} invalid rows skipped: ${invalidRowMessages}`
+            );
+          }
+
+          // Optionally reload user data
+          dispatch(fetchUsers()); // This re-fetches users from the backend
+        })
+        .catch((error) => {
+          // Check if error message exists in the response, otherwise provide a default error message
+          const errorMessage =
+            error?.message || "An error occurred while importing users.";
+          toast.error(`Failed to import users: ${errorMessage}`);
+        });
+    }
+  };
+
   // Begin Pagination
   const itemsPerPage = 5;
   const [itemOffset, setItemOffset] = useState(0);
@@ -133,6 +192,21 @@ const UserList = () => {
               <Link to="/add-user" className="add-user-link">
                 <button className="--btn --btn-primary">Add User</button>
               </Link>
+              <button
+                className="--btn --btn-primary"
+                onClick={() =>
+                  document.getElementById("import-users-input").click()
+                }
+              >
+                Import Users
+              </button>
+              <input
+                id="import-users-input"
+                type="file"
+                accept=".csv"
+                style={{ display: "none" }}
+                onChange={(e) => handleUserCSVUpload(e.target.files[0])}
+              />
             </span>
           </div>
 

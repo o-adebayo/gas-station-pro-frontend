@@ -10,6 +10,7 @@ import {
   getLoginStatus,
   getUser,
   getUsers,
+  importUsers,
   loginUser,
   loginWithCode,
   logoutUser,
@@ -442,6 +443,24 @@ export const userLoginWithCode = createAsyncThunk(
   async ({ code, email }, thunkAPI) => {
     try {
       return await loginWithCode(code, email);
+    } catch (error) {
+      const message =
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        error.message ||
+        error.toString();
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
+// Import users via CSV
+export const adminImportUsers = createAsyncThunk(
+  "users/import",
+  async (csvFile, thunkAPI) => {
+    try {
+      return await importUsers(csvFile); // Assuming userService is where the importUsers function is defined
     } catch (error) {
       const message =
         (error.response &&
@@ -944,6 +963,30 @@ const authSlice = createSlice({
         state.message = action.payload;
         state.user = null;
         toast.error(action.payload);
+      })
+      // Import users from CSV
+      .addCase(adminImportUsers.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(adminImportUsers.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        // Assuming the response contains an array of imported users
+        if (Array.isArray(action.payload.users)) {
+          state.users = [...state.users, ...action.payload.users];
+        }
+        //toast.success(`${action.payload.count} users imported successfully`);
+        if (action.payload.invalidRows?.length) {
+          toast.warning(
+            `Some rows were invalid: ${action.payload.invalidRows.length} rows`
+          );
+        }
+      })
+      .addCase(adminImportUsers.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+        //toast.error(`Failed to import users: ${action.payload}`);
       });
   },
 });

@@ -171,3 +171,13 @@ export const resendActivationEmailByAdmin = async (email) => {
   const response = await axios.post(API_URL + "resend-activation", email);
   return response.data.message;
 };
+
+// Import users via CSV file
+export const importUsers = async (formData) => {
+  const response = await axios.post(`${API_URL}import-users`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data", // Ensure multipart content type
+    },
+  });
+  return response.data;
+};
