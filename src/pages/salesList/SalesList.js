@@ -24,12 +24,14 @@ import {
 } from "../../redux/features/company/companySlice"; // Import necessary functions
 import { toast } from "react-toastify"; // Import toast for notifications
 import "./SalesList.scss";
+import { SpinnerImg } from "../../components/loader/Loader";
 
 const SalesList = () => {
   const dispatch = useDispatch();
 
   const reports = useSelector((state) => state.report.reports);
   const filteredReports = useSelector(selectFilteredReports);
+  const { isLoading } = useSelector((state) => state.report);
 
   const storesData = useSelector(selectStores); // Get the stores object
   const stores = storesData?.stores || []; // Ensure stores is an array inside storesData.stores
@@ -261,12 +263,13 @@ const SalesList = () => {
 
       {/* Display Total Sales */}
       <div className="totals-display">
-        <h4>Total Sales Liters: {totalSalesLiters} Liters</h4>
+        <h4>Total Sales Liters: {totalSalesLiters.toLocaleString()} Liters</h4>
         <h4>Total Sales Naira: ₦{totalSalesNaira.toLocaleString()}</h4>
       </div>
 
       {/* Table of Reports */}
       <div className="table-container">
+        {isLoading && <SpinnerImg />}
         <table>
           <thead>
             <tr>

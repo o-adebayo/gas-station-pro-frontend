@@ -30,7 +30,10 @@ const StoreList = () => {
   const user = useSelector(selectUser);
   const users = useSelector(selectUsers);
 
-  const { isLoading, isLoggedIn } = useSelector((state) => state.auth);
+  //changed from below to below so i can get loading state from storelocation slice since that is what is retuning my store locations
+  //const { isLoading, isLoggedIn } = useSelector((state) => state.auth);
+  const { isLoggedIn } = useSelector((state) => state.auth);
+  const { isLoading } = useSelector((state) => state.storeLocation);
   const storesData = useSelector(selectStores);
   const stores = storesData?.stores || [];
 
