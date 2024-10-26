@@ -1,32 +1,31 @@
-import React, { useState } from "react";
+import React from "react";
+import { Box, Button, TextField, Typography, MenuItem } from "@mui/material";
+import { Formik } from "formik";
+import * as yup from "yup";
 import Card from "../../components/card/Card";
-import "./Contact.scss";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { BACKEND_URL } from "../../services/authService";
 
 const Contact = () => {
-  const [subject, setSubject] = useState("");
-  const [message, setMessage] = useState("");
-  const [issueType, setIssueType] = useState("");
+  // Yup validation schema for form validation
+  const validationSchema = yup.object().shape({
+    issueType: yup.string().required("Please select an issue type."),
+    subject: yup.string().required("Subject is required"),
+    message: yup.string().required("Message is required"),
+  });
 
-  const data = {
-    subject,
-    message,
-    issueType,
-  };
+  // Function to handle form submission
+  const sendEmail = async (values, { resetForm }) => {
+    const data = {
+      subject: values.subject,
+      message: values.message,
+      issueType: values.issueType,
+    };
 
-  const sendEmail = async (e) => {
-    e.preventDefault();
-    if (!issueType) {
-      toast.error("Please select an issue type.");
-      return;
-    }
     try {
       const response = await axios.post(`${BACKEND_URL}/api/contactus`, data);
-      setSubject("");
-      setMessage("");
-      setIssueType("");
+      resetForm(); // Reset the form on success
       toast.success(response.data.message);
     } catch (error) {
       toast.error(error.message);
@@ -34,52 +33,90 @@ const Contact = () => {
   };
 
   return (
-    <div className="contact">
-      <Card cardClass="card">
-        {" "}
-        {/* Card outside the form */}
-        <form onSubmit={sendEmail}>
-          <label>Issue Type</label>
-          <select
-            name="issueType"
-            value={issueType}
-            onChange={(e) => setIssueType(e.target.value)}
-            required
-          >
-            <option value="">Select Issue Type</option>
-            <option value="Technical Issue">Technical Issue</option>
-            <option value="Billing Issue">Billing Issue</option>
-            <option value="General Inquiry">General Inquiry</option>
-            <option value="Other">Other</option>
-          </select>
+    <Box m="20px">
+      <Card>
+        <Typography variant="h4" mb={2}>
+          Contact Us
+        </Typography>
 
-          <label>Subject</label>
-          <input
-            type="text"
-            name="subject"
-            placeholder="Subject"
-            required
-            value={subject}
-            onChange={(e) => setSubject(e.target.value)}
-          />
+        <Formik
+          initialValues={{
+            subject: "",
+            message: "",
+            issueType: "",
+          }}
+          validationSchema={validationSchema}
+          onSubmit={sendEmail}
+        >
+          {({
+            values,
+            errors,
+            touched,
+            handleChange,
+            handleBlur,
+            handleSubmit,
+          }) => (
+            <form onSubmit={handleSubmit}>
+              {/* Issue Type Dropdown */}
+              <TextField
+                fullWidth
+                select
+                label="Issue Type"
+                name="issueType"
+                value={values.issueType}
+                onBlur={handleBlur}
+                onChange={handleChange}
+                error={touched.issueType && Boolean(errors.issueType)}
+                helperText={touched.issueType && errors.issueType}
+                sx={{ mb: 2 }}
+              >
+                <MenuItem value="">Select Issue Type</MenuItem>
+                <MenuItem value="Technical Issue">Technical Issue</MenuItem>
+                <MenuItem value="Billing Issue">Billing Issue</MenuItem>
+                <MenuItem value="General Inquiry">General Inquiry</MenuItem>
+                <MenuItem value="Other">Other</MenuItem>
+              </TextField>
 
-          <label>Message</label>
-          <textarea
-            cols="30"
-            rows="10"
-            name="message"
-            placeholder="Message"
-            required
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-          ></textarea>
+              {/* Subject Input */}
+              <TextField
+                fullWidth
+                variant="filled"
+                label="Subject"
+                name="subject"
+                value={values.subject}
+                onBlur={handleBlur}
+                onChange={handleChange}
+                error={touched.subject && Boolean(errors.subject)}
+                helperText={touched.subject && errors.subject}
+                sx={{ mb: 2 }}
+              />
 
-          <button type="submit" className="text-large navigation__cta">
-            Send Message
-          </button>
-        </form>
+              {/* Message Input */}
+              <TextField
+                fullWidth
+                variant="filled"
+                label="Message"
+                name="message"
+                multiline
+                rows={4}
+                value={values.message}
+                onBlur={handleBlur}
+                onChange={handleChange}
+                error={touched.message && Boolean(errors.message)}
+                helperText={touched.message && errors.message}
+                sx={{ mb: 2 }}
+              />
+
+              <Box display="flex" justifyContent="flex-end" mt={2}>
+                <Button type="submit" color="primary" variant="contained">
+                  Send Message
+                </Button>
+              </Box>
+            </form>
+          )}
+        </Formik>
       </Card>
-    </div>
+    </Box>
   );
 };
 

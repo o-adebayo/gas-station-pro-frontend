@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useTheme } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import useRedirectLoggedOutUser from "../../../customHook/useRedirectLoggedOutUser";
@@ -15,9 +16,11 @@ import {
 import Card from "../../card/Card";
 import { SpinnerImg } from "../../loader/Loader";
 import "./ReportDetail.scss";
+
 import DOMPurify from "dompurify";
 
 const ReportDetail = () => {
+  const theme = useTheme();
   useRedirectLoggedOutUser("/login");
   const dispatch = useDispatch();
   const { id } = useParams();
@@ -52,12 +55,43 @@ const ReportDetail = () => {
   };
 
   const handleBack = () => {
-    navigate("/dashboard");
+    navigate("/reports");
   };
 
   const handleEdit = () => {
     navigate(`/edit-report/${id}`); // Navigate to edit report page with the report ID
   };
+
+  useEffect(() => {
+    const root = document.documentElement;
+
+    // Set dynamic colors for various elements
+    root.style.setProperty("--card-bg-color", theme.palette.background.default);
+    root.style.setProperty("--card-shadow-color", theme.palette.background.alt);
+    root.style.setProperty("--primary-color", theme.palette.primary.main);
+    root.style.setProperty("--text-on-primary", theme.palette.text.primary);
+    root.style.setProperty("--highlight-color", theme.palette.secondary.main);
+
+    // Set heading color based on theme (primary for light, or white for dark)
+    root.style.setProperty("--heading-color", theme.palette.primary.main); // Modify this to any color you prefer
+
+    // Set other dynamic variables
+    root.style.setProperty("--text-color", theme.palette.text.primary);
+    root.style.setProperty("--divider-color", theme.palette.divider);
+    root.style.setProperty("--code-bg-color", theme.palette.background.paper);
+    root.style.setProperty("--code-text-color", theme.palette.text.secondary);
+    root.style.setProperty(
+      "--notes-bg-color",
+      theme.palette.background.default
+    );
+    root.style.setProperty("--notes-border-color", theme.palette.divider);
+    root.style.setProperty("--cancel-btn-bg", theme.palette.error.main);
+    root.style.setProperty("--cancel-btn-hover-bg", theme.palette.error.dark);
+    root.style.setProperty(
+      "--text-on-cancel-btn",
+      theme.palette.getContrastText(theme.palette.error.main)
+    );
+  }, [theme]);
 
   return (
     <div className="report-detail">

@@ -1,0 +1,528 @@
+import React, { useEffect, useState } from "react";
+import { SpinnerImg } from "../../loader/Loader";
+import { Link } from "react-router-dom";
+import { AiOutlineEye } from "react-icons/ai";
+import { FaEdit, FaTrashAlt } from "react-icons/fa";
+import Search from "../../search/Search";
+import { Box, Button, useTheme } from "@mui/material";
+import { DataGrid } from "@mui/x-data-grid";
+import HeaderNew from "../../HeaderNew";
+import DataGridCustomToolbar from "../../DataGridCustomToolbar";
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
+import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
+import { useDispatch, useSelector } from "react-redux";
+import { confirmAlert } from "react-confirm-alert"; // Import
+import "react-confirm-alert/src/react-confirm-alert.css"; // Import css
+import {
+  deleteReport,
+  getDetailedSalesReports,
+  getReports,
+  importReports,
+} from "../../../redux/features/report/reportSlice";
+import { selectUser } from "../../../redux/features/auth/authSlice";
+import Popup from "reactjs-popup"; // Import reactjs-popup
+import "reactjs-popup/dist/index.css"; // Import css for popup
+import { toast } from "react-toastify";
+import {
+  getCompanyByCode,
+  selectCompany,
+} from "../../../redux/features/company/companySlice";
+import {
+  EMAIL_RESET,
+  sendAutomatedEmail,
+} from "../../../redux/features/email/emailSlice";
+import useRedirectLoggedOutUser from "../../../customHook/useRedirectLoggedOutUser";
+import FlexBetween from "../../FlexBetween";
+
+const ReportListNew = () => {
+  const theme = useTheme();
+  useRedirectLoggedOutUser("/login");
+  const dispatch = useDispatch();
+  // values to be sent to the backend
+  const [page, setPage] = useState(0);
+  // const [pageSize, setPageSize] = useState(25);
+  // Get initial pageSize from localStorage or use default 25
+  const [pageSize, setPageSize] = useState(
+    () => parseInt(localStorage.getItem("pageSize")) || 25
+  );
+
+  const [sort, setSort] = useState({});
+  const [search, setSearch] = useState("");
+
+  const [searchInput, setSearchInput] = useState("");
+  const [deleteCode, setDeleteCode] = useState(""); // Store delete code
+  const [selectedReportId, setSelectedReportId] = useState(null); // Store selected report ID for delete
+
+  const user = useSelector(selectUser);
+  const companyResponse = useSelector(selectCompany); // Fetch company details
+  const company = companyResponse?.company || {}; // Destructure company details
+  //const reports = useSelector(selectReports);
+  const { reports, isLoading, total } = useSelector(
+    (state) => state.report.reports
+  );
+
+  const isAdmin = user?.role === "admin"; // Check if the user is an admin
+
+  const columns = [
+    {
+      field: "_id",
+      headerName: "ID",
+      flex: 1,
+    },
+    {
+      field: "date",
+      headerName: "Date Created",
+      flex: 1,
+      renderCell: (params) => {
+        const date = new Date(params.value);
+        return date.toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long", // Displays the full month name (e.g., October)
+          day: "numeric",
+        });
+      },
+    },
+
+    {
+      field: "storeName",
+      headerName: "Store Name",
+      flex: 1,
+    },
+    {
+      field: "managerName",
+      headerName: "Store Manager",
+      flex: 1,
+    },
+    {
+      field: "storeTotalSales.totalSalesLiters",
+      headerName: "Total Sales (Liters)",
+      flex: 0.5,
+      renderCell: (params) => {
+        // Safely access totalSalesLiters
+        return params.row.storeTotalSales?.totalSalesLiters || "N/A"; // Handle cases where it's undefined
+      },
+    },
+
+    {
+      field: "storeTotalSales.totalSalesDollars",
+      headerName: "Total Sales (Naira)",
+      flex: 1,
+      renderCell: (params) => {
+        const totalSalesNaira =
+          params.row.storeTotalSales?.totalSalesDollars || 0;
+        return `₦${totalSalesNaira.toLocaleString()}`; // Format the number with commas
+      },
+    },
+
+    /*  {
+      field: "products",
+      headerName: "# of Products",
+      flex: 0.5,
+      sortable: false,
+      renderCell: (params) => params.value.length,
+    }, */
+    {
+      field: "actions",
+      headerName: "Actions",
+      type: "actions",
+      width: 150,
+      renderCell: (params) => {
+        return (
+          <div className="action" style={{ display: "flex", gap: "10px" }}>
+            <Link title="View Report" to={`/report-detail/${params.row._id}`}>
+              <VisibilityOutlinedIcon
+                sx={{
+                  color:
+                    theme.palette.mode === "dark"
+                      ? theme.palette.info.light
+                      : theme.palette.info.main,
+                  "&:hover": {
+                    color: theme.palette.info.dark,
+                  },
+                }}
+              />
+            </Link>
+            <Link title="Edit Report" to={`/edit-report/${params.row._id}`}>
+              <EditOutlinedIcon
+                sx={{
+                  color:
+                    theme.palette.mode === "dark"
+                      ? theme.palette.warning.light
+                      : theme.palette.warning.main,
+                  "&:hover": {
+                    color: theme.palette.warning.dark,
+                  },
+                }}
+              />
+            </Link>
+            <span title="Delete Report" style={{ cursor: "pointer" }}>
+              <DeleteOutlinedIcon
+                onClick={() => handleDeleteClick(params.row._id)}
+                sx={{
+                  color:
+                    theme.palette.mode === "dark"
+                      ? theme.palette.error.light
+                      : theme.palette.error.main,
+                  "&:hover": {
+                    color: theme.palette.error.dark,
+                  },
+                }}
+              />
+            </span>
+          </div>
+        );
+      },
+    },
+  ];
+
+  // Fetch reports when component mounts or when page, pageSize, sort, or search changes
+  useEffect(() => {
+    dispatch(
+      getDetailedSalesReports({
+        page: page + 1, // Backend page is 1-based, while DataGrid is 0-based
+        pageSize,
+        sort,
+        search,
+      })
+    );
+  }, [dispatch, page, pageSize, sort, search]);
+
+  // Function to delete the report without a code (for admins)
+  const delReport = async (id) => {
+    try {
+      const reportToDelete = reports.find((report) => report._id === id); // Get report details
+
+      await dispatch(deleteReport({ id })); // Pass the id as an object
+      /* await dispatch(
+        getDetailedSalesReports({
+          page: page + 1, // Backend page is 1-based, while DataGrid is 0-based
+          pageSize,
+          sort,
+          search,
+        })
+      ); */
+      await dispatch(getReports()); // Refresh report list
+
+      // Send email to company owner after deletion
+      if (company && company.ownerEmail) {
+        const emailData = {
+          subject: `${company.name} - Sales Report Deleted`,
+          send_to: company.ownerEmail,
+          reply_to: "noreply@gasstationpro.com",
+          template: "reportDeleted", // Use the "reportDeleted" template you created
+          name: user?.name, // The user who deleted the report
+          companyCode: null,
+          url: null,
+          ownerName: company.ownerName,
+          companyName: company.name,
+          storeName: reportToDelete.storeName, // Store name
+          managerName: null,
+          reportDate: new Date(reportToDelete.date).toISOString().split("T")[0], // Format the date
+          updatedDate: new Date().toISOString().split("T")[0], // updatedDate used as Deletion date as today's date
+        };
+
+        await dispatch(sendAutomatedEmail(emailData));
+        dispatch(EMAIL_RESET());
+        toast.success("Email notification sent to the owner.");
+      }
+    } catch (error) {
+      toast.error("Error deleting report or sending email: " + error.message);
+    }
+  };
+
+  // Function to delete the report with a code (for non-admins)
+  // Function to delete the report with a code (for non-admins)
+  /*   const delReportWithCode = async (id, deleteCode) => {
+    await dispatch(deleteReport({ id, deleteCode })); // Pass both id and deleteCode
+    await dispatch(getReports()); // Refresh the report list
+  };
+ */
+  // Function to delete the report with a code (for non-admins)
+  const delReportWithCode = async (id, deleteCode) => {
+    try {
+      const reportToDelete = reports.find((report) => report._id === id);
+
+      await dispatch(deleteReport({ id, deleteCode })); // Pass both id and deleteCode
+      await dispatch(getReports()); // Refresh report list
+      /*       await dispatch(
+        getDetailedSalesReports({
+          page: page + 1, // Backend page is 1-based, while DataGrid is 0-based
+          pageSize,
+          sort,
+          search,
+        })
+      ); */
+
+      // Send email to company owner after deletion
+      if (company && company.ownerEmail) {
+        const emailData = {
+          subject: `${company.name} - Sales Report Deleted`,
+          send_to: company.ownerEmail,
+          reply_to: "noreply@gasstationpro.com",
+          template: "reportDeleted",
+          name: user?.name,
+          companyCode: null,
+          ownerName: company.ownerName,
+          storeName: reportToDelete.storeName,
+          reportCreationDate: new Date(reportToDelete.date)
+            .toISOString()
+            .split("T")[0],
+          deletionDate: new Date().toISOString().split("T")[0],
+          deletedBy: user?.name,
+        };
+
+        await dispatch(sendAutomatedEmail(emailData));
+        dispatch(EMAIL_RESET());
+        toast.success("Email notification sent to the owner.");
+      }
+    } catch (error) {
+      toast.error("Error deleting report or sending email: " + error.message);
+    }
+  };
+
+  /*   const handleOnClickEdit = () => {
+    toast.info(
+      "Edit feature coming soon, please delete and recreate in the meantime"
+    );
+  };
+ */
+  // Function to handle the delete action with reactjs-popup
+  const handleDeleteClick = (id) => {
+    if (user.role === "admin") {
+      // Admins do not need a delete code
+      confirmAlert({
+        title: "Delete Report",
+        message: "Are you sure you want to delete this report?",
+        buttons: [
+          {
+            label: "Delete",
+            onClick: () => delReport(id),
+          },
+          {
+            label: "Cancel",
+          },
+        ],
+      });
+    } else {
+      // For non-admins, show the popup
+      setSelectedReportId(id); // Store the ID of the selected report
+    }
+  };
+
+  const handlePageSizeChange = (newPageSize) => {
+    setPageSize(newPageSize);
+    localStorage.setItem("pageSize", newPageSize); // Store selection
+  };
+
+  const handleReportCSVUpload = (file) => {
+    if (file) {
+      const formData = new FormData();
+      formData.append("csvFile", file);
+
+      dispatch(importReports(formData))
+        .unwrap()
+        .then((response) => {
+          const { count, existingStores, invalidRows } = response;
+
+          // Notify user of successful imports
+          toast.success(`${count} stores imported successfully.`);
+
+          // Check if any stores were skipped
+          if (existingStores && existingStores.length > 0) {
+            const skippedStoreNames = existingStores
+              .map((store) => `${store.name} (${store.location})`)
+              .join(", ");
+            toast.info(
+              `Skipped ${existingStores.length} existing stores: ${skippedStoreNames}`
+            );
+          }
+
+          // Check if any invalid rows were found
+          if (invalidRows && invalidRows.length > 0) {
+            const invalidRowMessages = invalidRows
+              .map((row) => `Row ${row.row}: ${row.message}`)
+              .join("; ");
+            toast.warn(
+              `${invalidRows.length} invalid rows skipped: ${invalidRowMessages}`
+            );
+          }
+
+          // Refresh store data
+          //dispatch(getReports()); // Re-fetch stores
+          dispatch(
+            getDetailedSalesReports({
+              page: page + 1, // Backend page is 1-based, while DataGrid is 0-based
+              pageSize,
+              sort,
+              search,
+            })
+          );
+        })
+        .catch((error) => {
+          toast.error(`Failed to import stores: ${error.message}`);
+        });
+    }
+  };
+
+  return (
+    <Box m="1.5rem 2.5rem">
+      <HeaderNew title="REPORTS" subtitle="Entire list of reports" />
+      <Box
+        sx={{
+          button: {
+            alignItems: "center",
+            gap: "20px",
+
+            padding: "5px",
+            cursor: "pointer",
+          },
+        }}
+      >
+        <Box display="flex" gap={2}>
+          {/* Add User Button */}
+          <Link to="/add-report" style={{ textDecoration: "none" }}>
+            <Button
+              variant="contained"
+              sx={{
+                backgroundColor:
+                  theme.palette.mode === "dark"
+                    ? theme.palette.primary.main
+                    : theme.palette.primary.light,
+                color: theme.palette.getContrastText(
+                  theme.palette.primary.main
+                ),
+                "&:hover": {
+                  backgroundColor: theme.palette.primary.dark,
+                },
+              }}
+            >
+              Add Report
+            </Button>
+          </Link>
+
+          {/* Only show these buttons to admin users */}
+          {isAdmin && (
+            <>
+              {/* Import Reports Button */}
+              <Button
+                variant="contained"
+                onClick={() =>
+                  document.getElementById("import-reports-input").click()
+                }
+                sx={{
+                  backgroundColor:
+                    theme.palette.mode === "dark"
+                      ? theme.palette.secondary.main
+                      : theme.palette.secondary.light,
+                  color: theme.palette.getContrastText(
+                    theme.palette.secondary.main
+                  ),
+                  "&:hover": {
+                    backgroundColor: theme.palette.secondary.dark,
+                  },
+                }}
+              >
+                Import Reports
+              </Button>
+              <input
+                id="import-reports-input"
+                type="file"
+                accept=".csv"
+                style={{ display: "none" }}
+                onChange={(e) => handleReportCSVUpload(e.target.files[0])} // Ensure to add this function if necessary
+              />
+
+              {/* Download Sample File Button */}
+              <Button
+                variant="contained"
+                onClick={() => {
+                  const link = document.createElement("a");
+                  link.href = `${process.env.REACT_APP_BACKEND_URL}/sample_data_files/Sample_Import_Reports_File.csv`;
+                  link.download = "Sample_Import_Reports_File.csv";
+                  link.click();
+                }}
+                sx={{
+                  backgroundColor:
+                    theme.palette.mode === "dark"
+                      ? theme.palette.info.main
+                      : theme.palette.info.light,
+                  color: theme.palette.getContrastText(theme.palette.info.main),
+                  "&:hover": {
+                    backgroundColor: theme.palette.info.dark,
+                  },
+                }}
+              >
+                Download Sample File
+              </Button>
+            </>
+          )}
+        </Box>
+        <input
+          id="import-reports-input"
+          type="file"
+          accept=".csv"
+          style={{ display: "none" }}
+          onChange={(e) => handleReportCSVUpload(e.target.files[0])}
+        />
+      </Box>
+      <Box
+        height="80vh"
+        sx={{
+          "& .MuiDataGrid-root": {
+            border: "none",
+          },
+          "& .MuiDataGrid-cell": {
+            borderBottom: "none",
+          },
+          "& .MuiDataGrid-columnHeaders": {
+            backgroundColor: theme.palette.background.alt,
+            color: theme.palette.secondary[100],
+            borderBottom: "none",
+          },
+          "& .MuiDataGrid-virtualScroller": {
+            backgroundColor: theme.palette.primary.light,
+          },
+          "& .MuiDataGrid-footerContainer": {
+            backgroundColor: theme.palette.background.alt,
+            color: theme.palette.secondary[100],
+            borderTop: "none",
+          },
+          "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
+            color: `${theme.palette.secondary[200]} !important`,
+          },
+        }}
+      >
+        <DataGrid
+          loading={isLoading || !reports}
+          getRowId={(row) => row._id}
+          rows={reports || []}
+          columns={columns}
+          rowCount={total}
+          rowsPerPageOptions={[20, 50, 100]}
+          pagination
+          page={page}
+          pageSize={pageSize}
+          paginationMode="server"
+          sortingMode="server"
+          onPageChange={(newPage) => setPage(newPage)}
+          //onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+          onPageSizeChange={handlePageSizeChange}
+          onSortModelChange={(newSortModel) => setSort(...newSortModel)}
+          checkboxSelection
+          disableRowSelectionOnClick
+          slots={{ toolbar: DataGridCustomToolbar }}
+          slotProps={{
+            toolbar: {
+              searchInput,
+              setSearchInput,
+              setSearch,
+            },
+          }}
+        />
+      </Box>
+    </Box>
+  );
+};
+
+export default ReportListNew;

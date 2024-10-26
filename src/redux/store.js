@@ -8,6 +8,7 @@ import emailReducer from "../redux/features/email/emailSlice";
 import userFilterSlice from "./features/auth/userFilterSlice";
 import storeFilterSlice from "./features/storeLocation/storeFilterSlice";
 import companyReducer from "../redux/features/company/companySlice";
+import globalReducer from "../redux/features/state/state";
 
 // Redux Persist
 import { persistReducer, persistStore } from "redux-persist";
@@ -24,6 +25,7 @@ const rootReducer = combineReducers({
   userFilter: userFilterSlice, //I had to use that name because i created a filter for reports from a different project before
   storeFilter: storeFilterSlice, //I had to use that name because i created a filter for reports from a different project before
   company: companyReducer,
+  global: globalReducer,
 });
 
 // Redux Persist configuration

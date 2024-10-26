@@ -67,3 +67,69 @@
     }
   }
 }
+/* Text styles for paragraphs and other text */
+p,
+.text-large,
+.text-med,
+.text-reg,
+.text-small,
+.text-tiny,
+.--text-xl,
+.--text-lg,
+.--text-md,
+.--text-sm,
+.--text-p {
+  font-family: "DM Sans", sans-serif; /* Main body font */
+  font-size: 1.6rem; /* Default size for paragraph */
+  line-height: 1.5;
+  margin: 0;
+  color: var(--color-dark);
+}
+.text-large {
+  font-size: 20px;
+}
+.text-med {
+  font-size: 18px;
+}
+.text-reg {
+  font-size: 16px;
+}
+.text-small {
+  font-size: 14px;
+}
+.text-tiny {
+  font-size: 12px;
+}
+
+/* Font weight classes */
+.--fw-bold {
+  font-weight: 600;
+}
+.--fw-thin {
+  font-weight: 200;
+}
+
+/* Color utilities */
+.--text-light {
+  color: #fff;
+}
+.--color-primary {
+  color: var(--color-primary);
+}
+.--color-danger {
+  color: var(--color-danger);
+}
+.--color-success {
+  color: var(--color-success);
+}
+.--color-white {
+  color: var(--color-white);
+}
+.--color-dark {
+  color: var(--color-dark);
+}
+
+/* Text alignment */
+.--text-center {
+  text-align: center;
+}

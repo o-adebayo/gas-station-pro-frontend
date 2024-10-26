@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs from "dayjs";
+import { TextField } from "@mui/material";
 import "./ReportForm.scss";
 import Card from "../../card/Card";
 import { v4 as uuidv4 } from "uuid";
@@ -289,10 +292,14 @@ const ReportForm = ({
   // this is better as it uses UTC
   const validateDate = () => {
     // Get today's date in UTC without time information
-    const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD in UTC
+    let date = Date();
+    const today = dayjs(date).format("YYYY-MM-DD");
+
+    //console.log("🚀 ~ validateDate ~ today:", today);
 
     // Convert report.date to UTC and extract date part (YYYY-MM-DD)
-    const reportDate = new Date(report.date).toISOString().split("T")[0]; // Ensure report date is in UTC and matches format
+    const reportDate = dayjs(report.date).format("YYYY-MM-DD");
+    //console.log("🚀 ~ validateDate ~ reportDate:", reportDate);
 
     //console.log("todays date is", today);
     //console.log("report date is", reportDate);
@@ -430,7 +437,7 @@ const ReportForm = ({
   };
 
   const handleCancel = () => {
-    navigate("/dashboard"); // Navigate to dashboard on cancel
+    navigate("/reports"); // Navigate to dashboard on cancel
   };
 
   return (
@@ -463,13 +470,39 @@ const ReportForm = ({
               <label>
                 Date: <span className="asterisk">*</span>
               </label>
-              <input
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  label="Select date"
+                  value={report.date ? dayjs(report.date) : null}
+                  onChange={(newValue) => {
+                    handleInputChange({
+                      target: {
+                        name: "date",
+                        value: newValue ? dayjs(newValue).toISOString() : "",
+                      },
+                    });
+                  }}
+                  slotProps={{
+                    textField: {
+                      required: true,
+                      InputProps: {
+                        style: { color: "black" }, // Set text color to black
+                      },
+                      InputLabelProps: {
+                        style: { color: "black" }, // Set label color to black
+                      },
+                    },
+                  }}
+                />
+              </LocalizationProvider>
+
+              {/*  <input
                 type="date"
                 name="date"
                 value={report.date || ""}
                 onChange={handleInputChange}
                 required
-              />
+              /> */}
               <hr />
             </>
           )}
@@ -766,13 +799,18 @@ const ReportForm = ({
           ))}
 
           <label>Notes:</label>
-          <ReactQuill
-            theme="snow"
+          <textarea
             value={notes}
-            onChange={setNotes}
-            modules={ReportForm.modules}
-            formats={ReportForm.formats}
+            onChange={(e) => setNotes(e.target.value)} // Capture the text change
+            rows={10} // You can adjust the number of rows for the textarea
+            style={{
+              width: "100%",
+              padding: "10px",
+              borderRadius: "8px",
+              border: "1px solid #e6e6e6",
+            }} // Inline styling for customization
           />
+
           <label>Upload Images:</label>
           <code className="--color-dark">Supported Format: jpg, jpeg, png</code>
           <input type="file" multiple onChange={handleImageChange} />
@@ -829,42 +867,5 @@ const ReportForm = ({
     </div>
   );
 };
-
-ReportForm.modules = {
-  toolbar: [
-    [{ header: "1" }, { header: "2" }, { font: [] }],
-    [{ size: [] }],
-    ["bold", "italic", "underline", "strike", "blockquote"],
-    [{ align: [] }],
-    [{ color: [] }, { background: [] }],
-    [
-      { list: "ordered" },
-      { list: "bullet" },
-      { indent: "-1" },
-      { indent: "+1" },
-    ],
-    ["clean"],
-  ],
-};
-ReportForm.formats = [
-  "header",
-  "font",
-  "size",
-  "bold",
-  "italic",
-  "underline",
-  "strike",
-  "blockquote",
-  "color",
-  "background",
-  "list",
-  "bullet",
-  "indent",
-  "link",
-  "video",
-  "image",
-  "code-block",
-  "align",
-];
 
 export default ReportForm;

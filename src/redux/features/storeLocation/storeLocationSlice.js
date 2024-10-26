@@ -203,7 +203,7 @@ const storeLocationSlice = createSlice({
           state.storeLocations = [];
         }
         state.storeLocations.push(action.payload);
-        toast.success("Store added successfully");
+        toast.success("Store Location created successfully!");
       })
       .addCase(createStoreLocation.rejected, (state, action) => {
         state.isLoading = false;
@@ -313,7 +313,7 @@ const storeLocationSlice = createSlice({
             ...action.payload.stores,
           ];
         }
-        //toast.success("Stores imported successfully");
+        toast.success("Stores imported successfully");
       })
       .addCase(importStores.rejected, (state, action) => {
         state.isLoading = false;

@@ -9,6 +9,7 @@ import {
   forgotPassword,
   getLoginStatus,
   getUser,
+  getUserById,
   getUsers,
   importUsers,
   loginUser,
@@ -22,6 +23,7 @@ import {
   sendLoginCode,
   sendReportDeleteCode,
   updateUser,
+  updateUserByAdmin,
   upgradeUser,
 } from "../../../services/authService";
 import { toast } from "react-toastify";
@@ -46,6 +48,7 @@ const initialState = {
   storeLocation: null,
   storeLocations: [],
   userId: "",
+  userById: null, // User fetched by ID
   isLoading: false,
   isError: false,
   isSuccess: false,
@@ -189,6 +192,24 @@ export const updateUserProfile = createAsyncThunk(
   async (userData, thunkAPI) => {
     try {
       return await updateUser(userData);
+    } catch (error) {
+      const message =
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        error.message ||
+        error.toString();
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
+// Update User by Admin
+export const updateUserProfileByAdmin = createAsyncThunk(
+  "auth/updateUserByAdmin",
+  async ({ id, updatedData }, thunkAPI) => {
+    try {
+      return await updateUserByAdmin(id, updatedData);
     } catch (error) {
       const message =
         (error.response &&
@@ -455,6 +476,24 @@ export const userLoginWithCode = createAsyncThunk(
   }
 );
 
+// Fetch User by ID
+export const fetchUserById = createAsyncThunk(
+  "auth/fetchUserById",
+  async (id, thunkAPI) => {
+    try {
+      return await getUserById(id);
+    } catch (error) {
+      const message =
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        error.message ||
+        error.toString();
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
 // Import users via CSV
 export const adminImportUsers = createAsyncThunk(
   "users/import",
@@ -702,6 +741,24 @@ const authSlice = createSlice({
         state.user = action.payload;
       })
       .addCase(updateUserProfile.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+        toast.error(action.payload);
+      })
+      //update user profile by admin
+      .addCase(updateUserProfileByAdmin.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(updateUserProfileByAdmin.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.isError = false;
+        state.userById = action.payload; // Update the userById with the new data
+        state.message = "User updated successfully!";
+        toast.success(state.message);
+      })
+      .addCase(updateUserProfileByAdmin.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.message = action.payload;
@@ -964,6 +1021,21 @@ const authSlice = createSlice({
         state.user = null;
         toast.error(action.payload);
       })
+      // Fetch User by ID
+      .addCase(fetchUserById.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(fetchUserById.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.userById = action.payload; // Store the fetched user data
+        //toast.success("User fetched successfully");
+      })
+      .addCase(fetchUserById.rejected, (state, action) => {
+        state.isLoading = false;
+        state.userById = null;
+        toast.error(action.payload || "Error fetching user");
+      })
       // Import users from CSV
       .addCase(adminImportUsers.pending, (state) => {
         state.isLoading = true;
@@ -1008,5 +1080,6 @@ export const selectIsLoggedIn = (state) => state.auth.isLoggedIn;
 export const selectUser = (state) => state.auth.user;
 export const selectUsers = (state) => state.auth.users; // New selector to select all users
 export const selectIsLoading = (state) => state.auth.isLoading; // New selector to select loading state
+export const selectUserById = (state) => state.auth.userById;
 
 export default authSlice.reducer;

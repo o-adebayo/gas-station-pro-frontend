@@ -1,30 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@100;200;300;400;500;600;700;800;900&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap");
-
 :root {
-  /* Colors from both index.css */
-  --nav-width: 68px;
-  --header-height: 45px;
-
-  --font-family: "Poppins", sans-serif;
-  --dark-blue: #0a1930;
-  --light-blue: #1f93ff;
-
-  --color-white: #fff;
-  --color-dark: #333;
-
-  --color-grey: #eee;
-  --box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-
-  --color-purple: #9d0191;
-  --color-orange: #ff7722;
-
-  --color-primary: #007bff;
-  --color-success: #28a745;
-  --color-danger: orangered;
-
-  /* Additional color variables */
   --primary-400: #080808;
   --primary-300: #0d0d0d;
   --primary-200: #737373;
@@ -43,500 +17,79 @@
     rgba(1, 115, 115, 1) 0%,
     rgba(170, 217, 209, 1) 100%
   );
-
-  /* use the below if we want the gradient to use blue instead but we need to update image colours too for the landing page */
-  /*   --gradient-bg: rgb(0, 123, 255);
-  --gradient: linear-gradient(
-    25deg,
-    rgba(0, 123, 255, 1) 0%, 
-    rgba(170, 217, 209, 1) 100%  
-  );
- */
 }
 
-/* General reset and smooth scroll */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  scroll-behavior: smooth;
+.body {
+  margin: 0px;
+  padding: 0px;
+  background-color: var(--primary-400);
 }
 
-html {
-  font-size: 10px;
-}
-
-body {
-  font-family: var(--font-family);
-  background: var(--primary-400); /* Default background color */
-}
-
-/* Section and container layout */
-section {
-  width: 100%;
-  padding: 4rem 0;
-}
-
-.container {
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 0 20px;
-}
-
-.--pad {
-  max-width: 100%;
-  margin: 0 auto;
-  padding: 0 20px;
-}
-
-.header {
-  padding-top: 2rem;
-}
-
-/* Utility classes for layout and alignment */
-.--flex-center {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.--flex-start {
-  display: flex;
-  justify-content: flex-start;
-  align-items: flex-start;
-}
-.--flex-end {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-}
-.--flex-between {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.--dir-column {
-  flex-direction: column;
-}
-.--flex-dir-column {
-  display: flex;
-}
-.--align-center {
-  display: flex;
-  align-items: center;
-}
-.--100vh {
-  height: 100vh;
-}
-.--mh-100vh {
-  min-height: 100vh;
-}
-
-/* Grid layout */
-.--grid-15 {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
-  row-gap: 1rem;
-  column-gap: 1rem;
-}
-.--grid-25 {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(24rem, 1fr));
-  row-gap: 1rem;
-  column-gap: 1rem;
-}
-
-/* Centering all elements */
-.--center-all {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  width: 100%;
-  margin: auto;
-  text-align: center;
-}
-
-/* Text styles for headings */
-h1,
-h2,
-h3,
-h4,
-h5 {
-  font-family: "DM Sans", sans-serif; /* Main heading font */
-  font-weight: 700;
-  color: var(--color-dark);
-  margin-bottom: 1rem;
-}
-h1 {
-  font-size: 5.6rem; /* size from second index.css */
-  line-height: 1.06;
-  letter-spacing: -3px;
-}
-h2 {
-  font-size: 4.8rem;
-  line-height: 1.2;
-  letter-spacing: -3px;
-}
-h3 {
-  font-family: "Be Vietnam Pro", sans-serif;
-  font-weight: 700;
-  font-size: 4rem;
-  line-height: 1.2;
-  letter-spacing: -0.64px;
-}
-h4 {
-  font-size: 2rem;
-  font-weight: 500;
-}
-h5 {
-  font-family: "DM Sans", sans-serif;
-  font-size: 2.4rem;
-  line-height: 1.4;
-  letter-spacing: -0.64px;
-}
-
-/* Text styles for paragraphs and other text */
-p,
-.text-large,
-.text-med,
-.text-reg,
-.text-small,
-.text-tiny,
-.--text-xl,
-.--text-lg,
-.--text-md,
-.--text-sm,
-.--text-p {
-  font-family: "DM Sans", sans-serif; /* Main body font */
-  font-size: 1.6rem; /* Default size for paragraph */
-  line-height: 1.5;
-  margin: 0;
-  color: var(--color-dark);
-}
 .text-large {
+  font-family: "Be Vietnam Pro";
   font-size: 20px;
+  line-height: 150%;
+  margin: 0px;
 }
-.text-med {
-  font-size: 18px;
-}
+
 .text-reg {
+  font-family: "DM Sans";
   font-size: 16px;
+  line-height: 150%;
+  margin: 0px;
 }
+
+.text-med {
+  font-family: "DM Sans";
+  font-size: 18px;
+  line-height: 150%;
+  margin: 0px;
+}
+
 .text-small {
+  font-family: "DM Sans";
   font-size: 14px;
+  line-height: 140%;
+  margin: 0px;
 }
+
 .text-tiny {
+  font-family: "DM Sans";
   font-size: 12px;
+  line-height: 150%;
+  margin: 0px;
 }
 
-/* Font weight classes */
-.--fw-bold {
-  font-weight: 600;
-}
-.--fw-thin {
-  font-weight: 200;
-}
-
-/* Color utilities */
-.--text-light {
-  color: #fff;
-}
-.--color-primary {
-  color: var(--color-primary);
-}
-.--color-danger {
-  color: var(--color-danger);
-}
-.--color-success {
-  color: var(--color-success);
-}
-.--color-white {
-  color: var(--color-white);
-}
-.--color-dark {
-  color: var(--color-dark);
+.h1 {
+  font-family: "DM Sans";
+  font-size: 56px;
+  line-height: 106%;
+  letter-spacing: -3px;
+  margin: 0px;
 }
 
-/* Text alignment */
-.--text-center {
-  text-align: center;
+.h2 {
+  font-family: "DM Sans";
+  font-size: 48px;
+  line-height: 120%;
+  letter-spacing: -3px;
+  margin: 0px;
 }
 
-/* Card styling */
-.--card {
-  border: 1px solid transparent;
-  border-radius: 5px;
-  box-shadow: var(--box-shadow);
-  overflow: hidden;
+.h3 {
+  font-family: "Be Vietnam Pro";
+  font-weight: 700;
+  font-size: 40px;
+  line-height: 120%;
+  letter-spacing: -0.64px;
+  margin: 0px;
 }
 
-/* Margin utilities */
-.--m {
-  margin: 1rem;
-}
-.--ml {
-  margin-left: 1rem;
-}
-.--mr {
-  margin-right: 1rem;
-}
-.--mb {
-  margin-bottom: 1rem;
-}
-.--mt {
-  margin-top: 1rem;
-}
-.--my {
-  margin: 1rem 0;
-}
-.--mx {
-  margin: 0 1rem;
-}
-.--m2 {
-  margin: 2rem;
-}
-.--ml2 {
-  margin-left: 2rem;
-}
-.--mr2 {
-  margin-right: 2rem;
-}
-.--mb2 {
-  margin-bottom: 2rem;
-}
-.--my2 {
-  margin: 2rem 0;
-}
-.--mx2 {
-  margin: 0 2rem;
-}
-
-/* Padding utilities */
-.--p {
-  padding: 1rem;
-}
-.--p2 {
-  padding: 2rem;
-}
-.--py {
-  padding: 1rem 0;
-}
-.--py2 {
-  padding: 2rem 0;
-}
-.--px {
-  padding: 0 1rem;
-}
-.--px2 {
-  padding: 0 2rem;
-}
-
-/* Button styling */
-.--btn {
-  font-size: 1.6rem;
-  font-weight: 400;
-  padding: 6px 8px;
-  margin: 0 5px 0 0;
-  border: 1px solid transparent;
-  border-radius: 3px;
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transition: all 0.3s;
-}
-.--btn:hover {
-  transform: translateY(-2px);
-}
-.--btn-lg {
-  padding: 8px 10px;
-}
-.--btn-block {
-  width: 100%;
-}
-.--btn-primary {
-  color: #fff;
-  background: var(--color-primary);
-}
-.--btn-secondary {
-  color: #fff;
-  border: 1px solid #fff;
-  background: transparent;
-}
-.--btn-danger {
-  color: #fff;
-  background: var(--color-danger);
-}
-.--btn-success {
-  color: #fff;
-  background: var(--color-success);
-}
-
-/* Background utilities */
-.--bg-light {
-  background: #fff;
-}
-.--bg-dark {
-  background: var(--color-dark);
-}
-.--bg-primary {
-  background: var(--color-primary);
-}
-.--bg-success {
-  background: var(--color-success);
-}
-.--bg-grey {
-  background: var(--color-grey);
-}
-
-/* Form styling */
-.--form-control {
-  font-size: 1.6rem;
-  font-weight: 300;
-}
-.--form-control > * {
-  margin: 5px 0;
-}
-.--form-control input,
-.--form-control textarea,
-.--form-control select {
-  font-size: 1.6rem;
-  font-weight: 300;
-  padding: 8px 1rem;
-  border: 1px solid #777;
-  border-radius: 3px;
-  outline: none;
-  display: block;
-}
-.--form-control label {
-  font-size: 1.6rem;
-  font-weight: 400;
-  display: inline-block;
-  min-width: 7rem;
-  color: var(--color-dark);
-  margin-right: 1rem;
-}
-
-/* Width classes */
-.--width-100 {
-  width: 100%;
-}
-.--width-500px {
-  width: 500px;
-}
-
-/* Line styling */
-.--line {
-  position: relative;
-}
-.--line::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  bottom: -5px;
-  transform: translateX(-50%);
-  width: 5rem;
-  height: 3px;
-  margin-bottom: 1rem;
-  background: linear-gradient(
-    135deg,
-    rgba(163, 1, 191, 1) 44%,
-    rgba(217, 8, 170, 1) 57%
-  );
-}
-
-/* List style */
-.--list-style-none {
-  list-style: none;
-}
-
-/* Profile image styling */
-.--profile-img {
-  width: 6rem;
-  height: 6rem;
-  border: 1px solid #ccc;
-  border-radius: 50%;
-}
-
-/* Link styles */
-a {
-  font-size: 1.4rem;
-  text-decoration: none;
-  transition: all 0.2s;
-}
-a:hover {
-  font-size: 1.5rem;
-}
-
-/* Editor and pagination */
-.ql-editor {
-  min-height: 200px;
-}
-.pagination {
-  list-style: none;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 2rem 0;
-  font-size: 1rem;
-}
-.pagination .page-num {
-  padding: 5px 10px;
-  cursor: pointer;
-  border-radius: 3px;
-  font-weight: normal;
-  color: #333;
-  border: 1px solid #333;
-  margin: 2px;
-}
-.pagination .page-num:hover {
-  color: #fff;
-  background-color: var(--light-blue);
-}
-.activePage {
-  color: #fff;
-  background-color: var(--light-blue);
-}
-
-/* Button group styling */
-.button-group {
-  display: flex;
-  gap: 10px; /* Adjust the space between the buttons */
-  align-items: center;
-}
-
-/* Responsive design for smaller screens */
-@media screen and (max-width: 600px) {
-  .--flex-dir-column {
-    flex-direction: column;
-  }
-}
-
-/* Instructions Section (Collapsible) */
-.instructions {
-  background-color: #fff;
-  padding: 10px;
-  border-left: 4px solid #007bff;
-  border-radius: 6px;
-  margin-bottom: 15px;
-  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
-  cursor: pointer; /* Make it clear it's clickable */
-}
-
-.instructions h4 {
-  font-size: 16px;
-  margin-bottom: 8px;
-  color: #017373;
-  user-select: none; /* Prevent text selection */
-}
-
-.instructions__content {
-  overflow: hidden;
-  max-height: 500px;
-  transition: max-height 0.3s ease;
-}
-
-.instructions__content.collapsed {
-  max-height: 0;
-  transition: max-height 0.3s ease;
+.h5 {
+  font-family: "DM Sans";
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 140%;
+  letter-spacing: -0.64px;
+  margin: 0px;
 }

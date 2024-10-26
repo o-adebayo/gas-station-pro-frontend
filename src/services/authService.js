@@ -111,6 +111,18 @@ export const updateUser = async (userData) => {
   return response.data;
 };
 
+// Update user Profile by admin
+export const updateUserByAdmin = async (userId, updatedData) => {
+  const response = await axios.patch(
+    `${API_URL}updateuserbyadmin/${userId}`,
+    updatedData
+  );
+  //const response = await axios.patch(API_URL + "updateUserByAdmin", userData);
+  // const response = await axios.patch(`${API_URL}updateUserByAdmin${id}`,userData);
+  return response.data;
+  //return response.data;
+};
+
 // Change Password
 export const changePassword = async (userData) => {
   const response = await axios.patch(API_URL + "changePassword", userData);
@@ -170,6 +182,21 @@ export const sendActivationEmail = async () => {
 export const resendActivationEmailByAdmin = async (email) => {
   const response = await axios.post(API_URL + "resend-activation", email);
   return response.data.message;
+};
+
+// Get user by ID
+export const getUserById = async (id) => {
+  try {
+    const response = await axios.get(`${API_URL}user/${id}`);
+    return response.data;
+  } catch (error) {
+    const message =
+      (error.response && error.response.data && error.response.data.message) ||
+      error.message ||
+      error.toString();
+    toast.error(message);
+    throw new Error(message);
+  }
 };
 
 // Import users via CSV file

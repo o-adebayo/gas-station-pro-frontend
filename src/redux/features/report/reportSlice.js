@@ -5,10 +5,12 @@ import { toast } from "react-toastify";
 const initialState = {
   report: null,
   reports: [],
+  //detailedreports: [],
   isError: false,
   isSuccess: false,
   isLoading: false,
   message: ",",
+  total: 0,
 };
 
 // Create New Report
@@ -109,6 +111,25 @@ export const getReport = createAsyncThunk(
   }
 );
 
+// Async thunk to fetch reports by storeId
+export const getReportsByStoreId = createAsyncThunk(
+  "reports/getReportsByStoreId",
+  async (storeId, thunkAPI) => {
+    try {
+      return await reportService.getReportsByStoreId(storeId);
+    } catch (error) {
+      const message =
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        error.message ||
+        error.toString();
+      console.error(message);
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
 // Update a single Report
 export const updateReport = createAsyncThunk(
   "reports/updateReport",
@@ -131,15 +152,15 @@ export const updateReport = createAsyncThunk(
 // Get Detailed Sales Reports with query parameters (filters)
 export const getDetailedSalesReports = createAsyncThunk(
   "reports/getDetailedSalesReports",
-  async (queryParams, thunkAPI) => {
+  async ({ page, pageSize, sort, search }, thunkAPI) => {
     try {
-      // Construct query string from the queryParams object
-      const queryString = new URLSearchParams(queryParams).toString();
-
-      // Make GET request with query string
-      const response = await reportService.getDetailedSalesReports(queryString);
-
-      return response.data;
+      // Pass both id and deleteCode to the service function
+      return await reportService.getDetailedSalesReports({
+        page,
+        pageSize,
+        sort: JSON.stringify(sort), // Convert sort to a string
+        search,
+      });
     } catch (error) {
       const message =
         (error.response &&
@@ -148,6 +169,24 @@ export const getDetailedSalesReports = createAsyncThunk(
         error.message ||
         error.toString();
       console.log(message);
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
+// Import reports via CSV
+export const importReports = createAsyncThunk(
+  "stores/import",
+  async (csvFile, thunkAPI) => {
+    try {
+      return await reportService.importReports(csvFile);
+    } catch (error) {
+      const message =
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        error.message ||
+        error.toString();
       return thunkAPI.rejectWithValue(message);
     }
   }
@@ -171,7 +210,8 @@ const reportSlice = createSlice({
         state.isSuccess = true;
         state.isError = false;
         console.log(action.payload);
-        state.reports.push(action.payload);
+        state.report = action.payload;
+        //state.reports.push(action.payload);
         toast.success("Report added successfully");
       })
       .addCase(createReport.rejected, (state, action) => {
@@ -187,12 +227,13 @@ const reportSlice = createSlice({
         state.isLoading = false;
         state.isSuccess = true;
         state.isError = false;
-        // Check if action.payload is an array before pushing or assigning it
+        state.reports = action.payload; // Set reports from the payload
+        /* // Check if action.payload is an array before pushing or assigning it
         if (Array.isArray(action.payload)) {
           state.reports = action.payload; // Directly replace the array with payload
         } else {
           state.reports = []; // Fallback to an empty array
-        }
+        } */
       })
       .addCase(getReports.rejected, (state, action) => {
         state.isLoading = false;
@@ -209,6 +250,8 @@ const reportSlice = createSlice({
         state.isSuccess = true;
         state.isError = false;
         state.reports = action.payload; // Assign the fetched reports to the state
+        //state.detailedreports = action.payload; // Assign the fetched reports to the state
+        state.total = action.payload.total; // Store total in the state
       })
       .addCase(getDetailedSalesReports.rejected, (state, action) => {
         state.isLoading = false;
@@ -251,6 +294,24 @@ const reportSlice = createSlice({
         state.message = action.payload;
         toast.error(action.payload);
       })
+      // get reports by store id
+      .addCase(getReportsByStoreId.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(getReportsByStoreId.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.isError = false;
+        // set our report state to the information we get back from the payload
+        // which is just the single report and all its data
+        state.reports = action.payload;
+      })
+      .addCase(getReportsByStoreId.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+        toast.error(action.payload);
+      })
       .addCase(updateReport.pending, (state) => {
         state.isLoading = true;
       })
@@ -258,16 +319,39 @@ const reportSlice = createSlice({
         state.isLoading = false;
         state.isSuccess = true;
         state.isError = false;
+        state.report = action.payload;
         // Update the specific report in the reports array
-        const index = state.reports.findIndex(
+        /* const index = state.reports.findIndex(
           (report) => report._id === action.payload._id
         );
         if (index !== -1) {
           state.reports[index] = action.payload; // Update the state with the new report data
-        }
+        } */
         toast.success("Report updated successfully");
       })
       .addCase(updateReport.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+        toast.error(action.payload);
+      })
+      // Import reports
+      .addCase(importReports.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(importReports.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        // If the response contains an array of stores, append them to the storeLocations state
+        if (Array.isArray(action.payload.stores)) {
+          state.storeLocations = [
+            ...state.storeLocations,
+            ...action.payload.stores,
+          ];
+        }
+        toast.success("Stores imported successfully");
+      })
+      .addCase(importReports.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.message = action.payload;
@@ -280,5 +364,7 @@ const reportSlice = createSlice({
 
 export const selectIsLoading = (state) => state.report.isLoading;
 export const selectReport = (state) => state.report.report;
+export const selectReports = (state) => state.report.reports;
+//export const selectDetailedReports = (state) => state.report.detailedreports;
 
 export default reportSlice.reducer;

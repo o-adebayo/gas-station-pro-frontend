@@ -3,16 +3,19 @@
   width: 100%;
   max-width: 1200px;
   padding: 2rem;
-  background-color: #ffffff;
+  background-color: var(--card-bg-color); /* Dynamic background color */
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   margin: 0 auto;
+
+  font-size: 0.875rem; /* Reduced base font size for the entire page */
 
   .card {
     width: 100%;
     padding: 2rem;
     border-radius: 12px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 8px var(--card-shadow-color); /* Dynamic shadow */
+    background-color: var(--card-bg-color); /* Dynamic background color */
   }
 
   .detail {
@@ -22,19 +25,23 @@
 
     .badge {
       display: inline-block;
-      background-color: var(--color-primary);
-      color: #ffffff;
+      background-color: var(--primary-color); /* Dynamic color */
+      color: var(--text-on-primary); /* Dynamic text color on primary */
       padding: 0.3rem 0.6rem;
       border-radius: 8px;
-      font-size: 1rem;
+      font-size: 0.75rem; /* Smaller font size for badges */
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
 
-    p b {
-      color: var(--dark-blue);
-      font-weight: 600;
+    p {
+      font-size: 0.875rem; /* Smaller font size for paragraphs */
+
+      b {
+        color: var(--highlight-color); /* Dynamic highlight color */
+        font-weight: 600;
+      }
     }
 
     .report-images {
@@ -45,38 +52,38 @@
       overflow-x: auto;
 
       .report-image {
-        max-height: 100px; /* Set smaller initial height */
-        max-width: 150px; /* Set smaller initial width */
+        max-height: 100px;
+        max-width: 150px;
         object-fit: cover;
         border-radius: 8px;
-        border: 1px solid #e6e6e6;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        border: 1px solid var(--image-border-color); /* Dynamic border */
+        box-shadow: 0 2px 8px var(--image-shadow-color); /* Dynamic shadow */
         transition: transform 0.3s, box-shadow 0.3s;
 
         &:hover {
-          transform: scale(1.1); /* Slight zoom on hover */
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Slight shadow on hover */
+          transform: scale(1.1); /* Zoom on hover */
+          box-shadow: 0 4px 12px var(--image-hover-shadow-color); /* Dynamic hover shadow */
         }
       }
     }
 
     .product-summary {
       padding: 1.5rem;
-      border: 1px solid #e6e6e6;
+      border: 1px solid var(--product-border-color); /* Dynamic border color */
       border-radius: 12px;
-      background-color: #f9f9f9;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+      background-color: var(--product-bg-color); /* Dynamic background */
+      box-shadow: 0 4px 8px var(--product-shadow-color); /* Dynamic shadow */
       margin-bottom: 2rem;
       transition: box-shadow 0.3s ease-in-out;
 
       &:hover {
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 12px var(--product-hover-shadow-color); /* Dynamic hover shadow */
       }
 
       h5 {
-        font-size: 1.7rem;
+        font-size: 1.5rem; /* Reduced heading font size */
         font-weight: bold;
-        color: var(--color-primary);
+        color: var(--heading-color); /* Dynamic heading color */
         margin-bottom: 1rem;
       }
 
@@ -84,7 +91,7 @@
         margin: 0.5rem 0;
 
         b {
-          color: var(--dark-blue);
+          color: var(--highlight-color); /* Dynamic text highlight */
         }
       }
 
@@ -97,11 +104,13 @@
           flex: 1;
           padding: 1.5rem;
           border-radius: 8px;
-          background-color: #ffffff;
-          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+          background-color: var(
+            --detail-item-bg-color
+          ); /* Dynamic background */
+          box-shadow: 0 2px 5px var(--detail-item-shadow-color); /* Dynamic shadow */
 
           p {
-            font-size: 1.6rem;
+            font-size: 0.875rem; /* Reduced font size for product details */
             margin: 0.5rem 0;
           }
         }
@@ -110,54 +119,54 @@
   }
 
   .notes-box {
-    border: 1px solid var(--light-blue);
+    border: 1px solid var(--notes-border-color); /* Dynamic border color */
     padding: 2rem;
     border-radius: 8px;
-    background-color: #f9f9f9;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    background-color: var(--notes-bg-color); /* Dynamic background */
+    box-shadow: 0 2px 5px var(--notes-shadow-color); /* Dynamic shadow */
     margin-top: 2rem;
 
     h4 {
       margin-bottom: 1rem;
-      color: var(--dark-blue);
+      color: var(--heading-color); /* Dynamic heading color */
       font-weight: 600;
-      font-size: 1.8rem;
+      font-size: 1.5rem; /* Reduced font size for heading */
     }
 
     div {
-      color: var(--color-dark);
+      color: var(--text-color); /* Dynamic text color */
     }
   }
 
   h4,
   h5,
   h6 {
-    color: var(--color-primary);
+    color: var(--heading-color); /* Dynamic heading color */
     font-weight: 600;
   }
 
   h4 {
-    font-size: 1.8rem;
+    font-size: 1.5rem; /* Reduced font size for h4 */
   }
 
   h5,
   h6 {
-    font-size: 1.6rem;
+    font-size: 1.25rem; /* Reduced font size for h5 and h6 */
   }
 
   hr {
     border: none;
-    border-top: 1px solid #e6e6e6;
+    border-top: 1px solid var(--divider-color); /* Dynamic divider color */
     margin: 2rem 0;
   }
 
   code {
     display: block;
-    background-color: #f1f4f8;
+    background-color: var(--code-bg-color); /* Dynamic background color */
     padding: 1rem;
     border-radius: 8px;
-    font-size: 1.3rem;
-    color: var(--color-dark);
+    font-size: 0.875rem; /* Reduced font size for code blocks */
+    color: var(--code-text-color); /* Dynamic text color */
     margin-top: 1.5rem;
   }
 }
@@ -186,7 +195,7 @@
     position: absolute;
     top: 20px;
     right: 30px;
-    color: #fff;
+    color: var(--text-color); /* Dynamic close button color */
     font-size: 40px;
     font-weight: bold;
     cursor: pointer;
@@ -194,7 +203,7 @@
 
   .close:hover,
   .close:focus {
-    color: #ccc;
+    color: var(--hover-color); /* Dynamic hover color */
     text-decoration: none;
     cursor: pointer;
   }
@@ -208,16 +217,16 @@
 }
 
 .cancel-btn {
-  background-color: #f44336;
-  color: white;
+  background-color: var(--cancel-btn-bg); /* Dynamic button background */
+  color: var(--text-on-cancel-btn); /* Dynamic text on button */
   height: 56px;
   width: 167px;
   padding: 10px 20px;
   border: none;
   cursor: pointer;
   transition: background-color 0.3s ease-in-out;
-}
 
-.cancel-btn:hover {
-  background-color: #e53935;
+  &:hover {
+    background-color: var(--cancel-btn-hover-bg); /* Dynamic hover background */
+  }
 }

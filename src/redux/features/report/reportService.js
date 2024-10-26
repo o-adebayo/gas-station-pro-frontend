@@ -44,6 +44,12 @@ const getReport = async (id) => {
   return response.data;
 };
 
+// Get all reports for a specific store by its storeId
+const getReportsByStoreId = async (storeId) => {
+  const response = await axios.get(`${API_URL}store/${storeId}`);
+  return response.data;
+};
+
 // Update a single Report by its ID
 // we need the id of the product and the formData we are sending back to save
 // Update a single Report by its ID
@@ -56,23 +62,22 @@ const updateReport = async (id, formData) => {
   return response.data;
 };
 
-// Helper function to build query parameters
-const buildQueryParams = (params) => {
-  const query = new URLSearchParams();
-  Object.keys(params).forEach((key) => {
-    if (params[key]) {
-      query.append(key, params[key]);
-    }
+// Service function for fetching detailed sales reports with query params
+const getDetailedSalesReports = async ({ page, pageSize, sort, search }) => {
+  const response = await axios.get(API_URL + "detailed-sales-report", {
+    params: { page, pageSize, sort, search }, // Axios will automatically convert this into query parameters
   });
-  return query.toString();
+  console.log("page is", page);
+  return response.data; // Return the API response data
 };
 
-// Service function for fetching detailed sales reports with query params
-const getDetailedSalesReports = async (params) => {
-  const queryParams = buildQueryParams(params); // Convert params into query string
-  const response = await axios.get(
-    `${API_URL}/detailed-sales-report?${queryParams}`
-  ); // Attach query string to API URL
+// Import stores via CSV file
+const importReports = async (formData) => {
+  const response = await axios.post(`${API_URL}import-reports`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data", // Ensure multipart content type
+    },
+  });
   return response.data;
 };
 
@@ -83,6 +88,8 @@ const reportService = {
   getReport,
   updateReport,
   getDetailedSalesReports,
+  getReportsByStoreId,
+  importReports,
 };
 
 export default reportService;
