@@ -30,18 +30,18 @@ const Analytics = () => {
 
   useEffect(() => {
     dispatch(getReports());
-  }, [dispatch]);
+  }, [dispatch, timePeriod]);
 
   const handleTimePeriodChange = (event) => {
     setTimePeriod(event.target.value);
   };
 
   // Transform reports data into daily sales totals
-  const getDailySalesData = () => {
+  const getDailySalesData = (reports) => {
     const dailySalesMap = {};
 
     reports.forEach((report) => {
-      const date = report.date.split("T")[0]; // Extract the date (e.g., "2024-10-30")
+      const date = report.date.split("T")[0];
       const storeName = report.storeName;
       const salesAmount = report.storeTotalSales?.totalSalesDollars || 0;
 
@@ -49,11 +49,8 @@ const Analytics = () => {
         dailySalesMap[date] = {};
       }
 
-      if (!dailySalesMap[date][storeName]) {
-        dailySalesMap[date][storeName] = salesAmount;
-      } else {
-        dailySalesMap[date][storeName] += salesAmount;
-      }
+      dailySalesMap[date][storeName] =
+        (dailySalesMap[date][storeName] || 0) + salesAmount;
     });
 
     // Convert dailySalesMap into an array format compatible with the chart
@@ -67,19 +64,14 @@ const Analytics = () => {
   };
 
   // Function to get daily rates data for each product (PMS, AGO, DPK)
-  const getDailyProductRatesData = () => {
+  const getDailyProductRatesData = (reports) => {
     const productRatesMap = {};
 
     reports.forEach((report) => {
-      const date = report.date.split("T")[0]; // Extract date (e.g., "2024-10-30")
+      const date = report.date.split("T")[0];
 
       if (!productRatesMap[date]) {
-        productRatesMap[date] = {
-          date,
-          PMS: null,
-          AGO: null,
-          DPK: null,
-        };
+        productRatesMap[date] = { date, PMS: null, AGO: null, DPK: null };
       }
 
       // Store rates for each product if available
@@ -139,7 +131,7 @@ const Analytics = () => {
     const dailySalesMap = {};
 
     reports.forEach((report) => {
-      const date = report.date.split("T")[0]; // Extract date as "YYYY-MM-DD"
+      const date = report.date.split("T")[0];
       const products = report.products || {};
 
       if (!dailySalesMap[date]) {
@@ -208,15 +200,97 @@ const Analytics = () => {
     }));
   };
 
+  // helper function to filter by time period
+  /*   const filterReportsByTimePeriod = (reports, timePeriod) => {
+    const now = new Date();
+    let startDate;
+
+    switch (timePeriod) {
+      case "week":
+        startDate = new Date();
+        startDate.setDate(now.getDate() - 7);
+        break;
+      case "month":
+        startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+        break;
+      case "quarter":
+        startDate = new Date(now.getFullYear(), now.getMonth() - 3, 1);
+        break;
+      case "year":
+        startDate = new Date(now.getFullYear(), 0, 1);
+        break;
+      case "lastYear":
+        startDate = new Date(now.getFullYear() - 1, 0, 1);
+        break;
+      default:
+        return reports;
+    }
+
+    return reports.filter((report) => new Date(report.date) >= startDate);
+  }; */
+
+  const filterReportsByTimePeriod = (reports, timePeriod) => {
+    const now = new Date();
+    now.setUTCHours(0, 0, 0, 0); // Set now to midnight UTC
+
+    console.log("🚀 ~ filterReportsByTimePeriod ~ now:", now);
+    return reports.filter((report) => {
+      const reportDate = new Date(report.date);
+      reportDate.setUTCHours(0, 0, 0, 0); // Set reportDate to midnight UTC
+
+      if (timePeriod === "today") {
+        return reportDate.toDateString() === now.toDateString();
+      } else if (timePeriod === "last3Days") {
+        const threeDaysAgo = new Date();
+        threeDaysAgo.setDate(now.getDate() - 3);
+        return reportDate >= threeDaysAgo && reportDate <= now;
+      } else if (timePeriod === "last7Days") {
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(now.getDate() - 7);
+        return reportDate >= sevenDaysAgo && reportDate <= now;
+      } else if (timePeriod === "week") {
+        const dayOfWeek = now.getDay(); // 0 for Sunday, 1 for Monday, etc.
+        const startOfWeek = new Date(now);
+        startOfWeek.setDate(
+          now.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1)
+        ); // Adjust for Monday start
+        return reportDate >= startOfWeek && reportDate <= now;
+      } else if (timePeriod === "month") {
+        const oneMonthAgo = new Date(now);
+        oneMonthAgo.setMonth(now.getMonth() - 1);
+        return reportDate >= oneMonthAgo && reportDate <= now;
+      } else if (timePeriod === "quarter") {
+        const threeMonthsAgo = new Date(now);
+        threeMonthsAgo.setMonth(now.getMonth() - 3);
+        return reportDate >= threeMonthsAgo && reportDate <= now;
+      } else if (timePeriod === "year") {
+        const oneYearAgo = new Date(now);
+        oneYearAgo.setFullYear(now.getFullYear() - 1);
+        return reportDate >= oneYearAgo && reportDate <= now;
+      } else if (timePeriod === "lastYear") {
+        const lastYearStart = new Date(now.getFullYear() - 1, 0, 1);
+        const lastYearEnd = new Date(now.getFullYear() - 1, 11, 31);
+        return reportDate >= lastYearStart && reportDate <= lastYearEnd;
+      }
+      return true; // Default case: no filtering
+    });
+  };
+
+  // apply the time period filter helpr function
+  const filteredReports = filterReportsByTimePeriod(reports, timePeriod);
+  // check if the time period selected has data
+  const hasData = filteredReports && filteredReports.length > 0;
+
   // call all the functions so we can use the data in our charts
-  const dailyProductRatesData = getDailyProductRatesData();
-  const dailySalesData = getDailySalesData();
+  const dailyProductRatesData = getDailyProductRatesData(filteredReports);
+  const dailySalesData = getDailySalesData(filteredReports);
   //const productSalesByStoreData = getProductSalesByStoreData();
-  const dailyProductSalesData = getDailyProductSalesData(reports);
+  const dailyProductSalesData = getDailyProductSalesData(filteredReports);
   // Generate data for radar charts
-  const productSalesData = getTotalSalesByProduct(reports);
-  const storeSalesData = getTotalSalesByStore(reports);
-  const managerSalesData = getTotalSalesByManager(reports);
+  const productSalesData = getTotalSalesByProduct(filteredReports);
+  const storeSalesData = getTotalSalesByStore(filteredReports);
+  const managerSalesData = getTotalSalesByManager(filteredReports);
+  console.log("🚀 ~ Analytics ~ filteredReports:", filteredReports);
 
   return (
     <Box m="1.5rem 2.5rem">
@@ -241,6 +315,9 @@ const Analytics = () => {
           variant="outlined"
           style={{ color: "white", backgroundColor: theme.palette.grey[800] }}
         >
+          <MenuItem value="today">Today</MenuItem>
+          <MenuItem value="last3Days">Last 3 Days</MenuItem>
+          <MenuItem value="last7Days">Last 7 Days</MenuItem>
           <MenuItem value="week">This Week</MenuItem>
           <MenuItem value="month">This Month</MenuItem>
           <MenuItem value="quarter">This Quarter</MenuItem>

@@ -17,7 +17,7 @@ import "react-confirm-alert/src/react-confirm-alert.css"; // Import css
 import {
   deleteReport,
   getDetailedSalesReports,
-  getReports,
+  //getReports,
   importReports,
 } from "../../../redux/features/report/reportSlice";
 import { selectUser } from "../../../redux/features/auth/authSlice";
@@ -40,12 +40,18 @@ const ReportListNew = () => {
   useRedirectLoggedOutUser("/login");
   const dispatch = useDispatch();
   // values to be sent to the backend
-  const [page, setPage] = useState(0);
-  // const [pageSize, setPageSize] = useState(25);
+  //const [page, setPage] = useState(0);
+  //const [pageSize, setPageSize] = useState(20);
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 20,
+  });
+  const [sortModel, setSortModel] = useState([]);
+
   // Get initial pageSize from localStorage or use default 25
-  const [pageSize, setPageSize] = useState(
-    () => parseInt(localStorage.getItem("pageSize")) || 25
-  );
+  /*   const [pageSize, setPageSize] = useState(
+    () => parseInt(localStorage.getItem("pageSize")) || 20
+  ); */
 
   const [sort, setSort] = useState({});
   const [search, setSearch] = useState("");
@@ -58,9 +64,11 @@ const ReportListNew = () => {
   const companyResponse = useSelector(selectCompany); // Fetch company details
   const company = companyResponse?.company || {}; // Destructure company details
   //const reports = useSelector(selectReports);
-  const { reports, isLoading, total } = useSelector(
-    (state) => state.report.reports
-  );
+  const { reports } = useSelector((state) => {
+    const reportsData = state.report.reports || {}; // Default to an empty object
+    return reportsData.reports ? reportsData : { reports: reportsData }; // Return an object with reports key
+  });
+  const { isLoading, total } = useSelector((state) => state.report.reports);
 
   const isAdmin = user?.role === "admin"; // Check if the user is an admin
 
@@ -180,13 +188,14 @@ const ReportListNew = () => {
   useEffect(() => {
     dispatch(
       getDetailedSalesReports({
-        page: page + 1, // Backend page is 1-based, while DataGrid is 0-based
-        pageSize,
-        sort,
+        page: paginationModel.page + 1, // For backend 1-based indexing
+        pageSize: paginationModel.pageSize,
+        sortField: sortModel[0]?.field || "", // Sorting field
+        sortOrder: sortModel[0]?.sort || "", // Sorting order ('asc' or 'desc')
         search,
       })
     );
-  }, [dispatch, page, pageSize, sort, search]);
+  }, [dispatch, paginationModel, sortModel, search]);
 
   // Function to delete the report without a code (for admins)
   const delReport = async (id) => {
@@ -194,15 +203,16 @@ const ReportListNew = () => {
       const reportToDelete = reports.find((report) => report._id === id); // Get report details
 
       await dispatch(deleteReport({ id })); // Pass the id as an object
-      /* await dispatch(
+      await dispatch(
         getDetailedSalesReports({
-          page: page + 1, // Backend page is 1-based, while DataGrid is 0-based
-          pageSize,
-          sort,
+          page: paginationModel.page + 1, // For backend 1-based indexing
+          pageSize: paginationModel.pageSize,
+          sortField: sortModel[0]?.field || "", // Sorting field
+          sortOrder: sortModel[0]?.sort || "", // Sorting order ('asc' or 'desc')
           search,
         })
-      ); */
-      await dispatch(getReports()); // Refresh report list
+      );
+      //await dispatch(getReports()); // Refresh report list
 
       // Send email to company owner after deletion
       if (company && company.ownerEmail) {
@@ -244,7 +254,17 @@ const ReportListNew = () => {
       const reportToDelete = reports.find((report) => report._id === id);
 
       await dispatch(deleteReport({ id, deleteCode })); // Pass both id and deleteCode
-      await dispatch(getReports()); // Refresh report list
+      dispatch(
+        getDetailedSalesReports({
+          page: paginationModel.page + 1, // For backend 1-based indexing
+          pageSize: paginationModel.pageSize,
+          sortField: sortModel[0]?.field || "", // Sorting field
+          sortOrder: sortModel[0]?.sort || "", // Sorting order ('asc' or 'desc')
+          search,
+        })
+      );
+
+      //await dispatch(getReports()); // Refresh report list
       /*       await dispatch(
         getDetailedSalesReports({
           page: page + 1, // Backend page is 1-based, while DataGrid is 0-based
@@ -309,11 +329,11 @@ const ReportListNew = () => {
       setSelectedReportId(id); // Store the ID of the selected report
     }
   };
-
+  /* 
   const handlePageSizeChange = (newPageSize) => {
     setPageSize(newPageSize);
     localStorage.setItem("pageSize", newPageSize); // Store selection
-  };
+  }; */
 
   const handleReportCSVUpload = (file) => {
     if (file) {
@@ -352,9 +372,10 @@ const ReportListNew = () => {
           //dispatch(getReports()); // Re-fetch stores
           dispatch(
             getDetailedSalesReports({
-              page: page + 1, // Backend page is 1-based, while DataGrid is 0-based
-              pageSize,
-              sort,
+              page: paginationModel.page + 1, // For backend 1-based indexing
+              pageSize: paginationModel.pageSize,
+              sortField: sortModel[0]?.field || "", // Sorting field
+              sortOrder: sortModel[0]?.sort || "", // Sorting order ('asc' or 'desc')
               search,
             })
           );
@@ -493,22 +514,48 @@ const ReportListNew = () => {
           },
         }}
       >
-        <DataGrid
+        {/* <DataGrid
           loading={isLoading || !reports}
           getRowId={(row) => row._id}
           rows={reports || []}
           columns={columns}
           rowCount={total}
-          rowsPerPageOptions={[20, 50, 100]}
+          //pageSizeOptions={[10, 20, 50]}
+          rowsPerPageOptions={[10, 20, 50]}
           pagination
           page={page}
           pageSize={pageSize}
           paginationMode="server"
           sortingMode="server"
           onPageChange={(newPage) => setPage(newPage)}
-          //onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-          onPageSizeChange={handlePageSizeChange}
+          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+          //onPageSizeChange={handlePageSizeChange}
           onSortModelChange={(newSortModel) => setSort(...newSortModel)}
+          checkboxSelection
+          disableRowSelectionOnClick
+          slots={{ toolbar: DataGridCustomToolbar }}
+          slotProps={{
+            toolbar: {
+              searchInput,
+              setSearchInput,
+              setSearch,
+            },
+          }}
+        /> */}
+
+        <DataGrid
+          loading={isLoading || !reports}
+          getRowId={(row) => row._id}
+          rows={reports || []}
+          columns={columns}
+          rowCount={total}
+          paginationMode="server"
+          sortingMode="server"
+          paginationModel={paginationModel}
+          pageSizeOptions={[20, 50, 100]}
+          onPaginationModelChange={setPaginationModel}
+          sortModel={sortModel}
+          onSortModelChange={setSortModel}
           checkboxSelection
           disableRowSelectionOnClick
           slots={{ toolbar: DataGridCustomToolbar }}

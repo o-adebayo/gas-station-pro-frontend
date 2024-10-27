@@ -257,7 +257,10 @@ const reportSlice = createSlice({
         state.isLoading = false;
         state.isError = true;
         state.message = action.payload;
+        //console.log(state.message);
         toast.error(action.payload);
+        // we can try to comment to top line out so it does not show a red toast error when users simplay go to the reports page for the first time
+        // we should instead check if the returned result is 0 and then display a message in the frontend
       })
       .addCase(deleteReport.pending, (state) => {
         state.isLoading = true;
