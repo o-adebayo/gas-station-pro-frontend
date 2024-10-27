@@ -1,5 +1,14 @@
-import React, { useEffect } from "react";
-import { Box, Button, useTheme } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  useTheme,
+} from "@mui/material";
 import "./UserListNew.scss";
 import HeaderNew from "../../components/HeaderNew";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
@@ -31,6 +40,9 @@ const UserListNew = () => {
   const isLoading = useSelector((state) => state.auth.isLoading);
   const storesData = useSelector(selectStores);
   const stores = storesData?.stores || [];
+
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [userIdToDelete, setUserIdToDelete] = useState(null);
 
   const isAdmin = user?.role === "admin"; // Check if the user is an admin
 
@@ -221,7 +233,7 @@ const UserListNew = () => {
     dispatch(fetchUsers());
   };
 
-  const confirmDelete = (id) => {
+  /*   const confirmDelete = (id) => {
     confirmAlert({
       title: "Delete This User",
       message:
@@ -237,6 +249,20 @@ const UserListNew = () => {
         },
       ],
     });
+  }; */
+
+  const confirmDelete = (id) => {
+    setUserIdToDelete(id);
+    setOpenDeleteDialog(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    delUser(userIdToDelete);
+    setOpenDeleteDialog(false);
+  };
+
+  const handleDeleteCancel = () => {
+    setOpenDeleteDialog(false);
   };
 
   const handleResendActivationEmail = async (email) => {
@@ -430,6 +456,30 @@ const UserListNew = () => {
           onChange={(e) => handleUserCSVUpload(e.target.files[0])}
         />
       </Box>
+
+      <Dialog
+        open={openDeleteDialog}
+        onClose={handleDeleteCancel}
+        aria-labelledby="delete-dialog-title"
+        aria-describedby="delete-dialog-description"
+      >
+        <DialogTitle id="delete-dialog-title">Delete User</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="delete-dialog-description">
+            Deleting a user account cannot be undone. Are you sure you want to
+            delete this user?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDeleteCancel} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleDeleteConfirm} color="error" autoFocus>
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       <Box
         mt="40px"
         height="75vh"

@@ -1,5 +1,14 @@
-import React, { useEffect } from "react";
-import { Box, Button, useTheme } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  useTheme,
+} from "@mui/material";
 import "./StoreListNew.scss";
 import HeaderNew from "../../components/HeaderNew";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
@@ -37,6 +46,9 @@ const StoreListNew = () => {
   const { isLoading } = useSelector((state) => state.storeLocation);
   const storesData = useSelector(selectStores);
   const stores = storesData?.stores || [];
+
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [storeIdToDelete, setStoreIdToDelete] = useState(null);
 
   const isAdmin = user?.role === "admin"; // Check if the user is an admin
 
@@ -174,7 +186,7 @@ const StoreListNew = () => {
       },
     },
   ];
-
+  /* 
   const confirmDelete = (id) => {
     confirmAlert({
       title: "Delete This Store",
@@ -191,7 +203,7 @@ const StoreListNew = () => {
       ],
     });
   };
-
+ */
   const getManagerName = (managerId) => {
     if (!managerId) {
       return "Not Assigned";
@@ -200,6 +212,20 @@ const StoreListNew = () => {
       (user) => String(user._id) === String(managerId)
     );
     return manager ? manager.name : "Not Assigned";
+  };
+
+  const confirmDelete = (id) => {
+    setStoreIdToDelete(id);
+    setOpenDeleteDialog(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    delStore(storeIdToDelete);
+    setOpenDeleteDialog(false);
+  };
+
+  const handleDeleteCancel = () => {
+    setOpenDeleteDialog(false);
   };
 
   const handleStoreCSVUpload = (file) => {
@@ -346,6 +372,29 @@ const StoreListNew = () => {
           onChange={(e) => handleStoreCSVUpload(e.target.files[0])}
         />
       </Box>
+
+      <Dialog
+        open={openDeleteDialog}
+        onClose={handleDeleteCancel}
+        aria-labelledby="delete-dialog-title"
+        aria-describedby="delete-dialog-description"
+      >
+        <DialogTitle id="delete-dialog-title">Delete Store</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="delete-dialog-description">
+            Deleting a store cannot be undone. Are you sure you want to delete
+            this store?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDeleteCancel} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleDeleteConfirm} color="error" autoFocus>
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Box
         mt="40px"

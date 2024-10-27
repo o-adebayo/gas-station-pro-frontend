@@ -1,10 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { SpinnerImg } from "../../loader/Loader";
 import { Link } from "react-router-dom";
-import { AiOutlineEye } from "react-icons/ai";
-import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import Search from "../../search/Search";
-import { Box, Button, useTheme } from "@mui/material";
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  TextField,
+  useTheme,
+} from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import HeaderNew from "../../HeaderNew";
 import DataGridCustomToolbar from "../../DataGridCustomToolbar";
@@ -59,6 +67,10 @@ const ReportListNew = () => {
   const [searchInput, setSearchInput] = useState("");
   const [deleteCode, setDeleteCode] = useState(""); // Store delete code
   const [selectedReportId, setSelectedReportId] = useState(null); // Store selected report ID for delete
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [reportIdToDelete, setReportIdToDelete] = useState(null);
+  const [deleteCodeInput, setDeleteCodeInput] = useState("");
+  const [openCodeDialog, setOpenCodeDialog] = useState(false); // For managers
 
   const user = useSelector(selectUser);
   const companyResponse = useSelector(selectCompany); // Fetch company details
@@ -172,9 +184,7 @@ const ReportListNew = () => {
                     theme.palette.mode === "dark"
                       ? theme.palette.error.light
                       : theme.palette.error.main,
-                  "&:hover": {
-                    color: theme.palette.error.dark,
-                  },
+                  "&:hover": { color: theme.palette.error.dark },
                 }}
               />
             </span>
@@ -190,8 +200,9 @@ const ReportListNew = () => {
       getDetailedSalesReports({
         page: paginationModel.page + 1, // For backend 1-based indexing
         pageSize: paginationModel.pageSize,
-        sortField: sortModel[0]?.field || "", // Sorting field
-        sortOrder: sortModel[0]?.sort || "", // Sorting order ('asc' or 'desc')
+        sort: sortModel[0]?.sort || "",
+        //sortField: sortModel[0]?.field || "", // Sorting field
+        //sortOrder: sortModel[0]?.sort || "", // Sorting order ('asc' or 'desc')
         search,
       })
     );
@@ -309,6 +320,34 @@ const ReportListNew = () => {
  */
   // Function to handle the delete action with reactjs-popup
   const handleDeleteClick = (id) => {
+    setReportIdToDelete(id);
+    if (isAdmin) {
+      setOpenDeleteDialog(true); // Admins see confirm-only dialog
+    } else {
+      setOpenCodeDialog(true); // Managers see code entry dialog
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (reportIdToDelete) await delReport(reportIdToDelete);
+    setOpenDeleteDialog(false);
+  };
+
+  const handleConfirmDeleteWithCode = async () => {
+    if (reportIdToDelete && deleteCodeInput) {
+      await delReportWithCode(reportIdToDelete, deleteCodeInput);
+      setOpenCodeDialog(false);
+      setDeleteCodeInput("");
+    } else {
+      toast.error("Please enter a valid delete code.");
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setOpenDeleteDialog(false);
+  };
+
+  /*   const handleDeleteClick = (id) => {
     if (user.role === "admin") {
       // Admins do not need a delete code
       confirmAlert({
@@ -328,7 +367,8 @@ const ReportListNew = () => {
       // For non-admins, show the popup
       setSelectedReportId(id); // Store the ID of the selected report
     }
-  };
+  }; */
+
   /* 
   const handlePageSizeChange = (newPageSize) => {
     setPageSize(newPageSize);
@@ -487,6 +527,61 @@ const ReportListNew = () => {
           onChange={(e) => handleReportCSVUpload(e.target.files[0])}
         />
       </Box>
+
+      {/* Delete confirmation Dialog for admins */}
+      <Dialog
+        open={openDeleteDialog}
+        onClose={handleCancelDelete}
+        aria-labelledby="delete-dialog-title"
+      >
+        <DialogTitle id="delete-dialog-title">Delete Report</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete this report? This action cannot be
+            undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelDelete} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleConfirmDelete} color="error" autoFocus>
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Delete authorization code Dialog for non-admins (i.e. store managers)*/}
+      <Dialog
+        open={openCodeDialog}
+        onClose={() => setOpenCodeDialog(false)}
+        aria-labelledby="code-dialog-title"
+      >
+        <DialogTitle id="code-dialog-title">Enter Delete Code</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Please enter the delete code to confirm report deletion.
+          </DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Delete Code"
+            fullWidth
+            variant="outlined"
+            value={deleteCodeInput}
+            onChange={(e) => setDeleteCodeInput(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenCodeDialog(false)} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleConfirmDeleteWithCode} color="error">
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       <Box
         height="80vh"
         sx={{
