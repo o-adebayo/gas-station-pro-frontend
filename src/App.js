@@ -43,6 +43,7 @@ import EditStoreNew from "./pages/storeList/EditStoreNew";
 import ViewUserNew from "./pages/userList/ViewUserNew";
 import EditUserNew from "./pages/userList/EditUserNew";
 import Analytics from "./pages/analytics/Analytics";
+import ReportDetailNew from "./components/report/reportDetail/ReportDetailNew";
 
 axios.defaults.withCredentials = true;
 
@@ -94,7 +95,7 @@ function App() {
             <Route path="/contact-us" element={<Contact />} />
             <Route path="/edit-profile" element={<EditProfileNew />} />
             <Route path="/reports" element={<ReportListNew />} />
-            <Route path="/report-detail/:id" element={<ReportDetail />} />
+            <Route path="/report-detail/:id" element={<ReportDetailNew />} />
           </Route>
           <Route path="/" element={<Home />} />
 
