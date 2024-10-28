@@ -17,7 +17,6 @@ import {
 
 //new pages
 import Contact from "./pages/contact/Contact";
-import ReportDetail from "./components/report/reportDetail/ReportDetail";
 import DashboardNew from "./pages/dashboard/DashboardNew";
 import LayoutNew from "./components/layout/LayoutNew";
 import UserListNew from "./pages/userList/UserListNew";
