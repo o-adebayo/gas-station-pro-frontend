@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Box,
   Select,
@@ -17,11 +17,22 @@ import ProductSalesByStoreBarChart from "../../components/Charts/ProductSalesByS
 import SalesRadarChart from "../../components/Charts/SalesRadarChart";
 import AIPoweredInsights from "../../components/Charts/AIPoweredInsights";
 
+// Import helper functions
+import {
+  getDailySalesData,
+  getDailyProductRatesData,
+  getProductSalesByStoreData,
+  getDailyProductSalesData,
+  getTotalSalesByProduct,
+  getTotalSalesByStore,
+  getTotalSalesByManager,
+} from "../../utils/salesAnalyticsCalculations";
+
 const Analytics = () => {
   const theme = useTheme();
   const dispatch = useDispatch();
   const isNonMediumScreens = useMediaQuery("(min-width: 1200px)");
-  const [timePeriod, setTimePeriod] = useState("month"); // Default to "This Month"
+  const [timePeriod, setTimePeriod] = useState("thismonth"); // Default to "This Month"
 
   const { reports } = useSelector((state) => {
     const reportsData = state.report.reports || {};
@@ -36,204 +47,10 @@ const Analytics = () => {
     setTimePeriod(event.target.value);
   };
 
-  // Transform reports data into daily sales totals
-  const getDailySalesData = (reports) => {
-    const dailySalesMap = {};
-
-    reports.forEach((report) => {
-      const date = report.date.split("T")[0];
-      const storeName = report.storeName;
-      const salesAmount = report.storeTotalSales?.totalSalesDollars || 0;
-
-      if (!dailySalesMap[date]) {
-        dailySalesMap[date] = {};
-      }
-
-      dailySalesMap[date][storeName] =
-        (dailySalesMap[date][storeName] || 0) + salesAmount;
-    });
-
-    // Convert dailySalesMap into an array format compatible with the chart
-    return Object.keys(dailySalesMap).map((date) => {
-      const entry = { date };
-      Object.keys(dailySalesMap[date]).forEach((storeName) => {
-        entry[storeName] = dailySalesMap[date][storeName];
-      });
-      return entry;
-    });
-  };
-
-  // Function to get daily rates data for each product (PMS, AGO, DPK)
-  const getDailyProductRatesData = (reports) => {
-    const productRatesMap = {};
-
-    reports.forEach((report) => {
-      const date = report.date.split("T")[0];
-
-      if (!productRatesMap[date]) {
-        productRatesMap[date] = { date, PMS: null, AGO: null, DPK: null };
-      }
-
-      // Store rates for each product if available
-      if (report.products.PMS) {
-        productRatesMap[date].PMS = report.products.PMS.rate || null;
-      }
-      if (report.products.AGO) {
-        productRatesMap[date].AGO = report.products.AGO.rate || null;
-      }
-      if (report.products.DPK) {
-        productRatesMap[date].DPK = report.products.DPK.rate || null;
-      }
-    });
-
-    // Convert to array format for charting
-    return Object.values(productRatesMap);
-  };
-
-  // Function to get totalSalesDollars by Product for each store
-  const getProductSalesByStoreData = () => {
-    const productSalesMap = {
-      PMS: {},
-      AGO: {},
-      DPK: {},
-    };
-
-    reports.forEach((report) => {
-      const storeName = report.storeName;
-
-      if (report.products.PMS) {
-        productSalesMap.PMS[storeName] =
-          (productSalesMap.PMS[storeName] || 0) +
-            report.products.PMS.totalSalesDollars || 0;
-      }
-
-      if (report.products.AGO) {
-        productSalesMap.AGO[storeName] =
-          (productSalesMap.AGO[storeName] || 0) +
-            report.products.AGO.totalSalesDollars || 0;
-      }
-
-      if (report.products.DPK) {
-        productSalesMap.DPK[storeName] =
-          (productSalesMap.DPK[storeName] || 0) +
-            report.products.DPK.totalSalesDollars || 0;
-      }
-    });
-
-    // Convert to array format for charting
-    return ["PMS", "AGO", "DPK"].map((product) => ({
-      product,
-      ...productSalesMap[product],
-    }));
-  };
-
-  const getDailyProductSalesData = (reports) => {
-    const dailySalesMap = {};
-
-    reports.forEach((report) => {
-      const date = report.date.split("T")[0];
-      const products = report.products || {};
-
-      if (!dailySalesMap[date]) {
-        dailySalesMap[date] = { date, PMS: 0, AGO: 0, DPK: 0 };
-      }
-
-      // Sum up total sales for each product type
-      dailySalesMap[date].PMS += products.PMS?.totalSalesDollars || 0;
-      dailySalesMap[date].AGO += products.AGO?.totalSalesDollars || 0;
-      dailySalesMap[date].DPK += products.DPK?.totalSalesDollars || 0;
-    });
-
-    // Convert to array format for the chart
-    return Object.values(dailySalesMap);
-  };
-
-  // Total sales by product
-  const getTotalSalesByProduct = (reports) => {
-    const productSales = { PMS: 0, AGO: 0, DPK: 0 };
-
-    reports.forEach((report) => {
-      const products = report.products || {};
-      productSales.PMS += products.PMS?.totalSalesDollars || 0;
-      productSales.AGO += products.AGO?.totalSalesDollars || 0;
-      productSales.DPK += products.DPK?.totalSalesDollars || 0;
-    });
-
-    return Object.keys(productSales).map((product) => ({
-      category: product,
-      totalSales: productSales[product],
-    }));
-  };
-
-  // Total sales by store
-  const getTotalSalesByStore = (reports) => {
-    const storeSales = {};
-
-    reports.forEach((report) => {
-      const storeName = report.storeName;
-      const salesAmount = report.storeTotalSales?.totalSalesDollars || 0;
-
-      storeSales[storeName] = (storeSales[storeName] || 0) + salesAmount;
-    });
-
-    return Object.keys(storeSales).map((storeName) => ({
-      category: storeName,
-      totalSales: storeSales[storeName],
-    }));
-  };
-
-  // Total sales by manager
-  const getTotalSalesByManager = (reports) => {
-    const managerSales = {};
-
-    reports.forEach((report) => {
-      const managerName = report.managerName;
-      const salesAmount = report.storeTotalSales?.totalSalesDollars || 0;
-
-      managerSales[managerName] =
-        (managerSales[managerName] || 0) + salesAmount;
-    });
-
-    return Object.keys(managerSales).map((manager) => ({
-      category: manager,
-      totalSales: managerSales[manager],
-    }));
-  };
-
-  // helper function to filter by time period
-  /*   const filterReportsByTimePeriod = (reports, timePeriod) => {
-    const now = new Date();
-    let startDate;
-
-    switch (timePeriod) {
-      case "week":
-        startDate = new Date();
-        startDate.setDate(now.getDate() - 7);
-        break;
-      case "month":
-        startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-        break;
-      case "quarter":
-        startDate = new Date(now.getFullYear(), now.getMonth() - 3, 1);
-        break;
-      case "year":
-        startDate = new Date(now.getFullYear(), 0, 1);
-        break;
-      case "lastYear":
-        startDate = new Date(now.getFullYear() - 1, 0, 1);
-        break;
-      default:
-        return reports;
-    }
-
-    return reports.filter((report) => new Date(report.date) >= startDate);
-  }; */
-
   const filterReportsByTimePeriod = (reports, timePeriod) => {
     const now = new Date();
     now.setUTCHours(0, 0, 0, 0); // Set now to midnight UTC
 
-    console.log("🚀 ~ filterReportsByTimePeriod ~ now:", now);
     return reports.filter((report) => {
       const reportDate = new Date(report.date);
       reportDate.setUTCHours(0, 0, 0, 0); // Set reportDate to midnight UTC
@@ -241,32 +58,77 @@ const Analytics = () => {
       if (timePeriod === "today") {
         return reportDate.toDateString() === now.toDateString();
       } else if (timePeriod === "last3Days") {
-        const threeDaysAgo = new Date();
+        const threeDaysAgo = new Date(now);
         threeDaysAgo.setDate(now.getDate() - 3);
         return reportDate >= threeDaysAgo && reportDate <= now;
       } else if (timePeriod === "last7Days") {
-        const sevenDaysAgo = new Date();
+        const sevenDaysAgo = new Date(now);
         sevenDaysAgo.setDate(now.getDate() - 7);
         return reportDate >= sevenDaysAgo && reportDate <= now;
-      } else if (timePeriod === "week") {
-        const dayOfWeek = now.getDay(); // 0 for Sunday, 1 for Monday, etc.
+      } else if (timePeriod === "thisweek") {
+        const dayOfWeek = now.getDay();
         const startOfWeek = new Date(now);
         startOfWeek.setDate(
           now.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1)
-        ); // Adjust for Monday start
+        );
         return reportDate >= startOfWeek && reportDate <= now;
-      } else if (timePeriod === "month") {
-        const oneMonthAgo = new Date(now);
-        oneMonthAgo.setMonth(now.getMonth() - 1);
-        return reportDate >= oneMonthAgo && reportDate <= now;
-      } else if (timePeriod === "quarter") {
-        const threeMonthsAgo = new Date(now);
-        threeMonthsAgo.setMonth(now.getMonth() - 3);
-        return reportDate >= threeMonthsAgo && reportDate <= now;
-      } else if (timePeriod === "year") {
-        const oneYearAgo = new Date(now);
-        oneYearAgo.setFullYear(now.getFullYear() - 1);
-        return reportDate >= oneYearAgo && reportDate <= now;
+      } else if (timePeriod === "lastmonth") {
+        const firstDayOfLastMonth = new Date(
+          now.getFullYear(),
+          now.getMonth() - 1,
+          1
+        );
+        const lastDayOfLastMonth = new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          0
+        );
+        return (
+          reportDate >= firstDayOfLastMonth && reportDate <= lastDayOfLastMonth
+        );
+      } else if (timePeriod === "thismonth") {
+        const firstDayOfThisMonth = new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          1
+        );
+        return reportDate >= firstDayOfThisMonth && reportDate <= now;
+      } else if (timePeriod === "lastquarter") {
+        const currentQuarter = Math.floor((now.getMonth() + 3) / 3); // 1 for Q1, 2 for Q2, etc.
+        let startOfLastQuarter, endOfLastQuarter;
+
+        // Set the start and end dates for the last quarter based on the current quarter
+        if (currentQuarter === 1) {
+          // Last quarter is Q4 of the previous year
+          startOfLastQuarter = new Date(now.getFullYear() - 1, 9, 1); // October 1
+          endOfLastQuarter = new Date(now.getFullYear() - 1, 11, 31); // December 31
+        } else if (currentQuarter === 2) {
+          // Last quarter is Q1 of this year
+          startOfLastQuarter = new Date(now.getFullYear(), 0, 1); // January 1
+          endOfLastQuarter = new Date(now.getFullYear(), 2, 31); // March 31
+        } else if (currentQuarter === 3) {
+          // Last quarter is Q2 of this year
+          startOfLastQuarter = new Date(now.getFullYear(), 3, 1); // April 1
+          endOfLastQuarter = new Date(now.getFullYear(), 5, 30); // June 30
+        } else {
+          // Last quarter is Q3 of this year
+          startOfLastQuarter = new Date(now.getFullYear(), 6, 1); // July 1
+          endOfLastQuarter = new Date(now.getFullYear(), 8, 30); // September 30
+        }
+
+        return (
+          reportDate >= startOfLastQuarter && reportDate <= endOfLastQuarter
+        );
+      } else if (timePeriod === "thisquarter") {
+        const startOfQuarter = new Date(
+          now.getFullYear(),
+          Math.floor(now.getMonth() / 3) * 3,
+          1
+        );
+        return reportDate >= startOfQuarter && reportDate <= now;
+      } else if (timePeriod === "thisyear") {
+        const firstDayOfThisYear = new Date(now.getFullYear(), 0, 1);
+        return reportDate >= firstDayOfThisYear && reportDate <= now;
       } else if (timePeriod === "lastYear") {
         const lastYearStart = new Date(now.getFullYear() - 1, 0, 1);
         const lastYearEnd = new Date(now.getFullYear() - 1, 11, 31);
@@ -276,21 +138,41 @@ const Analytics = () => {
     });
   };
 
-  // apply the time period filter helpr function
-  const filteredReports = filterReportsByTimePeriod(reports, timePeriod);
-  // check if the time period selected has data
-  const hasData = filteredReports && filteredReports.length > 0;
+  // Memoize filteredReports first before using it in other calculations
+  const filteredReports = useMemo(
+    () => filterReportsByTimePeriod(reports, timePeriod),
+    [reports, timePeriod]
+  );
 
-  // call all the functions so we can use the data in our charts
-  const dailyProductRatesData = getDailyProductRatesData(filteredReports);
-  const dailySalesData = getDailySalesData(filteredReports);
-  //const productSalesByStoreData = getProductSalesByStoreData();
-  const dailyProductSalesData = getDailyProductSalesData(filteredReports);
-  // Generate data for radar charts
-  const productSalesData = getTotalSalesByProduct(filteredReports);
-  const storeSalesData = getTotalSalesByStore(filteredReports);
-  const managerSalesData = getTotalSalesByManager(filteredReports);
-  console.log("🚀 ~ Analytics ~ filteredReports:", filteredReports);
+  // Memoize function calls with filteredReports dependency
+  const dailyProductRatesData = useMemo(
+    () => getDailyProductRatesData(filteredReports),
+    [filteredReports]
+  );
+  const dailySalesData = useMemo(
+    () => getDailySalesData(filteredReports),
+    [filteredReports]
+  );
+  const productSalesByStoreData = useMemo(
+    () => getProductSalesByStoreData(filteredReports),
+    [filteredReports]
+  );
+  const dailyProductSalesData = useMemo(
+    () => getDailyProductSalesData(filteredReports),
+    [filteredReports]
+  );
+  const productSalesData = useMemo(
+    () => getTotalSalesByProduct(filteredReports),
+    [filteredReports]
+  );
+  const storeSalesData = useMemo(
+    () => getTotalSalesByStore(filteredReports),
+    [filteredReports]
+  );
+  const managerSalesData = useMemo(
+    () => getTotalSalesByManager(filteredReports),
+    [filteredReports]
+  );
 
   return (
     <Box m="1.5rem 2.5rem">
@@ -318,10 +200,11 @@ const Analytics = () => {
           <MenuItem value="today">Today</MenuItem>
           <MenuItem value="last3Days">Last 3 Days</MenuItem>
           <MenuItem value="last7Days">Last 7 Days</MenuItem>
-          <MenuItem value="week">This Week</MenuItem>
-          <MenuItem value="month">This Month</MenuItem>
-          <MenuItem value="quarter">This Quarter</MenuItem>
-          <MenuItem value="year">This Year</MenuItem>
+          <MenuItem value="lastmonth">Last Month</MenuItem>
+          <MenuItem value="thisweek">This Week</MenuItem>
+          <MenuItem value="thismonth">This Month</MenuItem>
+          <MenuItem value="thisquarter">This Quarter</MenuItem>
+          <MenuItem value="thisyear">This Year</MenuItem>
           <MenuItem value="lastYear">Last Year</MenuItem>
         </Select>
       </Box>

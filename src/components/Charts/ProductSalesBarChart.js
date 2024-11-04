@@ -50,7 +50,7 @@ const ProductSalesBarChart = ({ salesData, title }) => {
                 itemStyle={{ color: theme.palette.secondary[100] }}
               />
               <Legend />
-              <Bar dataKey="totalSales" fill="#8884d8">
+              <Bar dataKey="totalSales" fill={theme.palette.primary.alt}>
                 {salesData.map((entry, index) => (
                   <Cell
                     key={`cell-${index}`}

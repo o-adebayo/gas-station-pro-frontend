@@ -30,7 +30,6 @@ import { Link } from "react-router-dom";
 import CreateOutlinedIcon from "@mui/icons-material/CreateOutlined";
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
-import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
 import { toast } from "react-toastify";
 
@@ -119,7 +118,7 @@ const StoreListNew = () => {
     },
     {
       field: "tanks",
-      headerName: "tanks",
+      headerName: "Tanks",
       //width: 80,
       flex: 0.5,
     },

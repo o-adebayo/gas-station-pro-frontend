@@ -51,9 +51,9 @@ const ProductRatesLineChart = ({ ratesData }) => {
                 type="monotone"
                 dataKey="PMS"
                 name="PMS Rate"
-                stroke={theme.palette.primary.main}
+                stroke={theme.palette.success.main}
                 strokeWidth={2}
-                dot={{ fill: theme.palette.primary.main, r: 4 }}
+                dot={{ fill: theme.palette.success.main, r: 4 }}
                 activeDot={{ r: 6 }}
               />
               <Line
@@ -69,9 +69,9 @@ const ProductRatesLineChart = ({ ratesData }) => {
                 type="monotone"
                 dataKey="DPK"
                 name="DPK Rate"
-                stroke={theme.palette.success.main}
+                stroke={theme.palette.warning.main}
                 strokeWidth={2}
-                dot={{ fill: theme.palette.success.main, r: 4 }}
+                dot={{ fill: theme.palette.warning.main, r: 4 }}
                 activeDot={{ r: 6 }}
               />
             </LineChart>

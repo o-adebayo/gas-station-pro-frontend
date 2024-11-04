@@ -1,28 +1,30 @@
+// src/components/Loader.js
 import React from "react";
-import loaderImg from "../../assets/loader.gif";
 import ReactDOM from "react-dom";
+import { CircularProgress, Typography, Box } from "@mui/material";
 import "./Loader.scss";
-import { CircularProgress } from "@mui/material";
 
-const Loader = () => {
+const Loader = ({ message = "Loading..." }) => {
   return ReactDOM.createPortal(
     <div className="wrapper">
       <div className="loader">
-        {/* <img src={loaderImg} alt="Loading..." /> */}
         <CircularProgress />
+        <Typography variant="body1" mt={2} color="textSecondary">
+          {message}
+        </Typography>
       </div>
     </div>,
     document.getElementById("loader")
   );
 };
 
-export const SpinnerImg = () => {
-  return (
-    <div className="--center-all">
-      {/* <img src={loaderImg} alt="Loading..." /> */}
-      <CircularProgress />
-    </div>
-  );
-};
+export const SpinnerImg = ({ message = "Loading..." }) => (
+  <div className="--center-all">
+    <CircularProgress />
+    <Typography variant="body2" mt={1} color="textSecondary">
+      {message}
+    </Typography>
+  </div>
+);
 
 export default Loader;

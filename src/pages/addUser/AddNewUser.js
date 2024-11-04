@@ -12,7 +12,6 @@ import {
 } from "../../redux/features/auth/authSlice";
 import { toast } from "react-toastify";
 import UserFormNew from "../../components/user/userForm/UserFormNew";
-import { CircularProgress } from "@mui/material";
 
 const AddNewUser = () => {
   const dispatch = useDispatch();
@@ -82,7 +81,7 @@ const AddNewUser = () => {
 
   return (
     <div>
-      {isLoading && <Loader />}
+      {isLoading && <Loader message="Saving user data..." />}
 
       <UserFormNew
         saveUser={saveUser} // Pass the function to save the user

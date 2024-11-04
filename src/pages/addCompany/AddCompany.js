@@ -48,7 +48,7 @@ const AddCompany = () => {
 
   return (
     <div className="add-company --my2">
-      {isLoading && <Loader />}
+      {isLoading && <Loader message="Saving company data..." />}
 
       {/* <h3 className="--mt">Add New Company</h3> */}
       <CompanyForm

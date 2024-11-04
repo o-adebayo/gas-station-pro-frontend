@@ -11,7 +11,6 @@ import {
   Select,
   IconButton,
   InputAdornment,
-  CircularProgress,
 } from "@mui/material";
 import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -73,7 +72,7 @@ const EditUserNew = () => {
 
   // If loading, show a loader
   if (isLoading) {
-    return <Loader />;
+    return <Loader message="Loading profile data..." />;
   }
 
   // If user is not found or something went wrong

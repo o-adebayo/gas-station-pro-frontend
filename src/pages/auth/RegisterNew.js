@@ -97,7 +97,7 @@ const RegisterNew = () => {
       sx={{ backgroundColor: theme.palette.background.default }} //BACKGROUND COLOUR OF THE PAGE IN CASE WE WANT TO CHANGE IT
     >
       <Card sx={{ padding: 4, width: "100%", maxWidth: "500px" }}>
-        {isLoading && <Loader />}
+        {isLoading && <Loader message="Registering user account..." />}
         <Box display="flex" justifyContent="center" mb={2}>
           <TiUserAddOutline size={35} color="#999" />
         </Box>

@@ -27,7 +27,6 @@ import CreateOutlinedIcon from "@mui/icons-material/CreateOutlined";
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import VpnKeyOutlinedIcon from "@mui/icons-material/VpnKeyOutlined";
-import { confirmAlert } from "react-confirm-alert";
 import { toast } from "react-toastify";
 import { selectStores } from "../../redux/features/storeLocation/storeLocationSlice";
 
@@ -175,10 +174,10 @@ const UserListNew = () => {
                   sx={{
                     color:
                       theme.palette.mode === "dark"
-                        ? theme.palette.primary.light
-                        : theme.palette.primary.main,
+                        ? theme.palette.success.light
+                        : theme.palette.success.main,
                     "&:hover": {
-                      color: theme.palette.primary.dark,
+                      color: theme.palette.success.dark,
                     },
                   }}
                 />

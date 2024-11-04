@@ -54,6 +54,10 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
     navigate("/contact-us");
   };
 
+  const handleGoToCompany = () => {
+    navigate("/my-company"); // Change this to your actual company page route
+  };
+
   return (
     <AppBar
       sx={{
@@ -140,7 +144,12 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
               anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
             >
               <MenuItem onClick={handleGoToProfile}>Profile</MenuItem>
-              <MenuItem onClick={handleGetHelp}>Help</MenuItem>
+              <MenuItem onClick={handleGetHelp}>Need Help?</MenuItem>
+              {/* Conditional My Company menu item for admins */}
+              {user.role === "admin" && (
+                <MenuItem onClick={handleGoToCompany}>My Company</MenuItem>
+              )}
+
               <MenuItem onClick={logoutUser}>Log Out</MenuItem>
             </Menu>
           </FlexBetween>

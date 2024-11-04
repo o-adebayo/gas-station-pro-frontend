@@ -6,7 +6,6 @@ import {
   CardContent,
   Typography,
   Avatar,
-  CircularProgress,
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -73,7 +72,7 @@ const ProfileNew = () => {
 
   // If loading user data, show a loader
   if (isUserLoading || isStoreLoading) {
-    return <Loader />;
+    return <Loader message="Loading profile data..." />;
   }
 
   return (

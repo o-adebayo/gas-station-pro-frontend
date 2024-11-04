@@ -43,6 +43,7 @@ import ViewUserNew from "./pages/userList/ViewUserNew";
 import EditUserNew from "./pages/userList/EditUserNew";
 import Analytics from "./pages/analytics/Analytics";
 import ReportDetailNew from "./components/report/reportDetail/ReportDetailNew";
+import ViewCompany from "./pages/company/ViewCompany";
 
 axios.defaults.withCredentials = true;
 
@@ -72,6 +73,7 @@ function App() {
           <Route element={<LayoutNew />}>
             <Route path="/dashboard" element={<DashboardNew />} />
             <Route path="/profile" element={<ProfileNew />} />
+            <Route path="/my-company" element={<ViewCompany />} />
             <Route path="/users" element={<UserListNew />} />
             <Route path="/users/view-user/:id" element={<ViewUserNew />} />
             <Route path="/users/edit-user/:id" element={<EditUserNew />} />

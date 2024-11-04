@@ -70,7 +70,7 @@ const AddNewStoreLocation = () => {
 
   return (
     <div className="add-store-location --my2">
-      {isLoading && <Loader />}
+      {isLoading && <Loader message="Saving store data..." />}
 
       <StoreLocationFormNew
         saveStoreLocation={saveStoreLocation} // Pass save function to the form

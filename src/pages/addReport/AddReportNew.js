@@ -213,7 +213,9 @@ const AddReportNew = () => {
 
   return (
     <div>
-      {(isLoading || loadingState) && <Loader />}
+      {(isLoading || loadingState) && (
+        <Loader message="Saving Report data..." />
+      )}
       <ReportFormNew
         report={report}
         notes={notes}

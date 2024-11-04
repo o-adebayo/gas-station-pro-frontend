@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Box,
   TextField,
@@ -20,6 +20,14 @@ import HeaderNew from "../../components/HeaderNew";
 import { getReportsByStoreId } from "../../redux/features/report/reportSlice";
 import SalesOverviewChart from "../../components/Charts/SalesOverviewChart";
 import ProductSalesBarChart from "../../components/Charts/ProductSalesBarChart";
+
+// Importing utility functions
+import {
+  calculateStoreSales,
+  calculateMonthlySalesForStore,
+  calculateProductSalesForCurrentMonthForStore,
+  calculateProductSalesForCurrentYearForStore,
+} from "../../utils/salesCalculations";
 
 const ViewStoreNew = () => {
   const theme = useTheme();
@@ -64,209 +72,30 @@ const ViewStoreNew = () => {
   // Check if there are reports data
   const hasReportsData = reports && reports.length > 0;
 
-  // Function to filter and calculate store sales for the specific store
-  function calculateStoreSales(salesReports) {
-    if (!hasReportsData) {
-      return {
-        totalSalesForMonth: {
-          totalSalesDollars: 0,
-          totalSalesLiters: 0,
-          percentageDiffDollars: 0,
-          percentageDiffLiters: 0,
-        },
-        totalSalesForYear: {
-          totalSalesDollars: 0,
-          totalSalesLiters: 0,
-          percentageDiffDollars: 0,
-          percentageDiffLiters: 0,
-        },
-      };
-    }
-
-    const currentDate = new Date();
-    const currentMonth = currentDate.toLocaleString("default", {
-      month: "long",
-    });
-    const currentYear = currentDate.getFullYear();
-
-    let previousMonthDate = new Date(
-      currentDate.setMonth(currentDate.getMonth() - 1)
-    );
-    const previousMonth = previousMonthDate.toLocaleString("default", {
-      month: "long",
-    });
-    const previousYear = previousMonthDate.getFullYear();
-
-    // Initialize accumulators for the current and previous periods
-    let totalSalesDollarsForMonth = 0;
-    let totalSalesLitersForMonth = 0;
-    let totalSalesDollarsForYear = 0;
-    let totalSalesLitersForYear = 0;
-
-    let totalSalesDollarsForPreviousMonth = 0;
-    let totalSalesLitersForPreviousMonth = 0;
-    let totalSalesDollarsForPreviousYear = 0;
-    let totalSalesLitersForPreviousYear = 0;
-
-    salesReports.forEach((report) => {
-      // Totals for the current month
-      if (report.month === currentMonth && report.year === currentYear) {
-        totalSalesDollarsForMonth += report.storeTotalSales.totalSalesDollars;
-        totalSalesLitersForMonth += report.storeTotalSales.totalSalesLiters;
-      }
-      // Totals for the current year
-      if (report.year === currentYear) {
-        totalSalesDollarsForYear += report.storeTotalSales.totalSalesDollars;
-        totalSalesLitersForYear += report.storeTotalSales.totalSalesLiters;
-      }
-      // Totals for the previous month
-      if (report.month === previousMonth && report.year === currentYear) {
-        totalSalesDollarsForPreviousMonth +=
-          report.storeTotalSales.totalSalesDollars;
-        totalSalesLitersForPreviousMonth +=
-          report.storeTotalSales.totalSalesLiters;
-      }
-      // Totals for the previous year
-      if (report.year === previousYear) {
-        totalSalesDollarsForPreviousYear +=
-          report.storeTotalSales.totalSalesDollars;
-        totalSalesLitersForPreviousYear +=
-          report.storeTotalSales.totalSalesLiters;
-      }
-    });
-
-    // Calculate percentage differences
-    const percentageDiffDollarsMonth = totalSalesDollarsForPreviousMonth
-      ? ((totalSalesDollarsForMonth - totalSalesDollarsForPreviousMonth) /
-          totalSalesDollarsForPreviousMonth) *
-        100
-      : 0;
-
-    const percentageDiffLitersMonth = totalSalesLitersForPreviousMonth
-      ? ((totalSalesLitersForMonth - totalSalesLitersForPreviousMonth) /
-          totalSalesLitersForPreviousMonth) *
-        100
-      : 0;
-
-    const percentageDiffDollarsYear = totalSalesDollarsForPreviousYear
-      ? ((totalSalesDollarsForYear - totalSalesDollarsForPreviousYear) /
-          totalSalesDollarsForPreviousYear) *
-        100
-      : 0;
-
-    const percentageDiffLitersYear = totalSalesLitersForPreviousYear
-      ? ((totalSalesLitersForYear - totalSalesLitersForPreviousYear) /
-          totalSalesLitersForPreviousYear) *
-        100
-      : 0;
-
-    return {
-      totalSalesForMonth: {
-        totalSalesDollars: totalSalesDollarsForMonth,
-        totalSalesLiters: totalSalesLitersForMonth,
-        percentageDiffDollars: percentageDiffDollarsMonth,
-        percentageDiffLiters: percentageDiffLitersMonth,
-      },
-      totalSalesForYear: {
-        totalSalesDollars: totalSalesDollarsForYear,
-        totalSalesLiters: totalSalesLitersForYear,
-        percentageDiffDollars: percentageDiffDollarsYear,
-        percentageDiffLiters: percentageDiffLitersYear,
-      },
-    };
-  }
-
-  // Function to calculate monthly sales for the current year for a single store
-  function calculateMonthlySalesForStore(salesReports) {
-    const currentYear = new Date().getFullYear();
-
-    const monthlySales = {
-      January: { totalSalesDollars: 0, totalSalesLiters: 0 },
-      February: { totalSalesDollars: 0, totalSalesLiters: 0 },
-      March: { totalSalesDollars: 0, totalSalesLiters: 0 },
-      April: { totalSalesDollars: 0, totalSalesLiters: 0 },
-      May: { totalSalesDollars: 0, totalSalesLiters: 0 },
-      June: { totalSalesDollars: 0, totalSalesLiters: 0 },
-      July: { totalSalesDollars: 0, totalSalesLiters: 0 },
-      August: { totalSalesDollars: 0, totalSalesLiters: 0 },
-      September: { totalSalesDollars: 0, totalSalesLiters: 0 },
-      October: { totalSalesDollars: 0, totalSalesLiters: 0 },
-      November: { totalSalesDollars: 0, totalSalesLiters: 0 },
-      December: { totalSalesDollars: 0, totalSalesLiters: 0 },
-    };
-
-    salesReports.forEach((report) => {
-      if (report.year === currentYear) {
-        const { month, storeTotalSales } = report;
-
-        if (monthlySales[month]) {
-          monthlySales[month].totalSalesDollars +=
-            storeTotalSales.totalSalesDollars;
-          monthlySales[month].totalSalesLiters +=
-            storeTotalSales.totalSalesLiters;
-        }
-      }
-    });
-
-    return Object.keys(monthlySales).map((month) => ({
-      name: month,
-      totalSalesDollars: monthlySales[month].totalSalesDollars,
-      totalSalesLiters: monthlySales[month].totalSalesLiters,
-    }));
-  }
-
-  // Function to calculate product sales (PMS, AGO, DPK) for the current month for the store
-  function calculateProductSalesForCurrentMonthForStore(salesReports) {
-    const currentDate = new Date();
-    const currentMonth = currentDate.toLocaleString("default", {
-      month: "long",
-    });
-    const currentYear = currentDate.getFullYear();
-
-    const productSales = { PMS: 0, AGO: 0, DPK: 0 };
-
-    salesReports.forEach((report) => {
-      if (report.month === currentMonth && report.year === currentYear) {
-        productSales.PMS += report.products.PMS.totalSalesDollars || 0;
-        productSales.AGO += report.products.AGO.totalSalesDollars || 0;
-        productSales.DPK += report.products.DPK.totalSalesDollars || 0;
-      }
-    });
-
-    return Object.keys(productSales).map((product) => ({
-      name: product,
-      totalSales: productSales[product],
-    }));
-  }
-
-  // Function to calculate product sales (PMS, AGO, DPK) for the current year for the store
-  function calculateProductSalesForCurrentYearForStore(salesReports) {
-    const currentYear = new Date().getFullYear();
-
-    const productSales = { PMS: 0, AGO: 0, DPK: 0 };
-
-    salesReports.forEach((report) => {
-      if (report.year === currentYear) {
-        productSales.PMS += report.products.PMS.totalSalesDollars || 0;
-        productSales.AGO += report.products.AGO.totalSalesDollars || 0;
-        productSales.DPK += report.products.DPK.totalSalesDollars || 0;
-      }
-    });
-
-    return Object.keys(productSales).map((product) => ({
-      name: product,
-      totalSales: productSales[product],
-    }));
-  }
-
-  // Call the functions and pass the reports array for the specific store
-  const storeSales = calculateStoreSales(reports); // Calculate store sales data
+  // Using utility functions to calculate necessary values
+  /*   const storeSales = calculateStoreSales(reports);
   const monthlySalesData = calculateMonthlySalesForStore(reports);
   const productSalesForMonth =
     calculateProductSalesForCurrentMonthForStore(reports);
   const productSalesForYear =
-    calculateProductSalesForCurrentYearForStore(reports);
+    calculateProductSalesForCurrentYearForStore(reports); */
 
+  // Using useMemo to optimize calculations by memoizing results
+  const storeSales = useMemo(() => calculateStoreSales(reports), [reports]);
+  const monthlySalesData = useMemo(
+    () => calculateMonthlySalesForStore(reports),
+    [reports]
+  );
+  const productSalesForMonth = useMemo(
+    () => calculateProductSalesForCurrentMonthForStore(reports),
+    [reports]
+  );
+  const productSalesForYear = useMemo(
+    () => calculateProductSalesForCurrentYearForStore(reports),
+    [reports]
+  );
+
+  // if !store check should always be below usememo usage for calculations
   if (!store) return <Typography>Loading store details...</Typography>;
 
   return (

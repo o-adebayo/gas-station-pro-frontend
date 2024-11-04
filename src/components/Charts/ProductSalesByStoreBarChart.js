@@ -58,7 +58,7 @@ const ProductSalesByDateBarChart = ({ salesData }) => {
               <Bar
                 dataKey="PMS"
                 name="PMS"
-                fill={theme.palette.primary.main}
+                fill={theme.palette.success.main}
                 barSize={20}
               />
               <Bar
