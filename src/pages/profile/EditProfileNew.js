@@ -6,6 +6,7 @@ import {
   Avatar,
   useTheme,
   Divider,
+  CircularProgress,
 } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
@@ -104,7 +105,7 @@ const EditProfileNew = () => {
 
   return (
     <Box m="20px">
-      {isLoading && <Loader />}
+      {isLoading && <CircularProgress />}
       <HeaderNew
         title="Edit Profile"
         subtitle="Manage your profile information"

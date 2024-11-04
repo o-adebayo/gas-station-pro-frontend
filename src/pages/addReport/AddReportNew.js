@@ -26,6 +26,7 @@ import {
   EMAIL_RESET,
   sendAutomatedEmail,
 } from "../../redux/features/email/emailSlice";
+import { CircularProgress } from "@mui/material";
 
 const initialState = {
   date: "",
@@ -212,7 +213,7 @@ const AddReportNew = () => {
 
   return (
     <div>
-      {(isLoading || loadingState) && <Loader />}
+      {(isLoading || loadingState) && <CircularProgress />}
       <ReportFormNew
         report={report}
         notes={notes}

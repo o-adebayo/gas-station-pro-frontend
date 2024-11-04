@@ -7,6 +7,7 @@ import {
   Card,
   Link as MuiLink,
   useTheme,
+  CircularProgress,
 } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
@@ -60,7 +61,7 @@ const ActivateNew = () => {
       height="100vh"
       sx={{ backgroundColor: theme.palette.background.default }} //BACKGROUND COLOUR OF THE PAGE IN CASE WE WANT TO CHANGE IT
     >
-      {isLoading && <Loader />}
+      {isLoading && <CircularProgress />}
       <Card sx={{ padding: 4, width: "100%", maxWidth: "400px" }}>
         <Box display="flex" flexDirection="column" alignItems="center" mb={2}>
           <MdPassword size={35} color="#999" />

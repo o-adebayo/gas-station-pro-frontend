@@ -12,6 +12,7 @@ import {
   selectIsLoading,
 } from "../../redux/features/auth/authSlice";
 import { toast } from "react-toastify";
+import { CircularProgress } from "@mui/material";
 
 const initialState = {
   name: "", // Name of the user
@@ -95,7 +96,7 @@ const AddUser = () => {
 
   return (
     <div>
-      {isLoading && <Loader />}
+      {isLoading && <CircularProgress />}
       <h3 className="--mt">Add New User</h3>
       <UserForm
         user={user} // Pass the user object

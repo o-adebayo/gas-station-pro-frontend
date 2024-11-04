@@ -6,6 +6,7 @@ import {
   Typography,
   IconButton,
   InputAdornment,
+  CircularProgress,
 } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
@@ -173,7 +174,7 @@ const ChangePasswordNew = () => {
 
               <Box display="flex" justifyContent="flex-end">
                 <Button type="submit" color="primary" variant="contained">
-                  {isLoading ? <Loader /> : "Change Password"}
+                  {isLoading ? <CircularProgress /> : "Change Password"}
                 </Button>
               </Box>
             </form>

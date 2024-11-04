@@ -25,6 +25,7 @@ import {
 } from "../../redux/features/email/emailSlice";
 import { toast } from "react-toastify";
 import { selectStores } from "../../redux/features/storeLocation/storeLocationSlice";
+import { CircularProgress } from "@mui/material";
 
 const EditReportNew = () => {
   const { id } = useParams();
@@ -223,7 +224,7 @@ const EditReportNew = () => {
 
   return (
     <div>
-      {isLoading && <Loader />}
+      {isLoading && <CircularProgress />}
       {report && (
         <EditReportFormNew
           report={report}
