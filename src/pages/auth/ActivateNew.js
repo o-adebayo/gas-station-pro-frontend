@@ -61,7 +61,7 @@ const ActivateNew = () => {
       height="100vh"
       sx={{ backgroundColor: theme.palette.background.default }} //BACKGROUND COLOUR OF THE PAGE IN CASE WE WANT TO CHANGE IT
     >
-      {isLoading && <CircularProgress />}
+      {isLoading && <Loader />}
       <Card sx={{ padding: 4, width: "100%", maxWidth: "400px" }}>
         <Box display="flex" flexDirection="column" alignItems="center" mb={2}>
           <MdPassword size={35} color="#999" />

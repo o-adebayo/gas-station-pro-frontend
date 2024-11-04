@@ -96,7 +96,7 @@ const AddUser = () => {
 
   return (
     <div>
-      {isLoading && <CircularProgress />}
+      {isLoading && <Loader />}
       <h3 className="--mt">Add New User</h3>
       <UserForm
         user={user} // Pass the user object

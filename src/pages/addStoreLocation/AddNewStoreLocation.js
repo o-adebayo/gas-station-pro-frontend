@@ -6,7 +6,6 @@ import { createStoreLocation } from "../../redux/features/storeLocation/storeLoc
 import { toast } from "react-toastify";
 import { fetchUser, selectUser } from "../../redux/features/auth/authSlice";
 import StoreLocationFormNew from "../../components/storeLocation/storeLocationForm/StoreLocationFormNew";
-import { CircularProgress } from "@mui/material";
 
 const cloud_name = process.env.REACT_APP_CLOUDINARY_CLOUD_NAME;
 const upload_preset = process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET;
@@ -71,7 +70,7 @@ const AddNewStoreLocation = () => {
 
   return (
     <div className="add-store-location --my2">
-      {isLoading && <CircularProgress />}
+      {isLoading && <Loader />}
 
       <StoreLocationFormNew
         saveStoreLocation={saveStoreLocation} // Pass save function to the form

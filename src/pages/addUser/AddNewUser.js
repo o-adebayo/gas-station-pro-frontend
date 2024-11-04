@@ -82,7 +82,7 @@ const AddNewUser = () => {
 
   return (
     <div>
-      {isLoading && <CircularProgress />}
+      {isLoading && <Loader />}
 
       <UserFormNew
         saveUser={saveUser} // Pass the function to save the user

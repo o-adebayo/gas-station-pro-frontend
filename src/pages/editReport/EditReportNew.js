@@ -224,7 +224,7 @@ const EditReportNew = () => {
 
   return (
     <div>
-      {isLoading && <CircularProgress />}
+      {isLoading && <Loader />}
       {report && (
         <EditReportFormNew
           report={report}

@@ -105,7 +105,7 @@ const EditProfileNew = () => {
 
   return (
     <Box m="20px">
-      {isLoading && <CircularProgress />}
+      {isLoading && <Loader />}
       <HeaderNew
         title="Edit Profile"
         subtitle="Manage your profile information"

@@ -73,7 +73,7 @@ const EditUserNew = () => {
 
   // If loading, show a loader
   if (isLoading) {
-    return <CircularProgress />;
+    return <Loader />;
   }
 
   // If user is not found or something went wrong

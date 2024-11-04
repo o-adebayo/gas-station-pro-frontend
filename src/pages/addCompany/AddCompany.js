@@ -7,7 +7,6 @@ import { createCompany } from "../../redux/features/company/companySlice"; // As
 import CompanyForm from "../../components/company/companyForm/CompanyForm";
 
 import { toast } from "react-toastify";
-import { CircularProgress } from "@mui/material";
 
 const initialState = {
   name: "",
@@ -49,7 +48,7 @@ const AddCompany = () => {
 
   return (
     <div className="add-company --my2">
-      {isLoading && <CircularProgress />}
+      {isLoading && <Loader />}
 
       {/* <h3 className="--mt">Add New Company</h3> */}
       <CompanyForm

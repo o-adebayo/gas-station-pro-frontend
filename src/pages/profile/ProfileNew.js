@@ -73,7 +73,7 @@ const ProfileNew = () => {
 
   // If loading user data, show a loader
   if (isUserLoading || isStoreLoading) {
-    return <CircularProgress />;
+    return <Loader />;
   }
 
   return (
