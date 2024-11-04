@@ -213,7 +213,7 @@ const AddReportNew = () => {
 
   return (
     <div>
-      {(isLoading || loadingState) && <CircularProgress />}
+      {(isLoading || loadingState) && <Loader />}
       <ReportFormNew
         report={report}
         notes={notes}

@@ -54,7 +54,13 @@ const ReportListNew = () => {
     page: 0,
     pageSize: 20,
   });
-  const [sortModel, setSortModel] = useState([]);
+  //const [sortModel, setSortModel] = useState([]);
+  const [sortModel, setSortModel] = useState([
+    {
+      field: "date", // Specify the column to sort
+      sort: "desc", // Set the default sort order to descending
+    },
+  ]);
 
   // Get initial pageSize from localStorage or use default 25
   /*   const [pageSize, setPageSize] = useState(
