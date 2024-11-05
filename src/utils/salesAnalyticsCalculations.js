@@ -1,4 +1,4 @@
-// src/utils/analyticsCalculations.js
+// Helper functions to be used in different files
 
 // Transform reports data into daily sales totals
 export const getDailySalesData = (reports) => {
@@ -6,6 +6,8 @@ export const getDailySalesData = (reports) => {
 
   reports.forEach((report) => {
     const date = report.date.split("T")[0];
+    console.log("🚀 ~ reports.forEach ~ date:", date);
+
     const storeName = report.storeName;
     const salesAmount = report.storeTotalSales?.totalSalesDollars || 0;
 

@@ -30,6 +30,7 @@ import { SpinnerImg } from "../../loader/Loader";
 
 import DOMPurify from "dompurify";
 import HeaderNew from "../../HeaderNew";
+import dayjs from "dayjs";
 
 const ReportDetailNew = () => {
   const theme = useTheme();
@@ -164,7 +165,8 @@ const ReportDetailNew = () => {
                   "&:hover": { backgroundColor: theme.palette.secondary.dark },
                 }}
               >
-                Date: {new Date(report.date).toLocaleDateString()}
+                {/*  Date: {new Date(report.date).toLocaleDateString()} */}
+                Date: {dayjs(report.date).utc().format("YYYY-MM-DD")}
               </Button>
 
               <Button

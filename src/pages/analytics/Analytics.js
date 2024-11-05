@@ -17,6 +17,11 @@ import ProductSalesByStoreBarChart from "../../components/Charts/ProductSalesByS
 import SalesRadarChart from "../../components/Charts/SalesRadarChart";
 import AIPoweredInsights from "../../components/Charts/AIPoweredInsights";
 
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
+import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
+
 // Import helper functions
 import {
   getDailySalesData,
@@ -27,6 +32,8 @@ import {
   getTotalSalesByStore,
   getTotalSalesByManager,
 } from "../../utils/salesAnalyticsCalculations";
+
+dayjs.extend(utc);
 
 const Analytics = () => {
   const theme = useTheme();
