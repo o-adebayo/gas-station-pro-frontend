@@ -292,7 +292,8 @@ const ViewCompany = () => {
         <DialogTitle>Confirm Company Deletion</DialogTitle>
         <DialogContent>
           <Typography color="error" mb={2}>
-            Warning: This action is permanent and cannot be undone.
+            Warning: This action is permanent and cannot be undone. All users
+            and reports will also be deleted.
           </Typography>
           <Typography mb={2}>
             To confirm, please type the word <strong>"delete"</strong> below:
@@ -313,7 +314,7 @@ const ViewCompany = () => {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={closeDeleteDialog} color="primary">
+          <Button onClick={closeDeleteDialog} color="secondary">
             Cancel
           </Button>
           <Button

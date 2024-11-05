@@ -53,10 +53,10 @@ const SalesOverviewChart = ({ salesData }) => {
                 type="monotone"
                 dataKey="totalSalesDollars"
                 name="Total Sales (₦)" // Display name for this line
-                stroke={theme.palette.primary.main}
+                stroke={theme.palette.success.main}
                 strokeWidth={3}
                 dot={{
-                  fill: theme.palette.primary.main,
+                  fill: theme.palette.success.main,
                   strokeWidth: 2,
                   r: 6,
                 }}

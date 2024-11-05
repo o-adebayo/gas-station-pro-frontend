@@ -419,3 +419,22 @@ export const calculateProductSalesForCurrentYearForStore = (salesReports) => {
     totalSales: productSales[product],
   }));
 };
+
+// Function to filter reports for the current month
+// this will return the actual reports and not the summed up total values
+// Example filter function for current month
+export const filterReportsForCurrentMonth = (reports) => {
+  const currentMonth = new Date().toLocaleString("default", { month: "long" });
+  const currentYear = new Date().getFullYear();
+
+  return reports.filter(
+    (report) => report.month === currentMonth && report.year === currentYear
+  );
+};
+
+// Example filter function for current year
+export const filterReportsForCurrentYear = (reports) => {
+  const currentYear = new Date().getFullYear();
+
+  return reports.filter((report) => report.year === currentYear);
+};

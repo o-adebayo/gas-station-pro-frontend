@@ -1,5 +1,14 @@
-import { Box, useMediaQuery, useTheme } from "@mui/material";
-import React, { useEffect, useMemo } from "react";
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
+import React, { useEffect, useMemo, useState } from "react";
 import HeaderNew from "../../components/HeaderNew";
 //import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
 import FlexBetween from "../../components/FlexBetween";
@@ -25,6 +34,8 @@ import ProductSalesBarChart from "../../components/Charts/ProductSalesBarChart";
 
 // Importing utility functions
 import {
+  filterReportsForCurrentMonth,
+  filterReportsForCurrentYear,
   calculateTotalSales,
   calculateMonthlySales,
   calculateStoreMonthlySales,
@@ -33,6 +44,7 @@ import {
   calculateProductSalesForCurrentMonth,
   calculateProductSalesForCurrentYear,
 } from "../../utils/salesCalculations";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 
 const DashboardNew = () => {
   const theme = useTheme();
@@ -68,6 +80,11 @@ const DashboardNew = () => {
       dispatch(getReports());
     }
   }, [isLoggedIn, dispatch]);
+
+  const [openDialog, setOpenDialog] = useState(false);
+  const [dialogTitle, setDialogTitle] = useState("");
+  const [dialogData, setDialogData] = useState([]);
+  const [dialogColumns, setDialogColumns] = useState([]);
 
   // Use useMemo to memoize calculations unconditionally
   const totalSales = useMemo(() => calculateTotalSales(reports), [reports]);
@@ -116,6 +133,103 @@ const DashboardNew = () => {
   // Only render the StoreComparisonChart if the user is an admin
   const isAdmin = user.role === "admin";
 
+  const handleDrillDown = (title, data, columns) => {
+    setDialogTitle(title);
+    setDialogData(data);
+    setDialogColumns(columns); // Set the columns based on the selected StatBox
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setDialogData([]);
+  };
+
+  const getManagerName = (managerId) => {
+    if (!managerId) {
+      return "Not Assigned";
+    }
+    const manager = users.find(
+      (user) => String(user._id) === String(managerId)
+    );
+    return manager ? manager.name : "Not Assigned";
+  };
+
+  // Define different column sets
+  const storeColumns = [
+    { field: "_id", headerName: "ID", width: 90 },
+    { field: "name", headerName: "Store Name", width: 150 },
+    {
+      field: "ManagerName",
+      headerName: "Manager Name",
+      //width: 200,
+      flex: 1,
+      renderCell: (params) => {
+        return <div>{getManagerName(params.row.managerId)}</div>;
+      },
+    },
+    { field: "location", headerName: "Location", width: 150 },
+    { field: "description", headerName: "Description", width: 150 },
+  ];
+
+  const userColumns = [
+    { field: "_id", headerName: "ID", flex: 0.5 },
+    {
+      field: "photo",
+      headerName: "Avatar",
+      width: 70,
+      renderCell: (params) => (
+        <img
+          src={
+            params.row.photo?.filePath || "https://i.ibb.co/4pDNDk1/avatar.png"
+          }
+          alt=""
+          style={{ width: "32px", height: "32px", borderRadius: "50%" }}
+        />
+      ),
+    },
+    { field: "name", headerName: "Name", flex: 0.5 },
+    { field: "email", headerName: "Email", width: 250 },
+    {
+      field: "phone",
+      headerName: "Phone Number",
+      flex: 0.5,
+      renderCell: (params) =>
+        params.value.replace(/^(\d{3})(\d{3})(\d{4})/, "($1)$2-$3"),
+    },
+    { field: "role", headerName: "Role", width: 100 },
+    { field: "status", headerName: "Status", width: 80 },
+  ];
+
+  const salesColumns = [
+    { field: "_id", headerName: "ID", flex: 1 },
+    {
+      field: "date",
+      headerName: "Date Created",
+      flex: 1,
+      renderCell: (params) =>
+        new Date(params.value).toLocaleDateString("en-US"),
+    },
+    { field: "storeName", headerName: "Store Name", flex: 1 },
+    { field: "managerName", headerName: "Store Manager", flex: 1 },
+    {
+      field: "storeTotalSales.totalSalesLiters",
+      headerName: "Total Sales (Liters)",
+      flex: 0.5,
+      renderCell: (params) =>
+        params.row.storeTotalSales?.totalSalesLiters || "N/A",
+    },
+    {
+      field: "storeTotalSales.totalSalesDollars",
+      headerName: "Total Sales (Naira)",
+      flex: 1,
+      renderCell: (params) =>
+        `₦${(
+          params.row.storeTotalSales?.totalSalesDollars || 0
+        ).toLocaleString()}`,
+    },
+  ];
+
   return (
     <Box m="1.5rem 2.5rem">
       <FlexBetween>
@@ -162,6 +276,7 @@ const DashboardNew = () => {
               sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
             />
           }
+          onDrillDown={() => handleDrillDown("Stores", stores, storeColumns)}
         />
 
         <StatBox
@@ -174,6 +289,7 @@ const DashboardNew = () => {
               sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
             />
           }
+          onDrillDown={() => handleDrillDown("Users", users, userColumns)}
         />
 
         {/* Monthly Sales*/}
@@ -189,6 +305,13 @@ const DashboardNew = () => {
               sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
             />
           }
+          onDrillDown={() =>
+            handleDrillDown(
+              "Sales This Month (Lts)",
+              filterReportsForCurrentMonth(reports),
+              salesColumns
+            )
+          }
         />
         <StatBox
           title="Sales This Month (₦)"
@@ -201,6 +324,13 @@ const DashboardNew = () => {
             <PointOfSale
               sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
             />
+          }
+          onDrillDown={() =>
+            handleDrillDown(
+              "Sales This Month (₦)",
+              filterReportsForCurrentMonth(reports),
+              salesColumns
+            )
           }
         />
 
@@ -217,6 +347,13 @@ const DashboardNew = () => {
               sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
             />
           }
+          onDrillDown={() =>
+            handleDrillDown(
+              "Sales This Year (Lts)",
+              filterReportsForCurrentYear(reports),
+              salesColumns
+            )
+          }
         />
         <StatBox
           title="Sales This Year (₦)"
@@ -229,6 +366,13 @@ const DashboardNew = () => {
             <PointOfSale
               sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
             />
+          }
+          onDrillDown={() =>
+            handleDrillDown(
+              "Sales This Year (₦)",
+              filterReportsForCurrentYear(reports),
+              salesColumns
+            )
           }
         />
 
@@ -311,6 +455,81 @@ const DashboardNew = () => {
           />
         </Box>
       </Box>
+      {/* Dialog with DataGrid for drill-down data */}
+      <Dialog
+        open={openDialog}
+        onClose={handleCloseDialog}
+        fullWidth
+        maxWidth="md"
+      >
+        <DialogTitle>{dialogTitle}</DialogTitle>
+        <DialogContent>
+          <Box
+            height={400}
+            mt={2}
+            sx={{
+              "& .MuiDataGrid-root": {
+                border: "none",
+              },
+              "& .MuiDataGrid-cell": {
+                borderBottom: "none",
+              },
+              "& .MuiDataGrid-columnHeaders": {
+                backgroundColor: theme.palette.background.alt,
+                color: theme.palette.secondary[100],
+                borderBottom: "none",
+              },
+              "& .MuiDataGrid-virtualScroller": {
+                backgroundColor: theme.palette.primary.light,
+              },
+              "& .MuiDataGrid-footerContainer": {
+                backgroundColor: theme.palette.background.alt,
+                color: theme.palette.secondary[100],
+                borderTop: "none",
+              },
+              "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
+                color: `${theme.palette.secondary[200]} !important`,
+              },
+              img: {
+                width: "32px",
+                height: "32px",
+                borderRadius: "50%",
+                objectFit: "cover",
+              },
+              ".actions": {
+                display: "flex",
+                gap: "15px",
+              },
+            }}
+          >
+            <DataGrid
+              rows={dialogData}
+              columns={dialogColumns}
+              //pageSize={5}
+              rowsPerPageOptions={[5, 10, 20]}
+              getRowId={(row) => row._id} // Specify _id as the unique identifier
+              initialState={{
+                pagination: {
+                  paginationModel: {
+                    pageSize: 10,
+                  },
+                },
+              }}
+              slots={{ toolbar: GridToolbar }}
+              pageSizeOptions={[5, 10, 25]}
+              disableRowSelectionOnClick
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={handleCloseDialog}
+            color={theme.palette.success.main}
+          >
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

@@ -1,9 +1,18 @@
 import React from "react";
-import { Box, Typography, useTheme } from "@mui/material";
+import { Box, Typography, useTheme, IconButton } from "@mui/material";
 import FlexBetween from "./FlexBetween";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
-const StatBox = ({ title, value, increase, icon, description }) => {
+const StatBox = ({
+  title,
+  value,
+  increase,
+  icon,
+  description,
+  onDrillDown,
+}) => {
   const theme = useTheme();
+
   return (
     <Box
       gridColumn="span 2"
@@ -30,6 +39,8 @@ const StatBox = ({ title, value, increase, icon, description }) => {
       >
         {value}
       </Typography>
+
+      {/* Description, Increase Text, and Drill-Down Icon in a Row */}
       <FlexBetween gap="1rem">
         <Typography
           variant="h5"
@@ -38,7 +49,22 @@ const StatBox = ({ title, value, increase, icon, description }) => {
         >
           {increase}
         </Typography>
-        <Typography>{description}</Typography>
+        <Typography
+          variant="body2"
+          sx={{ color: theme.palette.text.secondary }}
+        >
+          {description}
+        </Typography>
+        <IconButton
+          onClick={onDrillDown}
+          sx={{
+            color: theme.palette.secondary[300],
+            "&:hover": { color: theme.palette.secondary[500] },
+            padding: 0,
+          }}
+        >
+          <ExpandMoreIcon fontSize="small" />
+        </IconButton>
       </FlexBetween>
     </Box>
   );

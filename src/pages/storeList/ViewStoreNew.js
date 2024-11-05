@@ -1,6 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
 import {
   Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   TextField,
   Typography,
   useMediaQuery,
@@ -27,7 +32,10 @@ import {
   calculateMonthlySalesForStore,
   calculateProductSalesForCurrentMonthForStore,
   calculateProductSalesForCurrentYearForStore,
+  filterReportsForCurrentMonth,
+  filterReportsForCurrentYear,
 } from "../../utils/salesCalculations";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 
 const ViewStoreNew = () => {
   const theme = useTheme();
@@ -38,6 +46,11 @@ const ViewStoreNew = () => {
 
   const [store, setStore] = useState(null);
   const [managerName, setManagerName] = useState(""); // State to hold the manager's name
+
+  const [openDialog, setOpenDialog] = useState(false);
+  const [dialogTitle, setDialogTitle] = useState("");
+  const [dialogData, setDialogData] = useState([]);
+  const [dialogColumns, setDialogColumns] = useState([]);
 
   const { reports } = useSelector((state) => {
     const reportsData = state.report.reports || {}; // Default to an empty object
@@ -69,6 +82,23 @@ const ViewStoreNew = () => {
     }
   }, [store, users]); // Runs when either `store` or `users` are updated
 
+  const handleDrillDown = (title, data, columns) => {
+    /*     console.log("Original Data:", data); // Log raw data before filtering
+    const filteredData = title.includes("Month")
+      ? filterReportsForCurrentMonth(data)
+      : filterReportsForCurrentYear(data);
+    console.log("Filtered Data for Dialog:", filteredData); // Log filtered data to see what is being passed */
+    setDialogTitle(title);
+    setDialogData(data);
+    setDialogColumns(columns);
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setDialogData([]);
+  };
+
   // Check if there are reports data
   const hasReportsData = reports && reports.length > 0;
 
@@ -98,6 +128,85 @@ const ViewStoreNew = () => {
   // if !store check should always be below usememo usage for calculations
   if (!store) return <Typography>Loading store details...</Typography>;
 
+  const usersColumns = [
+    { field: "_id", headerName: "ID", width: 90 },
+    {
+      field: "photo",
+      headerName: "Avatar",
+      width: 70,
+      renderCell: (params) => (
+        <img
+          src={
+            params.row.photo?.filePath || "https://i.ibb.co/4pDNDk1/avatar.png"
+          }
+          alt=""
+          style={{ width: "32px", height: "32px", borderRadius: "50%" }}
+        />
+      ),
+    },
+    { field: "name", headerName: "Name", flex: 1 },
+    { field: "email", headerName: "Email", flex: 1 },
+    { field: "phone", headerName: "Phone", flex: 1 },
+    {
+      field: "phone",
+      headerName: "Phone Number",
+      flex: 0.5,
+      renderCell: (params) =>
+        params.value.replace(/^(\d{3})(\d{3})(\d{4})/, "($1)$2-$3"),
+    },
+    { field: "role", headerName: "Role", width: 100 },
+    { field: "status", headerName: "Status", width: 80 },
+  ];
+
+  const salesColumns = [
+    { field: "_id", headerName: "ID", width: 90 },
+    { field: "storeName", headerName: "Store Name", flex: 1 },
+    {
+      field: "date",
+      headerName: "Date Created",
+      flex: 1,
+      renderCell: (params) => {
+        const date = params?.row?.date ? new Date(params.row.date) : null;
+        return date
+          ? date.toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })
+          : "N/A";
+      },
+    },
+    {
+      field: "totalSalesLiters",
+      headerName: "Total Sales (Liters)",
+      flex: 1,
+      renderCell: (params) => {
+        const totalSalesLiters =
+          params?.row?.storeTotalSales?.totalSalesLiters ?? "N/A";
+        return totalSalesLiters;
+      },
+      valueGetter: (params) => {
+        const totalSalesLiters = params?.row?.storeTotalSales?.totalSalesLiters;
+        return totalSalesLiters !== undefined ? totalSalesLiters : "N/A";
+      },
+    },
+    {
+      field: "totalSalesDollars",
+      headerName: "Total Sales (Naira)",
+      flex: 1,
+      renderCell: (params) => {
+        const totalSalesNaira = params?.row?.storeTotalSales?.totalSalesDollars;
+        return totalSalesNaira !== undefined
+          ? `₦${totalSalesNaira.toLocaleString()}`
+          : "N/A";
+      },
+      valueGetter: (params) => {
+        const totalSalesNaira = params?.row?.storeTotalSales?.totalSalesDollars;
+        return totalSalesNaira !== undefined ? totalSalesNaira : "N/A";
+      },
+    },
+  ];
+
   return (
     <Box m="1.5rem 2.5rem">
       <HeaderNew
@@ -124,6 +233,7 @@ const ViewStoreNew = () => {
               sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
             />
           }
+          onDrillDown={() => handleDrillDown("Users", users, usersColumns)}
         />
         <StatBox
           title="Sales This Month (Lts)"
@@ -136,6 +246,13 @@ const ViewStoreNew = () => {
             <LocalGasStationOutlined
               sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
             />
+          }
+          onDrillDown={() =>
+            handleDrillDown(
+              "Sales This Month (Lts)",
+              filterReportsForCurrentMonth(reports),
+              salesColumns
+            )
           }
         />
         <StatBox
@@ -150,6 +267,13 @@ const ViewStoreNew = () => {
               sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
             />
           }
+          onDrillDown={() =>
+            handleDrillDown(
+              "Sales This Month (₦)",
+              filterReportsForCurrentMonth(reports),
+              salesColumns
+            )
+          }
         />
         <StatBox
           title="Sales This Year (Lts)"
@@ -163,6 +287,13 @@ const ViewStoreNew = () => {
               sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
             />
           }
+          onDrillDown={() =>
+            handleDrillDown(
+              "Sales This Year (Lts)",
+              filterReportsForCurrentYear(reports),
+              salesColumns
+            )
+          }
         />
         <StatBox
           title="Sales This Year (₦)"
@@ -175,6 +306,13 @@ const ViewStoreNew = () => {
             <PointOfSale
               sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
             />
+          }
+          onDrillDown={() =>
+            handleDrillDown(
+              "Sales This Year (₦)",
+              filterReportsForCurrentYear(reports),
+              salesColumns
+            )
           }
         />
 
@@ -315,6 +453,74 @@ const ViewStoreNew = () => {
             </form>
           )}
         </Formik>
+        <Dialog
+          open={openDialog}
+          onClose={handleCloseDialog}
+          fullWidth
+          maxWidth="md"
+        >
+          <DialogTitle>{dialogTitle}</DialogTitle>
+          <DialogContent>
+            <Box
+              height={400}
+              mt={2}
+              sx={{
+                "& .MuiDataGrid-root": {
+                  border: "none",
+                },
+                "& .MuiDataGrid-cell": {
+                  borderBottom: "none",
+                },
+                "& .MuiDataGrid-columnHeaders": {
+                  backgroundColor: theme.palette.background.alt,
+                  color: theme.palette.secondary[100],
+                  borderBottom: "none",
+                },
+                "& .MuiDataGrid-virtualScroller": {
+                  backgroundColor: theme.palette.primary.light,
+                },
+                "& .MuiDataGrid-footerContainer": {
+                  backgroundColor: theme.palette.background.alt,
+                  color: theme.palette.secondary[100],
+                  borderTop: "none",
+                },
+                "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
+                  color: `${theme.palette.secondary[200]} !important`,
+                },
+                img: {
+                  width: "32px",
+                  height: "32px",
+                  borderRadius: "50%",
+                  objectFit: "cover",
+                },
+                ".actions": {
+                  display: "flex",
+                  gap: "15px",
+                },
+              }}
+            >
+              <DataGrid
+                rows={dialogData}
+                columns={dialogColumns}
+                getRowId={(row) => row._id}
+                slots={{ toolbar: GridToolbar }}
+                initialState={{
+                  pagination: { paginationModel: { pageSize: 10 } },
+                }}
+                pageSizeOptions={[5, 10, 20]}
+                disableRowSelectionOnClick
+              />
+            </Box>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              onClick={handleCloseDialog}
+              color={theme.palette.success.main}
+            >
+              Close
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Box>
     </Box>
   );
