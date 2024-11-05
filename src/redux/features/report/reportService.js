@@ -65,9 +65,18 @@ const updateReport = async (id, formData) => {
 // Service function for fetching detailed sales reports with query params
 const getDetailedSalesReports = async ({ page, pageSize, sort, search }) => {
   const response = await axios.get(API_URL + "detailed-sales-report", {
-    params: { page, pageSize, sort, search }, // Axios will automatically convert this into query parameters
+    params: {
+      page,
+      pageSize,
+      sort,
+      search,
+    },
+    paramsSerializer: (params) => {
+      // Serialize parameters so Axios encodes them correctly
+      return new URLSearchParams(params).toString();
+    },
   });
-  console.log("page is", page);
+  //console.log("page is", page);
   return response.data; // Return the API response data
 };
 

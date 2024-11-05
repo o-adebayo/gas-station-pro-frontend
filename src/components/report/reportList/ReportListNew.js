@@ -29,11 +29,10 @@ import {
   importReports,
 } from "../../../redux/features/report/reportSlice";
 import { selectUser } from "../../../redux/features/auth/authSlice";
-import Popup from "reactjs-popup"; // Import reactjs-popup
 import "reactjs-popup/dist/index.css"; // Import css for popup
 import { toast } from "react-toastify";
 import {
-  getCompanyByCode,
+  //getCompanyByCode,
   selectCompany,
 } from "../../../redux/features/company/companySlice";
 import {
@@ -41,7 +40,7 @@ import {
   sendAutomatedEmail,
 } from "../../../redux/features/email/emailSlice";
 import useRedirectLoggedOutUser from "../../../customHook/useRedirectLoggedOutUser";
-import FlexBetween from "../../FlexBetween";
+//import FlexBetween from "../../FlexBetween";
 
 const ReportListNew = () => {
   const theme = useTheme();
@@ -206,9 +205,7 @@ const ReportListNew = () => {
       getDetailedSalesReports({
         page: paginationModel.page + 1, // For backend 1-based indexing
         pageSize: paginationModel.pageSize,
-        sort: sortModel[0]?.sort || "",
-        //sortField: sortModel[0]?.field || "", // Sorting field
-        //sortOrder: sortModel[0]?.sort || "", // Sorting order ('asc' or 'desc')
+        sort: sortModel[0] ? JSON.stringify(sortModel[0]) : "{}", // Send as JSON string
         search,
       })
     );
@@ -224,12 +221,10 @@ const ReportListNew = () => {
         getDetailedSalesReports({
           page: paginationModel.page + 1, // For backend 1-based indexing
           pageSize: paginationModel.pageSize,
-          sortField: sortModel[0]?.field || "", // Sorting field
-          sortOrder: sortModel[0]?.sort || "", // Sorting order ('asc' or 'desc')
+          sort: sortModel[0] ? JSON.stringify(sortModel[0]) : "{}", // Send as JSON string
           search,
         })
       );
-      //await dispatch(getReports()); // Refresh report list
 
       // Send email to company owner after deletion
       if (company && company.ownerEmail) {
@@ -275,21 +270,10 @@ const ReportListNew = () => {
         getDetailedSalesReports({
           page: paginationModel.page + 1, // For backend 1-based indexing
           pageSize: paginationModel.pageSize,
-          sortField: sortModel[0]?.field || "", // Sorting field
-          sortOrder: sortModel[0]?.sort || "", // Sorting order ('asc' or 'desc')
+          sort: sortModel[0] ? JSON.stringify(sortModel[0]) : "{}", // Send as JSON string
           search,
         })
       );
-
-      //await dispatch(getReports()); // Refresh report list
-      /*       await dispatch(
-        getDetailedSalesReports({
-          page: page + 1, // Backend page is 1-based, while DataGrid is 0-based
-          pageSize,
-          sort,
-          search,
-        })
-      ); */
 
       // Send email to company owner after deletion
       if (company && company.ownerEmail) {
@@ -353,33 +337,11 @@ const ReportListNew = () => {
     setOpenDeleteDialog(false);
   };
 
-  /*   const handleDeleteClick = (id) => {
-    if (user.role === "admin") {
-      // Admins do not need a delete code
-      confirmAlert({
-        title: "Delete Report",
-        message: "Are you sure you want to delete this report?",
-        buttons: [
-          {
-            label: "Delete",
-            onClick: () => delReport(id),
-          },
-          {
-            label: "Cancel",
-          },
-        ],
-      });
-    } else {
-      // For non-admins, show the popup
-      setSelectedReportId(id); // Store the ID of the selected report
-    }
-  }; */
-
-  /* 
-  const handlePageSizeChange = (newPageSize) => {
-    setPageSize(newPageSize);
-    localStorage.setItem("pageSize", newPageSize); // Store selection
-  }; */
+  // Function to log and set the sort model
+  const handleSortModelChange = (newSortModel) => {
+    console.log("Updated Sort Model:", newSortModel);
+    setSortModel(newSortModel);
+  };
 
   const handleReportCSVUpload = (file) => {
     if (file) {
@@ -415,7 +377,6 @@ const ReportListNew = () => {
           }
 
           // Refresh store data
-          //dispatch(getReports()); // Re-fetch stores
           dispatch(
             getDetailedSalesReports({
               page: paginationModel.page + 1, // For backend 1-based indexing
@@ -615,35 +576,6 @@ const ReportListNew = () => {
           },
         }}
       >
-        {/* <DataGrid
-          loading={isLoading || !reports}
-          getRowId={(row) => row._id}
-          rows={reports || []}
-          columns={columns}
-          rowCount={total}
-          //pageSizeOptions={[10, 20, 50]}
-          rowsPerPageOptions={[10, 20, 50]}
-          pagination
-          page={page}
-          pageSize={pageSize}
-          paginationMode="server"
-          sortingMode="server"
-          onPageChange={(newPage) => setPage(newPage)}
-          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-          //onPageSizeChange={handlePageSizeChange}
-          onSortModelChange={(newSortModel) => setSort(...newSortModel)}
-          checkboxSelection
-          disableRowSelectionOnClick
-          slots={{ toolbar: DataGridCustomToolbar }}
-          slotProps={{
-            toolbar: {
-              searchInput,
-              setSearchInput,
-              setSearch,
-            },
-          }}
-        /> */}
-
         <DataGrid
           loading={isLoading || !reports}
           getRowId={(row) => row._id}
@@ -652,11 +584,11 @@ const ReportListNew = () => {
           rowCount={total}
           paginationMode="server"
           sortingMode="server"
+          onSortModelChange={handleSortModelChange}
           paginationModel={paginationModel}
           pageSizeOptions={[20, 50, 100]}
           onPaginationModelChange={setPaginationModel}
           sortModel={sortModel}
-          onSortModelChange={setSortModel}
           checkboxSelection
           disableRowSelectionOnClick
           slots={{ toolbar: DataGridCustomToolbar }}
