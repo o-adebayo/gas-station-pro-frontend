@@ -1,12 +1,16 @@
 // Helper functions to be used in different files
 
+import dayjs from "dayjs";
+
 // Transform reports data into daily sales totals
 export const getDailySalesData = (reports) => {
   const dailySalesMap = {};
 
   reports.forEach((report) => {
-    const date = report.date.split("T")[0];
-    console.log("🚀 ~ reports.forEach ~ date:", date);
+    //const date = report.date.split("T")[0];
+    const date = dayjs(report.date).utc().format("YYYY-MM-DD");
+    //{dayjs(report.date).utc().format("YYYY-MM-DD")}
+    //console.log("🚀 ~ reports.forEach ~ date:", date);
 
     const storeName = report.storeName;
     const salesAmount = report.storeTotalSales?.totalSalesDollars || 0;
@@ -33,7 +37,8 @@ export const getDailyProductRatesData = (reports) => {
   const productRatesMap = {};
 
   reports.forEach((report) => {
-    const date = report.date.split("T")[0];
+    //const date = report.date.split("T")[0];
+    const date = dayjs(report.date).utc().format("YYYY-MM-DD");
 
     if (!productRatesMap[date]) {
       productRatesMap[date] = { date, PMS: null, AGO: null, DPK: null };
@@ -89,7 +94,8 @@ export const getDailyProductSalesData = (reports) => {
   const dailySalesMap = {};
 
   reports.forEach((report) => {
-    const date = report.date.split("T")[0];
+    //const date = report.date.split("T")[0];
+    const date = dayjs(report.date).utc().format("YYYY-MM-DD");
     const products = report.products || {};
 
     if (!dailySalesMap[date]) {
