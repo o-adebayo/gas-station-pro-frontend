@@ -45,6 +45,7 @@ import {
   calculateProductSalesForCurrentYear,
 } from "../../utils/salesCalculations";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import dayjs from "dayjs";
 
 const DashboardNew = () => {
   const theme = useTheme();
@@ -207,8 +208,13 @@ const DashboardNew = () => {
       field: "date",
       headerName: "Date Created",
       flex: 1,
-      renderCell: (params) =>
-        new Date(params.value).toLocaleDateString("en-US"),
+      renderCell: (params) => {
+        //const date = new Date(params.value);
+        //const date = dayjs(params.value).utc(true).format("LL");
+        //const date = dayjs(params.value).utc().format("YYYY-MMMM-DD");
+        const date = dayjs(params.value).utc().format("MMMM DD, YYYY");
+        return date;
+      },
     },
     { field: "storeName", headerName: "Store Name", flex: 1 },
     { field: "managerName", headerName: "Store Manager", flex: 1 },
