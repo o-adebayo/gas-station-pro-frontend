@@ -20,7 +20,6 @@ import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import { useDispatch, useSelector } from "react-redux";
-import { confirmAlert } from "react-confirm-alert"; // Import
 import "react-confirm-alert/src/react-confirm-alert.css"; // Import css
 import {
   deleteReport,
@@ -351,18 +350,18 @@ const ReportListNew = () => {
       dispatch(importReports(formData))
         .unwrap()
         .then((response) => {
-          const { count, existingStores, invalidRows } = response;
+          const { count, existingReports, invalidRows } = response;
 
           // Notify user of successful imports
-          toast.success(`${count} stores imported successfully.`);
+          toast.success(`${count} reports imported successfully.`);
 
           // Check if any stores were skipped
-          if (existingStores && existingStores.length > 0) {
-            const skippedStoreNames = existingStores
+          if (existingReports && existingReports.length > 0) {
+            const skippedStoreNames = existingReports
               .map((store) => `${store.name} (${store.location})`)
               .join(", ");
             toast.info(
-              `Skipped ${existingStores.length} existing stores: ${skippedStoreNames}`
+              `Skipped ${existingReports.length} existing stores: ${skippedStoreNames}`
             );
           }
 
@@ -381,14 +380,13 @@ const ReportListNew = () => {
             getDetailedSalesReports({
               page: paginationModel.page + 1, // For backend 1-based indexing
               pageSize: paginationModel.pageSize,
-              sortField: sortModel[0]?.field || "", // Sorting field
-              sortOrder: sortModel[0]?.sort || "", // Sorting order ('asc' or 'desc')
+              sort: sortModel[0] ? JSON.stringify(sortModel[0]) : "{}", // Send as JSON string
               search,
             })
           );
         })
         .catch((error) => {
-          toast.error(`Failed to import stores: ${error.message}`);
+          toast.error(`Failed to import reports: ${error.message}`);
         });
     }
   };
