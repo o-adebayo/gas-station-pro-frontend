@@ -1,18 +1,22 @@
 // src/utils/salesCalculations.js
 
+import dayjs from "dayjs";
+
 // Function to calculate total sales (dollars and liters) for the current and previous periods
 export const calculateTotalSales = (salesReports) => {
-  const currentDate = new Date();
-  const currentMonth = currentDate.toLocaleString("default", { month: "long" });
-  const currentYear = currentDate.getFullYear();
+  //const currentDate = new Date();
+  const currentDate = dayjs();
+  const currentMonth = currentDate.format("MMMM"); // Full month name
+  const currentYear = currentDate.year();
 
-  const previousMonthDate = new Date(
-    currentDate.setMonth(currentDate.getMonth() - 1)
-  );
-  const previousMonth = previousMonthDate.toLocaleString("default", {
-    month: "long",
-  });
-  const previousYear = previousMonthDate.getFullYear();
+  const previousMonthDate = currentDate.subtract(1, "month");
+  const previousMonth = previousMonthDate.format("MMMM"); // Full previous month name
+  const previousYear = currentYear - 1;
+
+  /* console.log("🚀 ~ calculateTotalSales ~ currentMonth:", currentMonth);
+  console.log("🚀 ~ calculateTotalSales ~ currentYear:", currentYear);
+  console.log("🚀 ~ calculateTotalSales ~ previousMonth:", previousMonth);
+  console.log("🚀 ~ calculateTotalSales ~ previousYear:", previousYear); */
 
   let totalSalesDollarsForMonth = 0;
   let totalSalesLitersForMonth = 0;
@@ -89,7 +93,11 @@ export const calculateTotalSales = (salesReports) => {
 
 // Function to calculate monthly sales for each month of the current year
 export const calculateMonthlySales = (salesReports) => {
-  const currentYear = new Date().getFullYear();
+  //const currentYear = new Date().getFullYear();
+  const currentDate = dayjs();
+  //const currentMonth = currentDate.format("MMMM"); // Full month name
+  const currentYear = currentDate.year();
+
   const monthlySales = {
     January: { totalSalesDollars: 0, totalSalesLiters: 0 },
     February: { totalSalesDollars: 0, totalSalesLiters: 0 },
@@ -126,7 +134,11 @@ export const calculateMonthlySales = (salesReports) => {
 
 // Function to calculate total sales by store each month
 export const calculateStoreMonthlySales = (salesReports) => {
-  const currentYear = new Date().getFullYear();
+  // const currentYear = new Date().getFullYear();
+  const currentDate = dayjs();
+  //const currentMonth = currentDate.format("MMMM"); // Full month name
+  const currentYear = currentDate.year();
+
   const storeSalesData = {};
 
   salesReports.forEach((report) => {
@@ -178,9 +190,13 @@ export const calculateStoreMonthlySales = (salesReports) => {
 
 // Function to calculate sales by store for the current month
 export const calculateCurrentMonthSales = (salesReports) => {
-  const currentDate = new Date();
-  const currentMonth = currentDate.toLocaleString("default", { month: "long" });
-  const currentYear = currentDate.getFullYear();
+  //const currentDate = new Date();
+  //const currentMonth = currentDate.toLocaleString("default", { month: "long" });
+  //const currentYear = currentDate.getFullYear();
+
+  const currentDate = dayjs();
+  const currentMonth = currentDate.format("MMMM"); // Full month name
+  const currentYear = currentDate.year();
 
   const storeSales = {};
   salesReports.forEach((report) => {
@@ -199,7 +215,11 @@ export const calculateCurrentMonthSales = (salesReports) => {
 
 // Function to calculate total sales for each store in the current year
 export const calculateStoreSalesForCurrentYear = (salesReports) => {
-  const currentYear = new Date().getFullYear();
+  //const currentYear = new Date().getFullYear();
+  const currentDate = dayjs();
+  //const currentMonth = currentDate.format("MMMM"); // Full month name
+  const currentYear = currentDate.year();
+
   const storeSales = {};
 
   salesReports.forEach((report) => {
@@ -218,9 +238,13 @@ export const calculateStoreSalesForCurrentYear = (salesReports) => {
 
 // Function to calculate sales by product type for the current month
 export const calculateProductSalesForCurrentMonth = (salesReports) => {
-  const currentDate = new Date();
-  const currentMonth = currentDate.toLocaleString("default", { month: "long" });
-  const currentYear = currentDate.getFullYear();
+  //const currentDate = new Date();
+  //const currentMonth = currentDate.toLocaleString("default", { month: "long" });
+  //const currentYear = currentDate.getFullYear();
+
+  const currentDate = dayjs();
+  const currentMonth = currentDate.format("MMMM"); // Full month name
+  const currentYear = currentDate.year();
 
   const productSales = { PMS: 0, AGO: 0, DPK: 0 };
   salesReports.forEach((report) => {
@@ -239,7 +263,11 @@ export const calculateProductSalesForCurrentMonth = (salesReports) => {
 
 // Function to calculate sales by product type for the current year
 export const calculateProductSalesForCurrentYear = (salesReports) => {
-  const currentYear = new Date().getFullYear();
+  //const currentYear = new Date().getFullYear();
+
+  const currentDate = dayjs();
+  //const currentMonth = currentDate.format("MMMM"); // Full month name
+  const currentYear = currentDate.year();
 
   const productSales = { PMS: 0, AGO: 0, DPK: 0 };
   salesReports.forEach((report) => {
@@ -258,17 +286,25 @@ export const calculateProductSalesForCurrentYear = (salesReports) => {
 
 // Function to calculate sales for a specific store
 export const calculateStoreSales = (salesReports) => {
-  const currentDate = new Date();
-  const currentMonth = currentDate.toLocaleString("default", { month: "long" });
-  const currentYear = currentDate.getFullYear();
+  //const currentDate = new Date();
+  //const currentMonth = currentDate.toLocaleString("default", { month: "long" });
+  //const currentYear = currentDate.getFullYear();
 
-  const previousMonthDate = new Date(
+  const currentDate = dayjs();
+  const currentMonth = currentDate.format("MMMM"); // Full month name
+  const currentYear = currentDate.year();
+
+  const previousMonthDate = currentDate.subtract(1, "month");
+  const previousMonth = previousMonthDate.format("MMMM"); // Full previous month name
+  const previousYear = currentYear - 1;
+
+  /*   const previousMonthDate = new Date(
     currentDate.setMonth(currentDate.getMonth() - 1)
   );
   const previousMonth = previousMonthDate.toLocaleString("default", {
     month: "long",
   });
-  const previousYear = previousMonthDate.getFullYear();
+  const previousYear = previousMonthDate.getFullYear(); */
 
   let totalSalesDollarsForMonth = 0;
   let totalSalesLitersForMonth = 0;
@@ -345,7 +381,12 @@ export const calculateStoreSales = (salesReports) => {
 
 // Function to calculate monthly sales for a specific store
 export const calculateMonthlySalesForStore = (salesReports) => {
-  const currentYear = new Date().getFullYear();
+  //const currentYear = new Date().getFullYear();
+
+  const currentDate = dayjs();
+  //const currentMonth = currentDate.format("MMMM"); // Full month name
+  const currentYear = currentDate.year();
+
   const monthlySales = {
     January: { totalSalesDollars: 0, totalSalesLiters: 0 },
     February: { totalSalesDollars: 0, totalSalesLiters: 0 },
@@ -424,8 +465,12 @@ export const calculateProductSalesForCurrentYearForStore = (salesReports) => {
 // this will return the actual reports and not the summed up total values
 // Example filter function for current month
 export const filterReportsForCurrentMonth = (reports) => {
-  const currentMonth = new Date().toLocaleString("default", { month: "long" });
-  const currentYear = new Date().getFullYear();
+  //const currentMonth = new Date().toLocaleString("default", { month: "long" });
+  //const currentYear = new Date().getFullYear();
+
+  const currentDate = dayjs();
+  const currentMonth = currentDate.format("MMMM"); // Full month name
+  const currentYear = currentDate.year();
 
   return reports.filter(
     (report) => report.month === currentMonth && report.year === currentYear
@@ -434,7 +479,10 @@ export const filterReportsForCurrentMonth = (reports) => {
 
 // Example filter function for current year
 export const filterReportsForCurrentYear = (reports) => {
-  const currentYear = new Date().getFullYear();
+  //const currentYear = new Date().getFullYear();
+  const currentDate = dayjs();
+  //const currentMonth = currentDate.format("MMMM"); // Full month name
+  const currentYear = currentDate.year();
 
   return reports.filter((report) => report.year === currentYear);
 };

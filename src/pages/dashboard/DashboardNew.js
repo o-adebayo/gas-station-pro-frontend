@@ -76,8 +76,8 @@ const DashboardNew = () => {
   useEffect(() => {
     if (isLoggedIn) {
       dispatch(fetchUser()); // Fetch user data when logged in
-      dispatch(fetchUsers()); // Fetch user data when logged in
-      dispatch(getReports());
+      dispatch(fetchUsers()); // Fetch users
+      dispatch(getReports()); // fecth reports
     }
   }, [isLoggedIn, dispatch]);
 

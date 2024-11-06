@@ -39,6 +39,7 @@ import {
   sendAutomatedEmail,
 } from "../../../redux/features/email/emailSlice";
 import useRedirectLoggedOutUser from "../../../customHook/useRedirectLoggedOutUser";
+import dayjs from "dayjs";
 //import FlexBetween from "../../FlexBetween";
 
 const ReportListNew = () => {
@@ -99,12 +100,11 @@ const ReportListNew = () => {
       headerName: "Date Created",
       flex: 1,
       renderCell: (params) => {
-        const date = new Date(params.value);
-        return date.toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "long", // Displays the full month name (e.g., October)
-          day: "numeric",
-        });
+        //const date = new Date(params.value);
+        //const date = dayjs(params.value).utc(true).format("LL");
+        //const date = dayjs(params.value).utc().format("YYYY-MMMM-DD");
+        const date = dayjs(params.value).utc().format("MMMM DD, YYYY");
+        return date;
       },
     },
 
