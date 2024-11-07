@@ -6,6 +6,7 @@ import {
   Typography,
   IconButton,
   InputAdornment,
+  Skeleton,
 } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
@@ -88,93 +89,117 @@ const ChangePasswordNew = () => {
           }) => (
             <form onSubmit={handleSubmit}>
               <Box mb={3}>
-                <TextField
-                  fullWidth
-                  variant="filled"
-                  label="Old Password"
-                  name="oldPassword"
-                  type={showOldPassword ? "text" : "password"}
-                  value={values.oldPassword}
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  error={touched.oldPassword && Boolean(errors.oldPassword)}
-                  helperText={touched.oldPassword && errors.oldPassword}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton
-                          onClick={() => setShowOldPassword(!showOldPassword)}
-                        >
-                          {showOldPassword ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
+                {isLoading ? (
+                  <Skeleton variant="rectangular" width="100%" height={56} />
+                ) : (
+                  <TextField
+                    fullWidth
+                    variant="filled"
+                    label="Old Password"
+                    name="oldPassword"
+                    type={showOldPassword ? "text" : "password"}
+                    value={values.oldPassword}
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    error={touched.oldPassword && Boolean(errors.oldPassword)}
+                    helperText={touched.oldPassword && errors.oldPassword}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            onClick={() => setShowOldPassword(!showOldPassword)}
+                          >
+                            {showOldPassword ? (
+                              <VisibilityOff />
+                            ) : (
+                              <Visibility />
+                            )}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                )}
               </Box>
 
               <Box mb={3}>
-                <TextField
-                  fullWidth
-                  variant="filled"
-                  label="New Password"
-                  name="password"
-                  type={showNewPassword ? "text" : "password"}
-                  value={values.password}
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  error={touched.password && Boolean(errors.password)}
-                  helperText={touched.password && errors.password}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton
-                          onClick={() => setShowNewPassword(!showNewPassword)}
-                        >
-                          {showNewPassword ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
+                {isLoading ? (
+                  <Skeleton variant="rectangular" width="100%" height={56} />
+                ) : (
+                  <TextField
+                    fullWidth
+                    variant="filled"
+                    label="New Password"
+                    name="password"
+                    type={showNewPassword ? "text" : "password"}
+                    value={values.password}
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    error={touched.password && Boolean(errors.password)}
+                    helperText={touched.password && errors.password}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            onClick={() => setShowNewPassword(!showNewPassword)}
+                          >
+                            {showNewPassword ? (
+                              <VisibilityOff />
+                            ) : (
+                              <Visibility />
+                            )}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                )}
               </Box>
 
               <Box mb={3}>
-                <TextField
-                  fullWidth
-                  variant="filled"
-                  label="Confirm New Password"
-                  name="password2"
-                  type={showConfirmPassword ? "text" : "password"}
-                  value={values.password2}
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  error={touched.password2 && Boolean(errors.password2)}
-                  helperText={touched.password2 && errors.password2}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton
-                          onClick={() =>
-                            setShowConfirmPassword(!showConfirmPassword)
-                          }
-                        >
-                          {showConfirmPassword ? (
-                            <VisibilityOff />
-                          ) : (
-                            <Visibility />
-                          )}
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
+                {isLoading ? (
+                  <Skeleton variant="rectangular" width="100%" height={56} />
+                ) : (
+                  <TextField
+                    fullWidth
+                    variant="filled"
+                    label="Confirm New Password"
+                    name="password2"
+                    type={showConfirmPassword ? "text" : "password"}
+                    value={values.password2}
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    error={touched.password2 && Boolean(errors.password2)}
+                    helperText={touched.password2 && errors.password2}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            onClick={() =>
+                              setShowConfirmPassword(!showConfirmPassword)
+                            }
+                          >
+                            {showConfirmPassword ? (
+                              <VisibilityOff />
+                            ) : (
+                              <Visibility />
+                            )}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                )}
               </Box>
 
               <Box display="flex" justifyContent="flex-end">
-                <Button type="submit" color="primary" variant="contained">
-                  {isLoading ? <Loader /> : "Change Password"}
-                </Button>
+                {isLoading ? (
+                  <Skeleton variant="rectangular" width={160} height={36} />
+                ) : (
+                  <Button type="submit" color="primary" variant="contained">
+                    Change Password
+                  </Button>
+                )}
               </Box>
             </form>
           )}

@@ -1,5 +1,12 @@
 import React, { useEffect } from "react";
-import { Box, TextField, Typography, Avatar, Button } from "@mui/material";
+import {
+  Box,
+  TextField,
+  Typography,
+  Avatar,
+  Button,
+  Skeleton,
+} from "@mui/material";
 import { useParams, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Formik } from "formik";
@@ -45,11 +52,15 @@ const ViewUserNew = () => {
       />
 
       <Box display="flex" justifyContent="center" alignItems="center" mb={3}>
-        <Avatar
-          src={userById?.photo?.filePath || "/default-profile.png"}
-          alt="User Profile"
-          sx={{ width: 100, height: 100 }}
-        />
+        {isLoading ? (
+          <Skeleton variant="circular" width={100} height={100} />
+        ) : (
+          <Avatar
+            src={userById?.photo?.filePath || "/default-profile.png"}
+            alt="User Profile"
+            sx={{ width: 100, height: 100 }}
+          />
+        )}
       </Box>
 
       <Formik
@@ -68,62 +79,101 @@ const ViewUserNew = () => {
         {({ values }) => (
           <form>
             <Box display="flex" flexDirection="column" gap="16px">
-              <TextField
-                fullWidth
-                variant="filled"
-                label="Company Code"
-                value={values.companyCode}
-                disabled
-              />
-              <TextField
-                fullWidth
-                variant="filled"
-                label="Name"
-                value={values.name}
-                disabled
-              />
-              <TextField
-                fullWidth
-                variant="filled"
-                label="Email"
-                value={values.email}
-                disabled
-              />
-              <TextField
-                fullWidth
-                variant="filled"
-                label="Phone"
-                value={values.phone || "N/A"}
-                disabled
-              />
-              <TextField
-                fullWidth
-                variant="filled"
-                label="Role"
-                value={values.role}
-                disabled
-              />
-              <TextField
-                fullWidth
-                variant="filled"
-                label="Status"
-                value={values.status || "N/A"}
-                disabled
-              />
-              <TextField
-                fullWidth
-                variant="filled"
-                label="Created At"
-                value={values.createdAt}
-                disabled
-              />
-              <TextField
-                fullWidth
-                variant="filled"
-                label="Updated At"
-                value={values.updatedAt}
-                disabled
-              />
+              {isLoading ? (
+                <Skeleton variant="rectangular" width="100%" height={56} />
+              ) : (
+                <TextField
+                  fullWidth
+                  variant="filled"
+                  label="Company Code"
+                  value={values.companyCode}
+                  disabled
+                />
+              )}
+
+              {isLoading ? (
+                <Skeleton variant="rectangular" width="100%" height={56} />
+              ) : (
+                <TextField
+                  fullWidth
+                  variant="filled"
+                  label="Name"
+                  value={values.name}
+                  disabled
+                />
+              )}
+
+              {isLoading ? (
+                <Skeleton variant="rectangular" width="100%" height={56} />
+              ) : (
+                <TextField
+                  fullWidth
+                  variant="filled"
+                  label="Email"
+                  value={values.email}
+                  disabled
+                />
+              )}
+
+              {isLoading ? (
+                <Skeleton variant="rectangular" width="100%" height={56} />
+              ) : (
+                <TextField
+                  fullWidth
+                  variant="filled"
+                  label="Phone"
+                  value={values.phone || "N/A"}
+                  disabled
+                />
+              )}
+
+              {isLoading ? (
+                <Skeleton variant="rectangular" width="100%" height={56} />
+              ) : (
+                <TextField
+                  fullWidth
+                  variant="filled"
+                  label="Role"
+                  value={values.role}
+                  disabled
+                />
+              )}
+
+              {isLoading ? (
+                <Skeleton variant="rectangular" width="100%" height={56} />
+              ) : (
+                <TextField
+                  fullWidth
+                  variant="filled"
+                  label="Status"
+                  value={values.status || "N/A"}
+                  disabled
+                />
+              )}
+
+              {isLoading ? (
+                <Skeleton variant="rectangular" width="100%" height={56} />
+              ) : (
+                <TextField
+                  fullWidth
+                  variant="filled"
+                  label="Created At"
+                  value={values.createdAt}
+                  disabled
+                />
+              )}
+
+              {isLoading ? (
+                <Skeleton variant="rectangular" width="100%" height={56} />
+              ) : (
+                <TextField
+                  fullWidth
+                  variant="filled"
+                  label="Updated At"
+                  value={values.updatedAt}
+                  disabled
+                />
+              )}
             </Box>
 
             <Box display="flex" justifyContent="center" mt={3}>
@@ -132,6 +182,7 @@ const ViewUserNew = () => {
                 color="primary"
                 component={Link}
                 to={`/users/edit-user/${userById._id}`}
+                disabled={isLoading} // Disable button if loading
               >
                 Edit User
               </Button>

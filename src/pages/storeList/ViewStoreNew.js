@@ -8,6 +8,7 @@ import {
   DialogTitle,
   TextField,
   Typography,
+  Skeleton,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
@@ -56,6 +57,8 @@ const ViewStoreNew = () => {
     const reportsData = state.report.reports || {}; // Default to an empty object
     return reportsData.reports ? reportsData : { reports: reportsData }; // Return an object with reports key
   });
+
+  const { isLoading } = useSelector((state) => state.report);
 
   const { users } = useSelector((state) => state.auth); // Assuming users are in your auth slice
 
@@ -207,6 +210,49 @@ const ViewStoreNew = () => {
     },
   ];
 
+  const renderStatBox = (
+    title,
+    value,
+    increase,
+    description,
+    icon,
+    onDrillDown
+  ) => {
+    return isLoading ? (
+      <Box
+        gridColumn="span 2"
+        gridRow="span 1"
+        display="flex"
+        flexDirection="column"
+        justifyContent="space-between"
+        p="1.25rem 1rem"
+        flex="1 1 100%"
+        backgroundColor={theme.palette.background.alt}
+        borderRadius="0.55rem"
+      >
+        <Skeleton
+          variant="rectangular"
+          width="100%"
+          height="100%"
+          sx={{
+            borderRadius: "0.55rem",
+            transform: "scale(1)", // Ensures the skeleton occupies full space without shrinking
+            animation: "wave", // Adds the wave animation
+          }}
+        />
+      </Box>
+    ) : (
+      <StatBox
+        title={title}
+        value={value}
+        increase={increase}
+        description={description}
+        icon={icon}
+        onDrillDown={onDrillDown}
+      />
+    );
+  };
+
   return (
     <Box m="1.5rem 2.5rem">
       <HeaderNew
@@ -223,98 +269,83 @@ const ViewStoreNew = () => {
         }}
       >
         {/* ROW 1 */}
-        <StatBox
-          title="Users"
-          value={users && users.length ? users.length : 0}
-          increase="+14%"
-          description="Since last month"
-          icon={
-            <GroupOutlined
-              sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
-            />
-          }
-          onDrillDown={() => handleDrillDown("Users", users, usersColumns)}
-        />
-        <StatBox
-          title="Sales This Month (Lts)"
-          value={storeSales.totalSalesForMonth.totalSalesLiters.toLocaleString()}
-          increase={`${storeSales.totalSalesForMonth.percentageDiffLiters.toFixed(
-            2
-          )}%`}
-          description="Since last month"
-          icon={
-            <LocalGasStationOutlined
-              sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
-            />
-          }
-          onDrillDown={() =>
+
+        {renderStatBox(
+          "Users",
+          users?.length ?? 0,
+          "+14%",
+          "Since last month",
+          <GroupOutlined
+            sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
+          />,
+          () => handleDrillDown("Users", users, usersColumns)
+        )}
+
+        {renderStatBox(
+          "Sales This Month (Lts)",
+          storeSales.totalSalesForMonth.totalSalesLiters.toLocaleString(),
+          `${storeSales.totalSalesForMonth.percentageDiffLiters.toFixed(2)}%`,
+          "Since last month",
+          <LocalGasStationOutlined
+            sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
+          />,
+          () =>
             handleDrillDown(
               "Sales This Month (Lts)",
               filterReportsForCurrentMonth(reports),
               salesColumns
             )
-          }
-        />
-        <StatBox
-          title="Sales This Month (₦)"
-          value={storeSales.totalSalesForMonth.totalSalesDollars.toLocaleString()}
-          increase={`${storeSales.totalSalesForMonth.percentageDiffDollars.toFixed(
-            2
-          )}%`}
-          description="Since last month"
-          icon={
-            <PointOfSale
-              sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
-            />
-          }
-          onDrillDown={() =>
+        )}
+
+        {renderStatBox(
+          "Sales This Month (₦)",
+          `₦${storeSales.totalSalesForMonth.totalSalesDollars.toLocaleString()}`,
+          `${storeSales.totalSalesForMonth.percentageDiffDollars.toFixed(2)}%`,
+          "Since last month",
+          <PointOfSale
+            sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
+          />,
+          () =>
             handleDrillDown(
               "Sales This Month (₦)",
               filterReportsForCurrentMonth(reports),
               salesColumns
             )
-          }
-        />
-        <StatBox
-          title="Sales This Year (Lts)"
-          value={storeSales.totalSalesForYear.totalSalesLiters.toLocaleString()}
-          increase={`${storeSales.totalSalesForYear.percentageDiffLiters.toFixed(
-            2
-          )}%`}
-          description="Since last year"
-          icon={
-            <LocalGasStationOutlined
-              sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
-            />
-          }
-          onDrillDown={() =>
+        )}
+
+        {/* Yearly Sales*/}
+
+        {renderStatBox(
+          "Sales This Year (Lts)",
+          storeSales.totalSalesForYear.totalSalesLiters.toLocaleString(),
+          `${storeSales.totalSalesForYear.percentageDiffLiters.toFixed(2)}%`,
+          "Since last year",
+          <LocalGasStationOutlined
+            sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
+          />,
+          () =>
             handleDrillDown(
               "Sales This Year (Lts)",
               filterReportsForCurrentYear(reports),
               salesColumns
             )
-          }
-        />
-        <StatBox
-          title="Sales This Year (₦)"
-          value={storeSales.totalSalesForYear.totalSalesDollars.toLocaleString()}
-          increase={`${storeSales.totalSalesForYear.percentageDiffDollars.toFixed(
-            2
-          )}%`}
-          description="Since last year"
-          icon={
-            <PointOfSale
-              sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
-            />
-          }
-          onDrillDown={() =>
+        )}
+
+        {renderStatBox(
+          "Sales This Year (₦)",
+          `₦${storeSales.totalSalesForYear.totalSalesDollars.toLocaleString()}`,
+          `${storeSales.totalSalesForYear.percentageDiffDollars.toFixed(2)}%`,
+          "Since last ytear",
+          <PointOfSale
+            sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
+          />,
+          () =>
             handleDrillDown(
               "Sales This Year (₦)",
               filterReportsForCurrentYear(reports),
               salesColumns
             )
-          }
-        />
+        )}
 
         {/* ROW 2 */}
         <Box
@@ -324,9 +355,17 @@ const ViewStoreNew = () => {
           p="1rem"
           borderRadius="0.55rem"
         >
-          {hasReportsData ? (
+          {isLoading ? ( // If data is still loading, show the skeleton
+            <Skeleton
+              variant="rectangular"
+              width="100%"
+              height="300px"
+              sx={{ borderRadius: "0.55rem" }}
+            />
+          ) : hasReportsData ? ( // If loading is complete and there is data, show the chart
             <SalesOverviewChart salesData={monthlySalesData} />
           ) : (
+            // If loading is complete but there's no data, show a message
             <Typography>No reports data available</Typography>
           )}
         </Box>
@@ -341,15 +380,24 @@ const ViewStoreNew = () => {
           p="1rem"
           borderRadius="0.55rem"
         >
-          {hasReportsData ? (
+          {isLoading ? ( // Show skeleton if data is loading
+            <Skeleton
+              variant="rectangular"
+              width="100%"
+              height="100%"
+              sx={{ borderRadius: "0.55rem" }}
+            />
+          ) : hasReportsData ? ( // Show chart if data is loaded and available
             <ProductSalesBarChart
               salesData={productSalesForMonth}
               title="Total Sales by Product (₦) - This Month"
             />
           ) : (
+            // Show message if data is loaded but unavailable
             <Typography>No reports data available</Typography>
           )}
         </Box>
+
         <Box
           gridColumn="span 6"
           gridRow="span 3"
@@ -357,12 +405,20 @@ const ViewStoreNew = () => {
           p="1rem"
           borderRadius="0.55rem"
         >
-          {hasReportsData ? (
+          {isLoading ? ( // Show skeleton if data is loading
+            <Skeleton
+              variant="rectangular"
+              width="100%"
+              height="100%"
+              sx={{ borderRadius: "0.55rem" }}
+            />
+          ) : hasReportsData ? ( // Show chart if data is loaded and available
             <ProductSalesBarChart
               salesData={productSalesForYear}
               title="Total Sales by Product (₦) - This Year"
             />
           ) : (
+            // Show message if data is loaded but unavailable
             <Typography>No reports data available</Typography>
           )}
         </Box>
@@ -393,62 +449,101 @@ const ViewStoreNew = () => {
           {({ values }) => (
             <form>
               <Box display="flex" flexDirection="column" gap="16px">
-                <TextField
-                  fullWidth
-                  variant="filled"
-                  label="Company Code"
-                  value={values.companyCode}
-                  disabled
-                />
-                <TextField
-                  fullWidth
-                  variant="filled"
-                  label="Store Name"
-                  value={values.name}
-                  disabled
-                />
-                <TextField
-                  fullWidth
-                  variant="filled"
-                  label="Location"
-                  value={values.location}
-                  disabled
-                />
-                <TextField
-                  fullWidth
-                  variant="filled"
-                  label="Pumps"
-                  value={values.pumps}
-                  disabled
-                />
-                <TextField
-                  fullWidth
-                  variant="filled"
-                  label="Nozzles"
-                  value={values.nozzles}
-                  disabled
-                />
-                <TextField
-                  fullWidth
-                  variant="filled"
-                  label="Tanks"
-                  value={values.tanks}
-                  disabled
-                />
-                <TextField
-                  fullWidth
-                  variant="filled"
-                  label="Manager"
-                  value={values.manager}
-                  disabled
-                />
-                <TextField
-                  fullWidth
-                  variant="filled"
-                  label="Description"
-                  value={values.description}
-                  disabled
-                />
+                {isLoading ? (
+                  <Skeleton variant="rectangular" width="100%" height={56} />
+                ) : (
+                  <TextField
+                    fullWidth
+                    variant="filled"
+                    label="Company Code"
+                    value={values.companyCode}
+                    disabled
+                  />
+                )}
+
+                {isLoading ? (
+                  <Skeleton variant="rectangular" width="100%" height={56} />
+                ) : (
+                  <TextField
+                    fullWidth
+                    variant="filled"
+                    label="Store Name"
+                    value={values.name}
+                    disabled
+                  />
+                )}
+
+                {isLoading ? (
+                  <Skeleton variant="rectangular" width="100%" height={56} />
+                ) : (
+                  <TextField
+                    fullWidth
+                    variant="filled"
+                    label="Location"
+                    value={values.location}
+                    disabled
+                  />
+                )}
+
+                {isLoading ? (
+                  <Skeleton variant="rectangular" width="100%" height={56} />
+                ) : (
+                  <TextField
+                    fullWidth
+                    variant="filled"
+                    label="Pumps"
+                    value={values.pumps}
+                    disabled
+                  />
+                )}
+
+                {isLoading ? (
+                  <Skeleton variant="rectangular" width="100%" height={56} />
+                ) : (
+                  <TextField
+                    fullWidth
+                    variant="filled"
+                    label="Nozzles"
+                    value={values.nozzles}
+                    disabled
+                  />
+                )}
+
+                {isLoading ? (
+                  <Skeleton variant="rectangular" width="100%" height={56} />
+                ) : (
+                  <TextField
+                    fullWidth
+                    variant="filled"
+                    label="Tanks"
+                    value={values.tanks}
+                    disabled
+                  />
+                )}
+
+                {isLoading ? (
+                  <Skeleton variant="rectangular" width="100%" height={56} />
+                ) : (
+                  <TextField
+                    fullWidth
+                    variant="filled"
+                    label="Manager"
+                    value={values.manager}
+                    disabled
+                  />
+                )}
+
+                {isLoading ? (
+                  <Skeleton variant="rectangular" width="100%" height={56} />
+                ) : (
+                  <TextField
+                    fullWidth
+                    variant="filled"
+                    label="Description"
+                    value={values.description}
+                    disabled
+                  />
+                )}
               </Box>
             </form>
           )}

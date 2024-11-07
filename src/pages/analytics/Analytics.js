@@ -5,6 +5,7 @@ import {
   MenuItem,
   Typography,
   useTheme,
+  Skeleton,
   useMediaQuery,
 } from "@mui/material";
 import HeaderNew from "../../components/HeaderNew";
@@ -46,101 +47,115 @@ const Analytics = () => {
     return reportsData.reports ? reportsData : { reports: reportsData };
   });
 
-  useEffect(() => {
+  const { isLoading } = useSelector((state) => state.report);
+
+  /*   useEffect(() => {
     dispatch(getReports());
-  }, [dispatch, timePeriod]);
+  }, [dispatch, timePeriod]); */
+
+  useEffect(() => {
+    if (!reports || reports.length === 0) {
+      // Only fetch reports if the reports array is empty or undefined
+      dispatch(getReports());
+    }
+  }, [dispatch, timePeriod, reports]);
 
   const handleTimePeriodChange = (event) => {
     setTimePeriod(event.target.value);
   };
 
   const filterReportsByTimePeriod = (reports, timePeriod) => {
-    const now = new Date();
-    now.setUTCHours(0, 0, 0, 0); // Set now to midnight UTC
+    const now = dayjs().utc().startOf("day");
 
     return reports.filter((report) => {
-      const reportDate = new Date(report.date);
-      reportDate.setUTCHours(0, 0, 0, 0); // Set reportDate to midnight UTC
+      const reportDate = dayjs(report.date).utc().startOf("day");
 
       if (timePeriod === "today") {
-        return reportDate.toDateString() === now.toDateString();
+        /*  console.log(
+          "🚀 ~ returnreports.filter ~ timePeriod:",
+          now.utc().date()
+        ); */
+        return reportDate.isSame(now, "day");
       } else if (timePeriod === "last3Days") {
-        const threeDaysAgo = new Date(now);
-        threeDaysAgo.setDate(now.getDate() - 3);
-        return reportDate >= threeDaysAgo && reportDate <= now;
+        // Include today plus the last two full days
+        const twoDaysAgo = now.subtract(2, "day");
+        return reportDate.isBetween(twoDaysAgo, now, null, "[]");
       } else if (timePeriod === "last7Days") {
-        const sevenDaysAgo = new Date(now);
-        sevenDaysAgo.setDate(now.getDate() - 7);
-        return reportDate >= sevenDaysAgo && reportDate <= now;
+        const sevenDaysAgo = now.subtract(7, "day");
+        return reportDate.isBetween(sevenDaysAgo, now, null, "[]");
       } else if (timePeriod === "thisweek") {
-        const dayOfWeek = now.getDay();
-        const startOfWeek = new Date(now);
-        startOfWeek.setDate(
-          now.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1)
-        );
-        return reportDate >= startOfWeek && reportDate <= now;
+        const startOfWeek = now.startOf("week").add(1, "day"); // Start week on Monday
+        return reportDate.isBetween(startOfWeek, now, null, "[]");
       } else if (timePeriod === "lastmonth") {
-        const firstDayOfLastMonth = new Date(
-          now.getFullYear(),
-          now.getMonth() - 1,
-          1
-        );
-        const lastDayOfLastMonth = new Date(
-          now.getFullYear(),
-          now.getMonth(),
-          0
-        );
-        return (
-          reportDate >= firstDayOfLastMonth && reportDate <= lastDayOfLastMonth
+        const startOfLastMonth = now.subtract(1, "month").startOf("month");
+        const endOfLastMonth = now.subtract(1, "month").endOf("month");
+        return reportDate.isBetween(
+          startOfLastMonth,
+          endOfLastMonth,
+          null,
+          "[]"
         );
       } else if (timePeriod === "thismonth") {
-        const firstDayOfThisMonth = new Date(
-          now.getFullYear(),
-          now.getMonth(),
-          1
-        );
-        return reportDate >= firstDayOfThisMonth && reportDate <= now;
+        const startOfThisMonth = now.startOf("month");
+        return reportDate.isBetween(startOfThisMonth, now, null, "[]");
       } else if (timePeriod === "lastquarter") {
-        const currentQuarter = Math.floor((now.getMonth() + 3) / 3); // 1 for Q1, 2 for Q2, etc.
+        const currentQuarter = Math.floor((now.month() + 3) / 3);
         let startOfLastQuarter, endOfLastQuarter;
 
-        // Set the start and end dates for the last quarter based on the current quarter
         if (currentQuarter === 1) {
-          // Last quarter is Q4 of the previous year
-          startOfLastQuarter = new Date(now.getFullYear() - 1, 9, 1); // October 1
-          endOfLastQuarter = new Date(now.getFullYear() - 1, 11, 31); // December 31
+          startOfLastQuarter = dayjs(`${now.year() - 1}-10-01`).utc();
+          endOfLastQuarter = dayjs(`${now.year() - 1}-12-31`).utc();
         } else if (currentQuarter === 2) {
-          // Last quarter is Q1 of this year
-          startOfLastQuarter = new Date(now.getFullYear(), 0, 1); // January 1
-          endOfLastQuarter = new Date(now.getFullYear(), 2, 31); // March 31
+          startOfLastQuarter = dayjs(`${now.year()}-01-01`).utc();
+          endOfLastQuarter = dayjs(`${now.year()}-03-31`).utc();
         } else if (currentQuarter === 3) {
-          // Last quarter is Q2 of this year
-          startOfLastQuarter = new Date(now.getFullYear(), 3, 1); // April 1
-          endOfLastQuarter = new Date(now.getFullYear(), 5, 30); // June 30
+          startOfLastQuarter = dayjs(`${now.year()}-04-01`).utc();
+          endOfLastQuarter = dayjs(`${now.year()}-06-30`).utc();
         } else {
-          // Last quarter is Q3 of this year
-          startOfLastQuarter = new Date(now.getFullYear(), 6, 1); // July 1
-          endOfLastQuarter = new Date(now.getFullYear(), 8, 30); // September 30
+          startOfLastQuarter = dayjs(`${now.year()}-07-01`).utc();
+          endOfLastQuarter = dayjs(`${now.year()}-09-30`).utc();
         }
-
-        return (
-          reportDate >= startOfLastQuarter && reportDate <= endOfLastQuarter
+        return reportDate.isBetween(
+          startOfLastQuarter,
+          endOfLastQuarter,
+          null,
+          "[]"
         );
       } else if (timePeriod === "thisquarter") {
-        const startOfQuarter = new Date(
-          now.getFullYear(),
-          Math.floor(now.getMonth() / 3) * 3,
-          1
+        // Manually calculate the start of the current quarter
+        const currentMonth = now.month();
+        let startOfQuarter;
+
+        if (currentMonth >= 0 && currentMonth <= 2) {
+          startOfQuarter = dayjs(`${now.year()}-01-01`).utc();
+        } else if (currentMonth >= 3 && currentMonth <= 5) {
+          startOfQuarter = dayjs(`${now.year()}-04-01`).utc();
+        } else if (currentMonth >= 6 && currentMonth <= 8) {
+          startOfQuarter = dayjs(`${now.year()}-07-01`).utc();
+        } else {
+          startOfQuarter = dayjs(`${now.year()}-10-01`).utc();
+        }
+
+        // Debugging logs
+        /*  console.log(
+          "Start of this quarter (manual):",
+          startOfQuarter.format("YYYY-MM-DD")
         );
-        return reportDate >= startOfQuarter && reportDate <= now;
+        console.log("Current date:", now.format("YYYY-MM-DD")); */
+
+        return reportDate.isBetween(startOfQuarter, now, null, "[]");
       } else if (timePeriod === "thisyear") {
-        const firstDayOfThisYear = new Date(now.getFullYear(), 0, 1);
-        return reportDate >= firstDayOfThisYear && reportDate <= now;
+        const startOfYear = now.startOf("year");
+        return reportDate.isBetween(startOfYear, now, null, "[]");
       } else if (timePeriod === "lastYear") {
-        const lastYearStart = new Date(now.getFullYear() - 1, 0, 1);
-        const lastYearEnd = new Date(now.getFullYear() - 1, 11, 31);
-        return reportDate >= lastYearStart && reportDate <= lastYearEnd;
+        const startOfLastYear = dayjs()
+          .subtract(1, "year")
+          .startOf("year")
+          .utc();
+        const endOfLastYear = dayjs().subtract(1, "year").endOf("year").utc();
+        return reportDate.isBetween(startOfLastYear, endOfLastYear, null, "[]");
       }
+
       return true; // Default case: no filtering
     });
   };
@@ -181,6 +196,17 @@ const Analytics = () => {
     [filteredReports]
   );
 
+  const renderNoDataMessage = () => (
+    <Typography
+      variant="h6"
+      color="textSecondary"
+      align="center"
+      sx={{ mt: 2 }}
+    >
+      No data available, please select a different time period.
+    </Typography>
+  );
+
   return (
     <Box m="1.5rem 2.5rem">
       <HeaderNew
@@ -207,11 +233,12 @@ const Analytics = () => {
           <MenuItem value="today">Today</MenuItem>
           <MenuItem value="last3Days">Last 3 Days</MenuItem>
           <MenuItem value="last7Days">Last 7 Days</MenuItem>
-          <MenuItem value="lastmonth">Last Month</MenuItem>
           <MenuItem value="thisweek">This Week</MenuItem>
           <MenuItem value="thismonth">This Month</MenuItem>
           <MenuItem value="thisquarter">This Quarter</MenuItem>
           <MenuItem value="thisyear">This Year</MenuItem>
+          <MenuItem value="lastmonth">Last Month</MenuItem>
+          <MenuItem value="lastquarter">Last Quarter</MenuItem>
           <MenuItem value="lastYear">Last Year</MenuItem>
         </Select>
       </Box>
@@ -225,7 +252,18 @@ const Analytics = () => {
         borderRadius="0.55rem"
         mb={4}
       >
-        <SalesOverviewAreaChart salesData={dailySalesData} />
+        {isLoading ? (
+          <Skeleton
+            variant="rectangular"
+            width="100%"
+            height="300px"
+            sx={{ borderRadius: "0.55rem", animation: "wave" }}
+          />
+        ) : filteredReports.length > 0 ? (
+          <SalesOverviewAreaChart salesData={dailySalesData} />
+        ) : (
+          renderNoDataMessage()
+        )}
       </Box>
 
       {/* Product Rates Line Chart */}
@@ -237,7 +275,18 @@ const Analytics = () => {
         borderRadius="0.55rem"
         mb={4}
       >
-        <ProductRatesLineChart ratesData={dailyProductRatesData} />
+        {isLoading ? (
+          <Skeleton
+            variant="rectangular"
+            width="100%"
+            height="300px"
+            sx={{ borderRadius: "0.55rem", animation: "wave" }}
+          />
+        ) : filteredReports.length > 0 ? (
+          <ProductRatesLineChart ratesData={dailyProductRatesData} />
+        ) : (
+          renderNoDataMessage()
+        )}
       </Box>
 
       {/* Product Sales by Store Bar Chart */}
@@ -249,7 +298,18 @@ const Analytics = () => {
         borderRadius="0.55rem"
         mb={4}
       >
-        <ProductSalesByStoreBarChart salesData={dailyProductSalesData} />
+        {isLoading ? (
+          <Skeleton
+            variant="rectangular"
+            width="100%"
+            height="300px"
+            sx={{ borderRadius: "0.55rem", animation: "wave" }}
+          />
+        ) : filteredReports.length > 0 ? (
+          <ProductSalesByStoreBarChart salesData={dailyProductSalesData} />
+        ) : (
+          renderNoDataMessage()
+        )}
       </Box>
 
       {/* Radar Charts Display */}
@@ -263,15 +323,38 @@ const Analytics = () => {
           },
         }}
       >
-        <SalesRadarChart
-          title="Sales by Product"
-          salesData={productSalesData}
-        />
-        <SalesRadarChart title="Sales by Store" salesData={storeSalesData} />
-        <SalesRadarChart
-          title="Sales by Manager"
-          salesData={managerSalesData}
-        />
+        {isLoading ? (
+          Array.from({ length: 3 }).map((_, index) => (
+            <Skeleton
+              key={index}
+              variant="rectangular"
+              width="100%"
+              height="300px"
+              sx={{ borderRadius: "0.55rem", animation: "wave" }}
+            />
+          ))
+        ) : filteredReports.length > 0 ? (
+          <>
+            <SalesRadarChart
+              title="Sales by Product"
+              salesData={productSalesData}
+            />
+            <SalesRadarChart
+              title="Sales by Store"
+              salesData={storeSalesData}
+            />
+            <SalesRadarChart
+              title="Sales by Manager"
+              salesData={managerSalesData}
+            />
+          </>
+        ) : (
+          <>
+            {renderNoDataMessage()}
+            {renderNoDataMessage()}
+            {renderNoDataMessage()}
+          </>
+        )}
       </Box>
 
       {/* AI-Powered Insights */}
@@ -283,7 +366,18 @@ const Analytics = () => {
         borderRadius="0.55rem"
         backgroundColor={theme.palette.background.alt}
       >
-        <AIPoweredInsights />
+        {isLoading ? (
+          <Skeleton
+            variant="rectangular"
+            width="100%"
+            height="300px"
+            sx={{ borderRadius: "0.55rem", animation: "wave" }}
+          />
+        ) : filteredReports.length > 0 ? (
+          <AIPoweredInsights />
+        ) : (
+          renderNoDataMessage()
+        )}
       </Box>
     </Box>
   );

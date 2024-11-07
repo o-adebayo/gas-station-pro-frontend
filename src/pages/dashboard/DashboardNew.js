@@ -5,6 +5,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Skeleton,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
@@ -68,7 +69,7 @@ const DashboardNew = () => {
   //const reports = useSelector((state) => state.report.reports);
   //const reports = useMemo(() => reportsData?.reports || [], [reportsData]); // Memoize reports
 
-  const { isError, message } = useSelector((state) => state.report);
+  const { isError, message, isLoading } = useSelector((state) => state.report);
 
   const companyResponse = useSelector(selectCompany); // Fetch company details
   const company = companyResponse?.company || {}; // Destructure company details
@@ -119,17 +120,6 @@ const DashboardNew = () => {
     // Optionally, add a fallback or return null if user is missing
     return null;
   }
-
-  // Using utility functions to calculate necessary values
-  // CALL ALL NECESSARY FUNCTIONS TO GET THE APPROPRIATE VALUES FOR CHARTS
-  // call the function and pass the reports array of the entire company for admins and entire store for managers
-  /*   const totalSales = calculateTotalSales(reports);
-  const monthlySalesData = calculateMonthlySales(reports);
-  const storeMonthlySalesData = calculateStoreMonthlySales(reports);
-  const currentMonthSalesData = calculateCurrentMonthSales(reports);
-  const storeSalesData = calculateStoreSalesForCurrentYear(reports);
-  const productSalesForMonth = calculateProductSalesForCurrentMonth(reports);
-  const productSalesForYear = calculateProductSalesForCurrentYear(reports); */
 
   // Only render the StoreComparisonChart if the user is an admin
   const isAdmin = user.role === "admin";
@@ -236,6 +226,49 @@ const DashboardNew = () => {
     },
   ];
 
+  const renderStatBox = (
+    title,
+    value,
+    increase,
+    description,
+    icon,
+    onDrillDown
+  ) => {
+    return isLoading ? (
+      <Box
+        gridColumn="span 2"
+        gridRow="span 1"
+        display="flex"
+        flexDirection="column"
+        justifyContent="space-between"
+        p="1.25rem 1rem"
+        flex="1 1 100%"
+        backgroundColor={theme.palette.background.alt}
+        borderRadius="0.55rem"
+      >
+        <Skeleton
+          variant="rectangular"
+          width="100%"
+          height="100%"
+          sx={{
+            borderRadius: "0.55rem",
+            transform: "scale(1)", // Ensures the skeleton occupies full space without shrinking
+            animation: "wave", // Adds the wave animation
+          }}
+        />
+      </Box>
+    ) : (
+      <StatBox
+        title={title}
+        value={value}
+        increase={increase}
+        description={description}
+        icon={icon}
+        onDrillDown={onDrillDown}
+      />
+    );
+  };
+
   return (
     <Box m="1.5rem 2.5rem">
       <FlexBetween>
@@ -272,115 +305,95 @@ const DashboardNew = () => {
         }}
       >
         {/* ROW 1 */}
-        <StatBox
-          title="Stores"
-          value={stores && stores.length ? stores.length : 0}
-          increase="+14%"
-          description="Since last month"
-          icon={
-            <StoreOutlined
-              sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
-            />
-          }
-          onDrillDown={() => handleDrillDown("Stores", stores, storeColumns)}
-        />
+        {renderStatBox(
+          "Stores",
+          stores?.length ?? 0,
+          "+14%",
+          "Since last month",
+          <StoreOutlined
+            sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
+          />,
+          () => handleDrillDown("Stores", stores, storeColumns)
+        )}
 
-        <StatBox
-          title="Users"
-          value={users && users.length ? users.length : 0}
-          increase="+14%"
-          description="Since last month"
-          icon={
-            <GroupOutlined
-              sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
-            />
-          }
-          onDrillDown={() => handleDrillDown("Users", users, userColumns)}
-        />
+        {renderStatBox(
+          "Users",
+          users?.length ?? 0,
+          "+14%",
+          "Since last month",
+          <GroupOutlined
+            sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
+          />,
+          () => handleDrillDown("Users", users, userColumns)
+        )}
 
         {/* Monthly Sales*/}
-        <StatBox
-          title="Sales This Month (Lts)"
-          value={totalSales.totalSalesForMonth.totalSalesLiters.toLocaleString()}
-          increase={`${totalSales.totalSalesForMonth.percentageDiffLiters.toFixed(
-            2
-          )}%`}
-          description="Since last month"
-          icon={
-            <LocalGasStationOutlined
-              sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
-            />
-          }
-          onDrillDown={() =>
+
+        {renderStatBox(
+          "Sales This Month (Lts)",
+          totalSales.totalSalesForMonth.totalSalesLiters.toLocaleString(),
+          `${totalSales.totalSalesForMonth.percentageDiffLiters.toFixed(2)}%`,
+          "Since last month",
+          <LocalGasStationOutlined
+            sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
+          />,
+          () =>
             handleDrillDown(
               "Sales This Month (Lts)",
               filterReportsForCurrentMonth(reports),
               salesColumns
             )
-          }
-        />
-        <StatBox
-          title="Sales This Month (₦)"
-          value={`₦${totalSales.totalSalesForMonth.totalSalesDollars.toLocaleString()}`}
-          increase={`${totalSales.totalSalesForMonth.percentageDiffDollars.toFixed(
-            2
-          )}%`}
-          description="Since last month"
-          icon={
-            <PointOfSale
-              sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
-            />
-          }
-          onDrillDown={() =>
+        )}
+
+        {renderStatBox(
+          "Sales This Month (₦)",
+          `₦${totalSales.totalSalesForMonth.totalSalesDollars.toLocaleString()}`,
+          `${totalSales.totalSalesForMonth.percentageDiffDollars.toFixed(2)}%`,
+          "Since last month",
+          <PointOfSale
+            sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
+          />,
+          () =>
             handleDrillDown(
               "Sales This Month (₦)",
               filterReportsForCurrentMonth(reports),
               salesColumns
             )
-          }
-        />
+        )}
 
         {/* Yearly Sales*/}
-        <StatBox
-          title="Sales This Year (Lts)"
-          value={totalSales.totalSalesForYear.totalSalesLiters.toLocaleString()}
-          increase={`${totalSales.totalSalesForYear.percentageDiffLiters.toFixed(
-            2
-          )}%`}
-          description="Since last year"
-          icon={
-            <LocalGasStationOutlined
-              sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
-            />
-          }
-          onDrillDown={() =>
+
+        {renderStatBox(
+          "Sales This Year (Lts)",
+          totalSales.totalSalesForYear.totalSalesLiters.toLocaleString(),
+          `${totalSales.totalSalesForYear.percentageDiffLiters.toFixed(2)}%`,
+          "Since last year",
+          <LocalGasStationOutlined
+            sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
+          />,
+          () =>
             handleDrillDown(
               "Sales This Year (Lts)",
               filterReportsForCurrentYear(reports),
               salesColumns
             )
-          }
-        />
-        <StatBox
-          title="Sales This Year (₦)"
-          value={`₦${totalSales.totalSalesForYear.totalSalesDollars.toLocaleString()}`}
-          increase={`${totalSales.totalSalesForYear.percentageDiffDollars.toFixed(
-            2
-          )}%`}
-          description="Since last year"
-          icon={
-            <PointOfSale
-              sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
-            />
-          }
-          onDrillDown={() =>
+        )}
+
+        {renderStatBox(
+          "Sales This Year (₦)",
+          `₦${totalSales.totalSalesForYear.totalSalesDollars.toLocaleString()}`,
+          `${totalSales.totalSalesForYear.percentageDiffDollars.toFixed(2)}%`,
+          "Since last ytear",
+          <PointOfSale
+            sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
+          />,
+          () =>
             handleDrillDown(
               "Sales This Year (₦)",
               filterReportsForCurrentYear(reports),
               salesColumns
             )
-          }
-        />
+        )}
 
         {/* Sales Overview Chart */}
         <Box
@@ -390,9 +403,19 @@ const DashboardNew = () => {
           p="1rem"
           borderRadius="0.55rem"
         >
-          <SalesOverviewChart salesData={monthlySalesData} />
+          {isLoading ? (
+            <Skeleton
+              variant="rectangular"
+              height={300}
+              animation="wave"
+              sx={{ borderRadius: "0.55rem" }}
+            />
+          ) : (
+            <SalesOverviewChart salesData={monthlySalesData} />
+          )}
         </Box>
 
+        {/* Conditional Admin charts */}
         {isAdmin && (
           <>
             <Box
@@ -402,10 +425,19 @@ const DashboardNew = () => {
               p="1rem"
               borderRadius="0.55rem"
             >
-              <SalesPieChart
-                salesData={currentMonthSalesData}
-                title="Total Sales by Store (₦) - This Month"
-              />
+              {isLoading ? (
+                <Skeleton
+                  variant="rectangular"
+                  height={300}
+                  animation="wave"
+                  sx={{ borderRadius: "0.55rem" }}
+                />
+              ) : (
+                <SalesPieChart
+                  salesData={currentMonthSalesData}
+                  title="Total Sales by Store (₦) - This Month"
+                />
+              )}
             </Box>
 
             <Box
@@ -415,10 +447,19 @@ const DashboardNew = () => {
               p="1rem"
               borderRadius="0.55rem"
             >
-              <SalesPieChart
-                salesData={storeSalesData}
-                title="Total Sales by Store (₦) - This Year"
-              />
+              {isLoading ? (
+                <Skeleton
+                  variant="rectangular"
+                  height={300}
+                  animation="wave"
+                  sx={{ borderRadius: "0.55rem" }}
+                />
+              ) : (
+                <SalesPieChart
+                  salesData={storeSalesData}
+                  title="Total Sales by Store (₦) - This Year"
+                />
+              )}
             </Box>
 
             <Box
@@ -428,7 +469,16 @@ const DashboardNew = () => {
               p="1rem"
               borderRadius="0.55rem"
             >
-              <StoreComparisonChart storeSalesData={storeMonthlySalesData} />
+              {isLoading ? (
+                <Skeleton
+                  variant="rectangular"
+                  height={300}
+                  animation="wave"
+                  sx={{ borderRadius: "0.55rem" }}
+                />
+              ) : (
+                <StoreComparisonChart storeSalesData={storeMonthlySalesData} />
+              )}
             </Box>
           </>
         )}
@@ -441,10 +491,19 @@ const DashboardNew = () => {
           p="1rem"
           borderRadius="0.55rem"
         >
-          <ProductSalesBarChart
-            salesData={productSalesForMonth}
-            title="Total Sales by Product (₦) - This Month"
-          />
+          {isLoading ? (
+            <Skeleton
+              variant="rectangular"
+              height={300}
+              animation="wave"
+              sx={{ borderRadius: "0.55rem" }}
+            />
+          ) : (
+            <ProductSalesBarChart
+              salesData={productSalesForMonth}
+              title="Total Sales by Product (₦) - This Month"
+            />
+          )}
         </Box>
 
         {/* Bar chart for product sales in the current year */}
@@ -455,12 +514,22 @@ const DashboardNew = () => {
           p="1rem"
           borderRadius="0.55rem"
         >
-          <ProductSalesBarChart
-            salesData={productSalesForYear}
-            title="Total Sales by Product (₦) - This Year"
-          />
+          {isLoading ? (
+            <Skeleton
+              variant="rectangular"
+              height={300}
+              animation="wave"
+              sx={{ borderRadius: "0.55rem" }}
+            />
+          ) : (
+            <ProductSalesBarChart
+              salesData={productSalesForYear}
+              title="Total Sales by Product (₦) - This Year"
+            />
+          )}
         </Box>
       </Box>
+
       {/* Dialog with DataGrid for drill-down data */}
       <Dialog
         open={openDialog}
@@ -508,23 +577,32 @@ const DashboardNew = () => {
               },
             }}
           >
-            <DataGrid
-              rows={dialogData}
-              columns={dialogColumns}
-              //pageSize={5}
-              rowsPerPageOptions={[5, 10, 20]}
-              getRowId={(row) => row._id} // Specify _id as the unique identifier
-              initialState={{
-                pagination: {
-                  paginationModel: {
-                    pageSize: 10,
+            {isLoading ? (
+              <Skeleton
+                variant="rectangular"
+                width="100%"
+                height={400}
+                animation="wave"
+              />
+            ) : (
+              <DataGrid
+                rows={dialogData}
+                columns={dialogColumns}
+                //pageSize={5}
+                rowsPerPageOptions={[5, 10, 20]}
+                getRowId={(row) => row._id} // Specify _id as the unique identifier
+                initialState={{
+                  pagination: {
+                    paginationModel: {
+                      pageSize: 10,
+                    },
                   },
-                },
-              }}
-              slots={{ toolbar: GridToolbar }}
-              pageSizeOptions={[5, 10, 25]}
-              disableRowSelectionOnClick
-            />
+                }}
+                slots={{ toolbar: GridToolbar }}
+                pageSizeOptions={[5, 10, 25]}
+                disableRowSelectionOnClick
+              />
+            )}
           </Box>
         </DialogContent>
         <DialogActions>

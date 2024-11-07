@@ -11,6 +11,7 @@ import {
   DialogContentText,
   DialogTitle,
   TextField,
+  Skeleton,
   useTheme,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
@@ -85,7 +86,9 @@ const ReportListNew = () => {
     const reportsData = state.report.reports || {}; // Default to an empty object
     return reportsData.reports ? reportsData : { reports: reportsData }; // Return an object with reports key
   });
-  const { isLoading, total } = useSelector((state) => state.report.reports);
+  const { total } = useSelector((state) => state.report.reports);
+  const { isLoading } = useSelector((state) => state.report);
+  console.log("🚀 ~ ReportListNew ~ isLoading:", isLoading);
 
   const isAdmin = user?.role === "admin"; // Check if the user is an admin
 
@@ -391,6 +394,15 @@ const ReportListNew = () => {
     }
   };
 
+  const renderButtonSkeleton = () => (
+    <Skeleton variant="rectangular" width={120} height={36} />
+  );
+
+  const renderDataGridSkeleton = () =>
+    [...Array(10)].map((_, i) => (
+      <Skeleton key={i} variant="rectangular" width="100%" height={40} />
+    ));
+
   return (
     <Box m="1.5rem 2.5rem">
       <HeaderNew title="REPORTS" subtitle="Entire list of reports" />
@@ -405,8 +417,11 @@ const ReportListNew = () => {
           },
         }}
       >
-        <Box display="flex" gap={2}>
-          {/* Add User Button */}
+        <Box display="flex" gap={2} mb={2}>
+          {/* Add Report Button */}
+          {/*         {isLoading ? (
+            renderButtonSkeleton()
+          ) : ( */}
           <Link to="/add-report" style={{ textDecoration: "none" }}>
             <Button
               variant="contained"
@@ -426,11 +441,19 @@ const ReportListNew = () => {
               Add Report
             </Button>
           </Link>
+          {/*  )} */}
 
           {/* Only show these buttons to admin users */}
           {isAdmin && (
             <>
               {/* Import Reports Button */}
+              {/*  {isLoading ? (
+                <>
+                  {renderButtonSkeleton()}
+                  {renderButtonSkeleton(180)}
+                </>
+              ) : (
+                <> */}
               <Button
                 variant="contained"
                 onClick={() =>
@@ -483,7 +506,10 @@ const ReportListNew = () => {
               </Button>
             </>
           )}
+          {/*   </>
+          )} */}
         </Box>
+
         <input
           id="import-reports-input"
           type="file"
@@ -574,6 +600,11 @@ const ReportListNew = () => {
           },
         }}
       >
+        {/*   {isLoading ? (
+          <Box display="flex" flexDirection="column" gap={2}>
+            {renderDataGridSkeleton()}
+          </Box>
+        ) : ( */}
         <DataGrid
           loading={isLoading || !reports}
           getRowId={(row) => row._id}
@@ -598,6 +629,7 @@ const ReportListNew = () => {
             },
           }}
         />
+        {/*     )} */}
       </Box>
     </Box>
   );

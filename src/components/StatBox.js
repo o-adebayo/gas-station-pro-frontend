@@ -15,6 +15,8 @@ const StatBox = ({
 
   return (
     <Box
+      width="100%"
+      height="100%"
       gridColumn="span 2"
       gridRow="span 1"
       display="flex"

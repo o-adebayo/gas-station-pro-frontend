@@ -7,6 +7,7 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  Skeleton,
   useTheme,
 } from "@mui/material";
 import "./StoreListNew.scss";
@@ -42,7 +43,8 @@ const StoreListNew = () => {
   const user = useSelector(selectUser);
   const users = useSelector(selectUsers);
   const { isLoggedIn } = useSelector((state) => state.auth);
-  const { isLoading } = useSelector((state) => state.storeLocation);
+  const isLoading = useSelector((state) => state.storeLocation.isLoading);
+
   const storesData = useSelector(selectStores);
   const stores = storesData?.stores || [];
 
@@ -58,11 +60,17 @@ const StoreListNew = () => {
     }
   }, [dispatch, isLoggedIn]);
 
-  useEffect(() => {
+  /* useEffect(() => {
     if (user && user.companyCode) {
       dispatch(fetchStoreLocations());
     }
-  }, [dispatch, user]);
+  }, [dispatch, user]); */
+  useEffect(() => {
+    if (user && user.companyCode && (!stores || stores.length === 0)) {
+      // Fetch stores only if the array is empty or undefined
+      dispatch(fetchStoreLocations());
+    }
+  }, [dispatch, user, stores]);
 
   const delStore = async (id) => {
     await dispatch(deleteStoreLocation(id));
@@ -269,6 +277,10 @@ const StoreListNew = () => {
     }
   };
 
+  const renderButtonSkeleton = (width = 120) => (
+    <Skeleton variant="rectangular" width={width} height={36} />
+  );
+
   return (
     <Box m="1.5rem 2.5rem">
       <HeaderNew title="STORES" subtitle="List of Stores" />
@@ -285,80 +297,95 @@ const StoreListNew = () => {
       >
         <Box display="flex" gap={2}>
           {/* Add Store Button */}
-          <Link to="/add-store" style={{ textDecoration: "none" }}>
-            <Button
-              variant="contained"
-              sx={{
-                backgroundColor:
-                  theme.palette.mode === "dark"
-                    ? theme.palette.primary.main
-                    : theme.palette.primary.light,
-                color: theme.palette.getContrastText(
-                  theme.palette.primary.main
-                ),
-                "&:hover": {
-                  backgroundColor: theme.palette.primary.dark,
-                },
-              }}
-            >
-              Add Store
-            </Button>
-          </Link>
+          {isLoading ? (
+            renderButtonSkeleton()
+          ) : (
+            <Link to="/add-store" style={{ textDecoration: "none" }}>
+              <Button
+                variant="contained"
+                sx={{
+                  backgroundColor:
+                    theme.palette.mode === "dark"
+                      ? theme.palette.primary.main
+                      : theme.palette.primary.light,
+                  color: theme.palette.getContrastText(
+                    theme.palette.primary.main
+                  ),
+                  "&:hover": {
+                    backgroundColor: theme.palette.primary.dark,
+                  },
+                }}
+              >
+                Add Store
+              </Button>
+            </Link>
+          )}
 
           {/* Only show these buttons to admin users */}
           {isAdmin && (
             <>
               {/* Import Stores Button */}
-              <Button
-                variant="contained"
-                onClick={() =>
-                  document.getElementById("import-stores-input").click()
-                }
-                sx={{
-                  backgroundColor:
-                    theme.palette.mode === "dark"
-                      ? theme.palette.secondary.main
-                      : theme.palette.secondary.light,
-                  color: theme.palette.getContrastText(
-                    theme.palette.secondary.main
-                  ),
-                  "&:hover": {
-                    backgroundColor: theme.palette.secondary.dark,
-                  },
-                }}
-              >
-                Import Stores
-              </Button>
-              <input
-                id="import-stores-input"
-                type="file"
-                accept=".csv"
-                style={{ display: "none" }}
-                onChange={(e) => handleStoreCSVUpload(e.target.files[0])}
-              />
+              {isLoading ? (
+                <>
+                  {renderButtonSkeleton()}
+                  {renderButtonSkeleton(180)}
+                </>
+              ) : (
+                <>
+                  <Button
+                    variant="contained"
+                    onClick={() =>
+                      document.getElementById("import-stores-input").click()
+                    }
+                    sx={{
+                      backgroundColor:
+                        theme.palette.mode === "dark"
+                          ? theme.palette.secondary.main
+                          : theme.palette.secondary.light,
+                      color: theme.palette.getContrastText(
+                        theme.palette.secondary.main
+                      ),
+                      "&:hover": {
+                        backgroundColor: theme.palette.secondary.dark,
+                      },
+                    }}
+                  >
+                    Import Stores
+                  </Button>
+                  <input
+                    id="import-stores-input"
+                    type="file"
+                    accept=".csv"
+                    style={{ display: "none" }}
+                    onChange={(e) => handleStoreCSVUpload(e.target.files[0])}
+                  />
 
-              {/* Download Sample File Button */}
-              <Button
-                variant="contained"
-                onClick={() => {
-                  const link = document.createElement("a");
-                  link.href = `${process.env.REACT_APP_BACKEND_URL}/sample_data_files/Sample_Import_Stores_File.csv`;
-                  link.download = "Sample_Import_Stores_File.csv";
-                  link.click();
-                }}
-                sx={{
-                  backgroundColor:
-                    theme.palette.mode === "dark"
-                      ? theme.palette.info.main
-                      : theme.palette.info.light,
-                  color: theme.palette.getContrastText(theme.palette.info.main),
-                  "&:hover": {
-                    backgroundColor: theme.palette.info.dark,
-                  },
-                }}
-              >
-                Download Sample File
-              </Button>
+                  {/* Download Sample File Button */}
+                  <Button
+                    variant="contained"
+                    onClick={() => {
+                      const link = document.createElement("a");
+                      link.href = `${process.env.REACT_APP_BACKEND_URL}/sample_data_files/Sample_Import_Stores_File.csv`;
+                      link.download = "Sample_Import_Stores_File.csv";
+                      link.click();
+                    }}
+                    sx={{
+                      backgroundColor:
+                        theme.palette.mode === "dark"
+                          ? theme.palette.info.main
+                          : theme.palette.info.light,
+                      color: theme.palette.getContrastText(
+                        theme.palette.info.main
+                      ),
+                      "&:hover": {
+                        backgroundColor: theme.palette.info.dark,
+                      },
+                    }}
+                  >
+                    Download Sample File
+                  </Button>
+                </>
+              )}
             </>
           )}
         </Box>
@@ -433,29 +460,47 @@ const StoreListNew = () => {
           },
         }}
       >
-        <DataGrid
-          loading={isLoading || !stores}
-          getRowId={(row) => row._id}
-          rows={stores || []}
-          columns={columns}
-          initialState={{
-            pagination: {
-              paginationModel: {
-                pageSize: 10,
+        {isLoading ? (
+          <Box display="flex" flexDirection="column" gap={2}>
+            {[...Array(10)].map(
+              (
+                _,
+                i // 10 skeleton rows for more placeholder data
+              ) => (
+                <Skeleton
+                  key={i}
+                  variant="rectangular"
+                  width="100%"
+                  height={40}
+                />
+              )
+            )}
+          </Box>
+        ) : (
+          <DataGrid
+            loading={isLoading}
+            getRowId={(row) => row._id}
+            rows={stores || []}
+            columns={columns}
+            initialState={{
+              pagination: {
+                paginationModel: {
+                  pageSize: 10,
+                },
               },
-            },
-          }}
-          slots={{ toolbar: GridToolbar }}
-          slotProps={{
-            toolbar: {
-              showQuickFilter: true,
-              quickFilterProps: { debounceMs: 500 },
-            },
-          }}
-          pageSizeOptions={[5, 10, 25]}
-          checkboxSelection
-          disableRowSelectionOnClick
-        />
+            }}
+            slots={{ toolbar: GridToolbar }}
+            slotProps={{
+              toolbar: {
+                showQuickFilter: true,
+                quickFilterProps: { debounceMs: 500 },
+              },
+            }}
+            pageSizeOptions={[5, 10, 25]}
+            checkboxSelection
+            disableRowSelectionOnClick
+          />
+        )}
       </Box>
     </Box>
   );

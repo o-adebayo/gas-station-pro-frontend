@@ -6,6 +6,7 @@ import {
   CardContent,
   Typography,
   Avatar,
+  Skeleton,
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -71,10 +72,10 @@ const ProfileNew = () => {
   }, [user]);
 
   // If loading user data, show a loader
-  if (isUserLoading || isStoreLoading) {
+  /*  if (isUserLoading || isStoreLoading) {
     return <Loader message="Loading profile data..." />;
   }
-
+ */
   return (
     <Box m="20px">
       {!user ? (
@@ -90,38 +91,61 @@ const ProfileNew = () => {
               alignItems="center"
               mb={3}
             >
-              <Avatar
-                src={profile?.photo?.filePath || "/default-profile.png"}
-                alt="Profile"
-                sx={{ width: 100, height: 100 }}
-              />
+              {isUserLoading || isStoreLoading ? (
+                <Skeleton variant="circular" width={100} height={100} />
+              ) : (
+                <Avatar
+                  src={profile?.photo?.filePath || "/default-profile.png"}
+                  alt="Profile"
+                  sx={{ width: 100, height: 100 }}
+                />
+              )}
             </Box>
+
             <Box display="flex" flexDirection="column" gap={2} mb={3}>
-              <Typography variant="h6">
-                <strong>Name: </strong> {profile?.name}
-              </Typography>
-              <Typography variant="h6">
-                <strong>Email: </strong> {profile?.email}
-              </Typography>
-              <Typography variant="h6">
-                <strong>Phone: </strong> {profile?.phone}
-              </Typography>
-              <Typography variant="h6">
-                <strong>Role: </strong> {profile?.role}
-              </Typography>
-              <Typography variant="h6">
-                <strong>Store: </strong> {storeLocations?.store?.name || "N/A"}
-              </Typography>
+              {isUserLoading || isStoreLoading ? (
+                <>
+                  <Skeleton variant="text" width="60%" height={30} />
+                  <Skeleton variant="text" width="80%" height={30} />
+                  <Skeleton variant="text" width="60%" height={30} />
+                  <Skeleton variant="text" width="50%" height={30} />
+                  <Skeleton variant="text" width="70%" height={30} />
+                </>
+              ) : (
+                <>
+                  <Typography variant="h6">
+                    <strong>Name: </strong> {profile?.name}
+                  </Typography>
+                  <Typography variant="h6">
+                    <strong>Email: </strong> {profile?.email}
+                  </Typography>
+                  <Typography variant="h6">
+                    <strong>Phone: </strong> {profile?.phone}
+                  </Typography>
+                  <Typography variant="h6">
+                    <strong>Role: </strong> {profile?.role}
+                  </Typography>
+                  <Typography variant="h6">
+                    <strong>Store: </strong>{" "}
+                    {storeLocations?.store?.name || "N/A"}
+                  </Typography>
+                </>
+              )}
             </Box>
+
             <Box display="flex" justifyContent="center">
-              <Button
-                variant="contained"
-                color="primary"
-                component={Link}
-                to="/edit-profile"
-              >
-                Edit Profile
-              </Button>
+              {isUserLoading || isStoreLoading ? (
+                <Skeleton variant="rectangular" width={120} height={36} />
+              ) : (
+                <Button
+                  variant="contained"
+                  color="primary"
+                  component={Link}
+                  to="/edit-profile"
+                >
+                  Edit Profile
+                </Button>
+              )}
             </Box>
           </CardContent>
         </Card>

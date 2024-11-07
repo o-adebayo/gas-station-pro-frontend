@@ -6,6 +6,7 @@ import {
   Avatar,
   useTheme,
   Divider,
+  Skeleton,
 } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
@@ -104,7 +105,7 @@ const EditProfileNew = () => {
 
   return (
     <Box m="20px">
-      {isLoading && <Loader message="Updating profile details..." />}
+      {/*  {isLoading && <Loader message="Updating profile details..." />} */}
       <HeaderNew
         title="Edit Profile"
         subtitle="Manage your profile information"
@@ -113,6 +114,7 @@ const EditProfileNew = () => {
         initialValues={initialValues}
         validationSchema={validationSchema}
         onSubmit={saveProfile}
+        enableReinitialize // Reinitialize Formik with updated values when user data changes
       >
         {({
           values,
@@ -125,17 +127,32 @@ const EditProfileNew = () => {
         }) => (
           <form onSubmit={handleSubmit}>
             <Box display="flex" flexDirection="column" alignItems="center">
-              <Avatar
-                alt="Profile Photo"
-                src={imagePreview || "/default-profile.png"}
-                sx={{ width: 100, height: 100, mb: 3 }}
-              />
+              {isLoading ? (
+                <Skeleton
+                  variant="circular"
+                  width={100}
+                  height={100}
+                  sx={{ mb: 3 }}
+                />
+              ) : (
+                <Avatar
+                  alt="Profile Photo"
+                  src={imagePreview || "/default-profile.png"}
+                  sx={{ width: 100, height: 100, mb: 3 }}
+                />
+              )}
+
               <Button
                 variant="contained"
                 component="label"
                 sx={{ mb: 3 }} // Adjusted margin for spacing
+                disabled={isLoading}
               >
-                Upload New Profile Photo
+                {isLoading ? (
+                  <Skeleton variant="rectangular" width={180} height={36} />
+                ) : (
+                  "Upload New Profile Photo"
+                )}
                 <input
                   type="file"
                   hidden
@@ -144,65 +161,106 @@ const EditProfileNew = () => {
                 />
               </Button>
 
-              <TextField
-                fullWidth
-                variant="filled"
-                label="Name"
-                name="name"
-                value={values.name}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                error={touched.name && Boolean(errors.name)}
-                helperText={touched.name && errors.name}
-                sx={{ mb: 2 }}
-              />
+              {isLoading ? (
+                <>
+                  <Skeleton
+                    variant="rectangular"
+                    width="100%"
+                    height={56}
+                    sx={{ mb: 2 }}
+                  />
+                  <Skeleton
+                    variant="rectangular"
+                    width="100%"
+                    height={56}
+                    sx={{ mb: 2 }}
+                  />
+                  <Skeleton
+                    variant="rectangular"
+                    width="100%"
+                    height={56}
+                    sx={{ mb: 2 }}
+                  />
+                  <Skeleton
+                    variant="rectangular"
+                    width="100%"
+                    height={56}
+                    sx={{ mb: 2 }}
+                  />
+                  <Skeleton
+                    variant="rectangular"
+                    width="100%"
+                    height={56}
+                    sx={{ mb: 2 }}
+                  />
+                </>
+              ) : (
+                <>
+                  <TextField
+                    fullWidth
+                    variant="filled"
+                    label="Name"
+                    name="name"
+                    value={values.name}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    error={touched.name && Boolean(errors.name)}
+                    helperText={touched.name && errors.name}
+                    sx={{ mb: 2 }}
+                  />
 
-              <TextField
-                fullWidth
-                variant="filled"
-                label="Email"
-                name="email"
-                value={values.email}
-                disabled
-                sx={{ mb: 2 }}
-              />
+                  <TextField
+                    fullWidth
+                    variant="filled"
+                    label="Email"
+                    name="email"
+                    value={values.email}
+                    disabled
+                    sx={{ mb: 2 }}
+                  />
 
-              <TextField
-                fullWidth
-                variant="filled"
-                label="Phone"
-                name="phone"
-                value={values.phone}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                error={touched.phone && Boolean(errors.phone)}
-                helperText={touched.phone && errors.phone}
-                sx={{ mb: 2 }}
-              />
+                  <TextField
+                    fullWidth
+                    variant="filled"
+                    label="Phone"
+                    name="phone"
+                    value={values.phone}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    error={touched.phone && Boolean(errors.phone)}
+                    helperText={touched.phone && errors.phone}
+                    sx={{ mb: 2 }}
+                  />
 
-              <TextField
-                fullWidth
-                variant="filled"
-                label="Role"
-                name="role"
-                value={values.role}
-                disabled
-                sx={{ mb: 2 }}
-              />
+                  <TextField
+                    fullWidth
+                    variant="filled"
+                    label="Role"
+                    name="role"
+                    value={values.role}
+                    disabled
+                    sx={{ mb: 2 }}
+                  />
 
-              <TextField
-                fullWidth
-                variant="filled"
-                label="Store"
-                value={storeName}
-                disabled
-                sx={{ mb: 2 }}
-              />
+                  <TextField
+                    fullWidth
+                    variant="filled"
+                    label="Store"
+                    value={storeName}
+                    disabled
+                    sx={{ mb: 2 }}
+                  />
+                </>
+              )}
 
               <Box display="flex" justifyContent="flex-end" width="100%">
-                <Button type="submit" variant="contained" color="primary">
-                  Save Changes
-                </Button>
+                {isLoading ? (
+                  <Skeleton variant="rectangular" width={120} height={36} />
+                ) : (
+                  <Button type="submit" variant="contained" color="primary">
+                    Save Changes
+                  </Button>
+                )}
               </Box>
             </Box>
           </form>
