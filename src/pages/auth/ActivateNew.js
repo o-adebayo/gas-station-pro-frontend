@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   Button,
@@ -7,11 +7,13 @@ import {
   Card,
   Link as MuiLink,
   useTheme,
+  InputAdornment,
+  IconButton,
   CircularProgress,
 } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
-import { MdPassword } from "react-icons/md";
+import { Password, Visibility, VisibilityOff, Lock } from "@mui/icons-material";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
@@ -27,6 +29,9 @@ const ActivateNew = () => {
   const navigate = useNavigate();
   const { activationToken } = useParams();
   const { isLoading } = useSelector((state) => state.auth);
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Yup validation schema
   const validationSchema = yup.object().shape({
@@ -62,9 +67,9 @@ const ActivateNew = () => {
       sx={{ backgroundColor: theme.palette.background.default }} //BACKGROUND COLOUR OF THE PAGE IN CASE WE WANT TO CHANGE IT
     >
       {isLoading && <Loader message="Activating user account..." />}
-      <Card sx={{ padding: 4, width: "100%", maxWidth: "400px" }}>
+      <Card sx={{ padding: 4, width: "100%", maxWidth: "450px" }}>
         <Box display="flex" flexDirection="column" alignItems="center" mb={2}>
-          <MdPassword size={35} color="#999" />
+          <Password fontSize="large" color="primary" />
           <Typography variant="h4" textAlign="center" mt={2}>
             Activate Account
           </Typography>
@@ -88,7 +93,7 @@ const ActivateNew = () => {
                 fullWidth
                 variant="filled"
                 label="New Password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 name="password"
                 value={values.password}
                 onChange={handleChange}
@@ -96,13 +101,29 @@ const ActivateNew = () => {
                 error={touched.password && Boolean(errors.password)}
                 helperText={touched.password && errors.password}
                 sx={{ mb: 2 }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Lock />
+                    </InputAdornment>
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
               />
 
               <TextField
                 fullWidth
                 variant="filled"
                 label="Confirm Password"
-                type="password"
+                type={showConfirmPassword ? "text" : "password"}
                 name="password2"
                 value={values.password2}
                 onChange={handleChange}
@@ -110,6 +131,28 @@ const ActivateNew = () => {
                 error={touched.password2 && Boolean(errors.password2)}
                 helperText={touched.password2 && errors.password2}
                 sx={{ mb: 2 }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Lock />
+                    </InputAdornment>
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() =>
+                          setShowConfirmPassword(!showConfirmPassword)
+                        }
+                      >
+                        {showConfirmPassword ? (
+                          <VisibilityOff />
+                        ) : (
+                          <Visibility />
+                        )}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
               />
 
               <Button
@@ -119,7 +162,11 @@ const ActivateNew = () => {
                 type="submit"
                 sx={{ mb: 2 }}
               >
-                Activate Account
+                {isLoading ? (
+                  <CircularProgress size={24} />
+                ) : (
+                  "Activate Account"
+                )}
               </Button>
             </form>
           )}

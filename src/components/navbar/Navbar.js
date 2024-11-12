@@ -8,7 +8,7 @@ import {
   ArrowDropDownOutlined,
 } from "@mui/icons-material";
 
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setMode } from "../../redux/features/state/state";
 
 //import profileImage from "../../assets/profile.jpeg";
@@ -32,6 +32,8 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const theme = useTheme();
+  const companyData = useSelector((state) => state.company.company);
+  const company = companyData?.company;
 
   const [anchorEl, setAnchorEl] = useState(null);
   const isOpen = Boolean(anchorEl);
@@ -57,6 +59,8 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
   const handleGoToCompany = () => {
     navigate("/my-company"); // Change this to your actual company page route
   };
+
+  const handleUpgradePlan = () => navigate("/upgrade-plan");
 
   return (
     <AppBar
@@ -87,6 +91,24 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
 
         {/* RIGHT SIDE */}
         <FlexBetween gap="1.5rem">
+          {/* Conditional Upgrade Button for Admins whose companies are on Free Plan*/}
+          {user?.role === "admin" && company?.planTier === "Free" && (
+            <Button
+              onClick={handleUpgradePlan}
+              variant="contained"
+              sx={{
+                backgroundColor: "red",
+                color: "#fff",
+                ml: 2,
+                "&:hover": {
+                  backgroundColor: "#cc0000",
+                },
+              }}
+            >
+              Upgrade Now
+            </Button>
+          )}
+
           <IconButton onClick={() => dispatch(setMode())}>
             {theme.palette.mode === "dark" ? (
               <DarkModeOutlined sx={{ fontSize: "25px" }} />

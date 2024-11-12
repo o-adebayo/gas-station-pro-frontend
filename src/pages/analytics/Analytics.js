@@ -7,6 +7,7 @@ import {
   useTheme,
   Skeleton,
   useMediaQuery,
+  TextField,
 } from "@mui/material";
 import HeaderNew from "../../components/HeaderNew";
 import SalesOverviewAreaChart from "../../components/Charts/SalesOverviewAreaChart";
@@ -20,6 +21,8 @@ import AIPoweredInsights from "../../components/Charts/AIPoweredInsights";
 
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 
@@ -33,6 +36,7 @@ import {
   getTotalSalesByStore,
   getTotalSalesByManager,
 } from "../../utils/salesAnalyticsCalculations";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 
 dayjs.extend(utc);
 
@@ -41,6 +45,8 @@ const Analytics = () => {
   const dispatch = useDispatch();
   const isNonMediumScreens = useMediaQuery("(min-width: 1200px)");
   const [timePeriod, setTimePeriod] = useState("thismonth"); // Default to "This Month"
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
 
   const { reports } = useSelector((state) => {
     const reportsData = state.report.reports || {};
@@ -60,8 +66,16 @@ const Analytics = () => {
     }
   }, [dispatch, timePeriod, reports]);
 
+  /*   const handleTimePeriodChange = (event) => {
+    setTimePeriod(event.target.value);
+  }; */
+
   const handleTimePeriodChange = (event) => {
     setTimePeriod(event.target.value);
+    if (event.target.value !== "custom") {
+      setStartDate(null);
+      setEndDate(null);
+    }
   };
 
   const filterReportsByTimePeriod = (reports, timePeriod) => {
@@ -70,7 +84,18 @@ const Analytics = () => {
     return reports.filter((report) => {
       const reportDate = dayjs(report.date).utc().startOf("day");
 
-      if (timePeriod === "today") {
+      if (timePeriod === "custom") {
+        if (!startDate || !endDate) {
+          return false; // If either date is missing, exclude all records
+        }
+        // Apply custom date range filter only when both dates are selected
+        return reportDate.isBetween(
+          dayjs(startDate).utc().startOf("day"),
+          dayjs(endDate).utc().endOf("day"),
+          null,
+          "[]"
+        );
+      } else if (timePeriod === "today") {
         /*  console.log(
           "🚀 ~ returnreports.filter ~ timePeriod:",
           now.utc().date()
@@ -161,9 +186,14 @@ const Analytics = () => {
   };
 
   // Memoize filteredReports first before using it in other calculations
-  const filteredReports = useMemo(
+  /*   const filteredReports = useMemo(
     () => filterReportsByTimePeriod(reports, timePeriod),
     [reports, timePeriod]
+  ); */
+
+  const filteredReports = useMemo(
+    () => filterReportsByTimePeriod(reports, timePeriod),
+    [reports, timePeriod, startDate, endDate]
   );
 
   // Memoize function calls with filteredReports dependency
@@ -240,8 +270,45 @@ const Analytics = () => {
           <MenuItem value="lastmonth">Last Month</MenuItem>
           <MenuItem value="lastquarter">Last Quarter</MenuItem>
           <MenuItem value="lastYear">Last Year</MenuItem>
+          <MenuItem value="custom">Custom</MenuItem> {/* Custom Option */}
         </Select>
       </Box>
+
+      {/* Display Date Range Picker if 'Custom' is selected */}
+      {timePeriod === "custom" && (
+        <Box display="flex" gap={2} mb={4}>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DatePicker
+              label="Start Date"
+              value={startDate}
+              onChange={(newValue) => setStartDate(newValue)}
+              renderInput={(params) => <TextField {...params} />}
+            />
+            <DatePicker
+              label="End Date"
+              value={endDate}
+              onChange={(newValue) => setEndDate(newValue)}
+              renderInput={(params) => <TextField {...params} />}
+            />
+          </LocalizationProvider>
+        </Box>
+      )}
+      {/* {timePeriod === "custom" && (
+        <Box mb={4}>
+          <DateRangePicker
+            startText="Start Date"
+            endText="End Date"
+            value={dateRange}
+            onChange={(newValue) => setDateRange(newValue)}
+            renderInput={(startProps, endProps) => (
+              <>
+                <TextField {...startProps} sx={{ marginRight: 2 }} />
+                <TextField {...endProps} />
+              </>
+            )}
+          />
+        </Box>
+      )} */}
 
       {/* Sales Overview Area Chart */}
       <Box

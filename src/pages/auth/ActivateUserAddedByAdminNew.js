@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Box,
   Button,
@@ -14,7 +14,7 @@ import {
 import { Formik } from "formik";
 import * as yup from "yup";
 import { MdPassword } from "react-icons/md";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { Visibility, VisibilityOff, Password, Lock } from "@mui/icons-material";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
@@ -67,10 +67,10 @@ const ActivateUserAddedByAdmin = () => {
       justifyContent="center"
       alignItems="center"
       height="100vh"
-      sx={{ backgroundColor: theme.palette.background.default }} //BACKGROUND COLOUR OF THE PAGE IN CASE WE WANT TO CHANGE IT
+      sx={{ backgroundColor: theme.palette.background.default }}
     >
       {isLoading && <Loader message="Activating user account..." />}
-      <Card sx={{ padding: 4, width: "100%", maxWidth: "400px" }}>
+      <Card sx={{ padding: 4, width: "100%", maxWidth: "450px" }}>
         <Box display="flex" flexDirection="column" alignItems="center" mb={2}>
           <MdPassword size={35} color="#999" />
           <Typography variant="h4" textAlign="center" mt={2}>
@@ -79,7 +79,7 @@ const ActivateUserAddedByAdmin = () => {
         </Box>
 
         <Formik
-          initialValues={{ password: "", password2: "" }} // Ensuring both fields are initialized
+          initialValues={{ password: "", password2: "" }}
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
         >
@@ -104,6 +104,11 @@ const ActivateUserAddedByAdmin = () => {
                 error={touched.password && Boolean(errors.password)}
                 helperText={touched.password && errors.password}
                 InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Lock />
+                    </InputAdornment>
+                  ),
                   endAdornment: (
                     <InputAdornment position="end">
                       <IconButton
@@ -129,6 +134,11 @@ const ActivateUserAddedByAdmin = () => {
                 error={touched.password2 && Boolean(errors.password2)}
                 helperText={touched.password2 && errors.password2}
                 InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Lock />
+                    </InputAdornment>
+                  ),
                   endAdornment: (
                     <InputAdornment position="end">
                       <IconButton
@@ -155,7 +165,11 @@ const ActivateUserAddedByAdmin = () => {
                 type="submit"
                 sx={{ mt: 3 }}
               >
-                Activate Account
+                {isLoading ? (
+                  <CircularProgress size={24} />
+                ) : (
+                  "Activate Account"
+                )}
               </Button>
             </form>
           )}
@@ -203,4 +217,5 @@ const ActivateUserAddedByAdmin = () => {
     </Box>
   );
 };
+
 export default ActivateUserAddedByAdmin;

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -6,14 +6,16 @@ import {
   Typography,
   Card,
   CircularProgress,
+  InputAdornment,
+  IconButton,
   Link as MuiLink,
   useTheme,
 } from "@mui/material";
-import { MdPassword } from "react-icons/md";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Formik } from "formik";
 import * as yup from "yup";
+import { Password, Visibility, VisibilityOff, Lock } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
 import { RESET, resetUserPassword } from "../../redux/features/auth/authSlice";
 import Loader from "../../components/loader/Loader";
@@ -36,6 +38,9 @@ const ResetNew = () => {
   const { isLoading, isSuccess, message } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Handle password reset form submission
   const handlePasswordReset = async (values) => {
@@ -65,9 +70,9 @@ const ResetNew = () => {
       sx={{ backgroundColor: theme.palette.background.default }} //BACKGROUND COLOUR OF THE PAGE IN CASE WE WANT TO CHANGE IT
     >
       {isLoading && <Loader message="Resetting password..." />}
-      <Card sx={{ padding: 4, width: "100%", maxWidth: "400px" }}>
+      <Card sx={{ padding: 4, width: "100%", maxWidth: "450px" }}>
         <Box display="flex" flexDirection="column" alignItems="center" mb={2}>
-          <MdPassword size={35} color="#999" />
+          <Password fontSize="large" color="primary" />
           <Typography variant="h4" textAlign="center" mt={2}>
             Reset Password
           </Typography>
@@ -92,13 +97,29 @@ const ResetNew = () => {
                 variant="filled"
                 label="Password"
                 name="password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 value={values.password}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 error={touched.password && Boolean(errors.password)}
                 helperText={touched.password && errors.password}
                 sx={{ mb: 2 }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Lock />
+                    </InputAdornment>
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
               />
 
               <TextField
@@ -106,13 +127,35 @@ const ResetNew = () => {
                 variant="filled"
                 label="Confirm Password"
                 name="password2"
-                type="password"
+                type={showConfirmPassword ? "text" : "password"}
                 value={values.password2}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 error={touched.password2 && Boolean(errors.password2)}
                 helperText={touched.password2 && errors.password2}
                 sx={{ mb: 2 }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Lock />
+                    </InputAdornment>
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() =>
+                          setShowConfirmPassword(!showConfirmPassword)
+                        }
+                      >
+                        {showConfirmPassword ? (
+                          <VisibilityOff />
+                        ) : (
+                          <Visibility />
+                        )}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
               />
 
               <Button
@@ -172,4 +215,5 @@ const ResetNew = () => {
     </Box>
   );
 };
+
 export default ResetNew;

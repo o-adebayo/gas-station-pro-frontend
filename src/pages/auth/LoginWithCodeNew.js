@@ -8,6 +8,7 @@ import {
   CircularProgress,
   Link as MuiLink,
   useTheme,
+  Grid,
 } from "@mui/material";
 import { GrInsecure } from "react-icons/gr";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -47,10 +48,26 @@ const LoginWithCodeNew = () => {
   };
 
   // Function to handle form submission
-  const handleLoginWithCode = async (values) => {
+  /*   const handleLoginWithCode = async (values) => {
     const { loginCode } = values;
+
     try {
       await dispatch(userLoginWithCode({ code: { loginCode }, email }));
+      toast.success("Logged in successfully.");
+    } catch (error) {
+      toast.error("Failed to login with code. Please try again.");
+    }
+  }; */
+
+  // Function to handle form submission
+  const handleLoginWithCode = async (values) => {
+    const { loginCode } = values;
+
+    try {
+      // Use unwrap to throw an error if the action is rejected
+      await dispatch(
+        userLoginWithCode({ code: { loginCode }, email })
+      ).unwrap();
       toast.success("Logged in successfully.");
     } catch (error) {
       toast.error("Failed to login with code. Please try again.");
@@ -71,14 +88,17 @@ const LoginWithCodeNew = () => {
       justifyContent="center"
       alignItems="center"
       height="100vh"
-      sx={{ backgroundColor: theme.palette.background.default }} //BACKGROUND COLOUR OF THE PAGE IN CASE WE WANT TO CHANGE IT
+      sx={{ backgroundColor: theme.palette.background.default }}
     >
       {isLoading && <CircularProgress />}
-      <Card sx={{ padding: 4, width: "100%", maxWidth: "400px" }}>
+      <Card sx={{ padding: 4, width: "100%", maxWidth: "450px" }}>
         <Box display="flex" flexDirection="column" alignItems="center" mb={2}>
           <GrInsecure size={35} color="#999" />
           <Typography variant="h4" textAlign="center" mt={2}>
-            Enter Access Code
+            Two-factor Authentication
+          </Typography>
+          <Typography textAlign="center" mt={1} color="textSecondary">
+            Enter the six-digit access code from your email
           </Typography>
         </Box>
 
@@ -96,31 +116,48 @@ const LoginWithCodeNew = () => {
             handleSubmit,
           }) => (
             <form onSubmit={handleSubmit}>
-              <TextField
-                fullWidth
-                variant="filled"
-                label="Access Code"
-                name="loginCode"
-                value={values.loginCode}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                error={touched.loginCode && Boolean(errors.loginCode)}
-                helperText={touched.loginCode && errors.loginCode}
+              <Grid
+                container
+                spacing={1}
+                justifyContent="center"
                 sx={{ mb: 2 }}
-              />
+              >
+                {Array.from({ length: 6 }).map((_, index) => (
+                  <Grid item xs={2} key={index}>
+                    <TextField
+                      variant="outlined"
+                      inputProps={{
+                        maxLength: 1,
+                        style: { textAlign: "center", fontSize: "1.5rem" },
+                      }}
+                      name={`loginCode[${index}]`}
+                      value={values.loginCode[index] || ""}
+                      onChange={(e) => {
+                        const loginCodeArray = values.loginCode.split("");
+                        loginCodeArray[index] = e.target.value;
+                        handleChange({
+                          target: {
+                            name: "loginCode",
+                            value: loginCodeArray.join(""),
+                          },
+                        });
+                      }}
+                      onBlur={handleBlur}
+                      error={touched.loginCode && Boolean(errors.loginCode)}
+                    />
+                  </Grid>
+                ))}
+              </Grid>
 
               <Button
                 fullWidth
                 variant="contained"
                 color="primary"
                 type="submit"
-                sx={{ mt: 3 }}
+                sx={{ mt: 2 }}
+                disabled={isLoading || values.loginCode.length < 6}
               >
-                {isLoading ? (
-                  <CircularProgress size={24} />
-                ) : (
-                  "Proceed To Login"
-                )}
+                {isLoading ? <CircularProgress size={24} /> : "Verify"}
               </Button>
 
               <Box
@@ -134,7 +171,7 @@ const LoginWithCodeNew = () => {
                   variant="body2"
                   sx={{ color: theme.palette.text.secondary }}
                 >
-                  Check your email for login access code
+                  Didn’t receive a code?
                 </Typography>
                 <Button
                   onClick={sendLoginCode}
@@ -164,9 +201,6 @@ const LoginWithCodeNew = () => {
                   sx={{
                     color: theme.palette.primary.main,
                     textDecoration: "none",
-                    "&:hover": {
-                      textDecoration: "underline",
-                    },
                   }}
                 >
                   Home

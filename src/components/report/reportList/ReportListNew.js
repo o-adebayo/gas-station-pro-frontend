@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { SpinnerImg } from "../../loader/Loader";
 import { Link } from "react-router-dom";
-import Search from "../../search/Search";
 import {
   Box,
   Button,
@@ -218,7 +216,9 @@ const ReportListNew = () => {
     try {
       const reportToDelete = reports.find((report) => report._id === id); // Get report details
 
-      await dispatch(deleteReport({ id })); // Pass the id as an object
+      await dispatch(deleteReport({ id })); // Delete the report
+
+      // Refresh report list after deletion
       await dispatch(
         getDetailedSalesReports({
           page: paginationModel.page + 1, // For backend 1-based indexing
@@ -243,15 +243,21 @@ const ReportListNew = () => {
           storeName: reportToDelete.storeName, // Store name
           managerName: null,
           reportDate: new Date(reportToDelete.date).toISOString().split("T")[0], // Format the date
-          updatedDate: new Date().toISOString().split("T")[0], // updatedDate used as Deletion date as today's date
+          updatedDate: new Date().toISOString().split("T")[0], // Today's date as deletion date
         };
 
-        await dispatch(sendAutomatedEmail(emailData));
-        dispatch(EMAIL_RESET());
-        toast.success("Email notification sent to the owner.");
+        try {
+          await dispatch(sendAutomatedEmail(emailData)).unwrap(); // Send email and unwrap response
+          dispatch(EMAIL_RESET());
+          toast.success("Email notification sent to the owner.");
+        } catch (emailError) {
+          // Only catch errors from email dispatch
+          toast.error("Failed to send email notification to the owner.");
+        }
       }
     } catch (error) {
-      toast.error("Error deleting report or sending email: " + error.message);
+      // Catch errors from report deletion or fetching
+      toast.error("Error deleting report or refreshing list: " + error.message);
     }
   };
 
@@ -267,8 +273,10 @@ const ReportListNew = () => {
     try {
       const reportToDelete = reports.find((report) => report._id === id);
 
-      await dispatch(deleteReport({ id, deleteCode })); // Pass both id and deleteCode
-      dispatch(
+      await dispatch(deleteReport({ id, deleteCode })); // Delete report with code
+
+      // Refresh report list after deletion
+      await dispatch(
         getDetailedSalesReports({
           page: paginationModel.page + 1, // For backend 1-based indexing
           pageSize: paginationModel.pageSize,
@@ -277,7 +285,7 @@ const ReportListNew = () => {
         })
       );
 
-      // Send email to company owner after deletion
+      // Prepare to send email to company owner after deletion
       if (company && company.ownerEmail) {
         const emailData = {
           subject: `${company.name} - Sales Report Deleted`,
@@ -295,12 +303,17 @@ const ReportListNew = () => {
           deletedBy: user?.name,
         };
 
-        await dispatch(sendAutomatedEmail(emailData));
-        dispatch(EMAIL_RESET());
-        toast.success("Email notification sent to the owner.");
+        try {
+          await dispatch(sendAutomatedEmail(emailData)).unwrap(); // Only show success if email sent
+          dispatch(EMAIL_RESET());
+          toast.success("Email notification sent to the owner.");
+        } catch (emailError) {
+          toast.error("Failed to send email notification to the owner.");
+        }
       }
     } catch (error) {
-      toast.error("Error deleting report or sending email: " + error.message);
+      // Catch errors from report deletion or fetching
+      toast.error("Error deleting report or refreshing list: " + error.message);
     }
   };
 

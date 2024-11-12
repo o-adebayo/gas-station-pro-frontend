@@ -8,12 +8,12 @@ import {
   CircularProgress,
   useTheme,
 } from "@mui/material";
-import { AiOutlineMail } from "react-icons/ai";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import { Formik } from "formik";
 import * as yup from "yup";
+import { Email } from "@mui/icons-material";
 import { forgotUserPassword, RESET } from "../../redux/features/auth/authSlice";
 
 // Yup validation schema
@@ -49,12 +49,19 @@ const ForgotNew = () => {
       justifyContent="center"
       alignItems="center"
       height="100vh"
-      sx={{ backgroundColor: theme.palette.background.default }} //BACKGROUND COLOUR OF THE PAGE IN CASE WE WANT TO CHANGE IT
+      sx={{ backgroundColor: theme.palette.background.default }}
     >
-      {isLoading && <CircularProgress />}
-      <Card sx={{ padding: 4, width: "100%", maxWidth: "400px" }}>
+      <Card
+        sx={{
+          padding: 4,
+          width: "100%",
+          maxWidth: "450px", // Matches the login card width
+          textAlign: "center",
+          boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)", // Optional: add shadow to match style
+        }}
+      >
         <Box display="flex" flexDirection="column" alignItems="center" mb={2}>
-          <AiOutlineMail size={35} color={theme.palette.text.secondary} />
+          <Email size={35} color={theme.palette.text.secondary} />
           <Typography variant="h4" textAlign="center" mt={2}>
             Forgot Password
           </Typography>
@@ -76,23 +83,30 @@ const ForgotNew = () => {
             <form onSubmit={handleSubmit}>
               <TextField
                 fullWidth
-                variant="filled"
-                label="Email"
+                variant="outlined"
+                label="Email Address"
                 name="email"
+                type="email"
                 value={values.email}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 error={touched.email && Boolean(errors.email)}
                 helperText={touched.email && errors.email}
-                sx={{ mb: 2 }}
+                sx={{ mb: 3 }}
+                InputProps={{
+                  startAdornment: (
+                    <Box component="span" mr={1}>
+                      <Email color={theme.palette.text.secondary} />
+                    </Box>
+                  ),
+                }}
               />
-
               <Button
                 fullWidth
                 variant="contained"
                 color="primary"
                 type="submit"
-                sx={{ mt: 3 }}
+                sx={{ mt: 2 }}
               >
                 {isLoading ? <CircularProgress size={24} /> : "Get Reset Email"}
               </Button>
@@ -101,12 +115,10 @@ const ForgotNew = () => {
         </Formik>
 
         <Box
-          mt={2}
-          textAlign="center"
+          mt={3}
           display="flex"
-          justifyContent="center"
+          justifyContent="space-between"
           alignItems="center"
-          gap={1}
         >
           <Link
             to="/"
@@ -117,18 +129,15 @@ const ForgotNew = () => {
           >
             Home
           </Link>
-          <Typography variant="body2">
-            Already have an account?{" "}
-            <Link
-              to="/login"
-              style={{
-                color: theme.palette.primary.main,
-                textDecoration: "none",
-              }}
-            >
-              Login
-            </Link>
-          </Typography>
+          <Link
+            to="/login"
+            style={{
+              color: theme.palette.primary.main,
+              textDecoration: "none",
+            }}
+          >
+            Login
+          </Link>
         </Box>
       </Card>
     </Box>
