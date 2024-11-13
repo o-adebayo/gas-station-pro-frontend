@@ -45,24 +45,12 @@ const ChangePasswordNew = () => {
 
   const handlePasswordChange = async (values) => {
     const { oldPassword, password } = values;
-
     const formData = { oldPassword, password };
-
-    console.log("user email", user?.email);
-
-    const emailData = {
-      subject: "Gas Station Pro Account Password Changed",
-      send_to: user?.email,
-      name: user?.name,
-      template: "PasswordChangeNotificationEmail",
-      url: "/forgotpassword",
-    };
 
     try {
       await dispatch(changeUserPassword(formData)).unwrap();
-      await dispatch(sendAutomatedEmail(emailData));
       await dispatch(RESET());
-      toast.success("Password changed successfully!");
+      //toast.success("Password changed successfully!");
       navigate("/profile");
     } catch (error) {
       toast.error("Failed to change password. Please try again.");
