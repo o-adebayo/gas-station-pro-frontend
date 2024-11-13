@@ -61,7 +61,7 @@ export const forgotPassword = async (userData) => {
 // Reset Password
 // Reset Password
 export const resetPassword = async (userData, resetToken) => {
-  const response = await axios.patch(
+  const response = await axios.put(
     `${API_URL}resetPassword/${resetToken}`,
     userData
   );
