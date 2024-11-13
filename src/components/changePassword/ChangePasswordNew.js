@@ -55,7 +55,7 @@ const ChangePasswordNew = () => {
       send_to: user?.email,
       name: user?.name,
       template: "PasswordChangeNotificationEmail",
-      link: "/forgotpassword",
+      url: "/forgotpassword",
     };
 
     try {
