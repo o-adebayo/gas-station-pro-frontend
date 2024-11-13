@@ -220,7 +220,7 @@ const ReportListNew = () => {
           search,
         })
       );
-      toast.success("Report deleted successfully.");
+      //toast.success("Report deleted successfully.");
     } catch (error) {
       toast.error("Error deleting report: " + error.message);
     }
