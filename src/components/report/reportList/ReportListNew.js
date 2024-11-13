@@ -33,10 +33,7 @@ import {
   //getCompanyByCode,
   selectCompany,
 } from "../../../redux/features/company/companySlice";
-import {
-  EMAIL_RESET,
-  sendAutomatedEmail,
-} from "../../../redux/features/email/emailSlice";
+
 import useRedirectLoggedOutUser from "../../../customHook/useRedirectLoggedOutUser";
 import dayjs from "dayjs";
 //import FlexBetween from "../../FlexBetween";
@@ -211,57 +208,26 @@ const ReportListNew = () => {
     );
   }, [dispatch, paginationModel, sortModel, search]);
 
-  // Function to delete the report without a code (for admins)
-  const delReport = async (id) => {
+  // Function to delete the report with or without a code (for admins/managers)
+  const delReport = async (id, deleteCode = null) => {
     try {
-      const reportToDelete = reports.find((report) => report._id === id); // Get report details
-
-      await dispatch(deleteReport({ id })); // Delete the report
-
-      // Refresh report list after deletion
-      await dispatch(
+      await dispatch(deleteReport({ id, deleteCode }));
+      dispatch(
         getDetailedSalesReports({
-          page: paginationModel.page + 1, // For backend 1-based indexing
+          page: paginationModel.page + 1,
           pageSize: paginationModel.pageSize,
-          sort: sortModel[0] ? JSON.stringify(sortModel[0]) : "{}", // Send as JSON string
+          sort: sortModel[0] ? JSON.stringify(sortModel[0]) : "{}",
           search,
         })
       );
-
-      // Send email to company owner after deletion
-      if (company && company.ownerEmail) {
-        const emailData = {
-          subject: `${company.name} - Sales Report Deleted`,
-          send_to: company.ownerEmail,
-          template: "SalesReportDeletionNotificationEmail", // Use the "reportDeleted" template you created
-          name: user?.name, // The user who deleted the report
-          companyCode: null,
-          url: null,
-          ownerName: company.ownerName,
-          companyName: company.name,
-          storeName: reportToDelete.storeName, // Store name
-          managerName: null,
-          reportDate: new Date(reportToDelete.date).toISOString().split("T")[0], // Format the date
-          updatedDate: new Date().toISOString().split("T")[0], // Today's date as deletion date
-        };
-
-        try {
-          await dispatch(sendAutomatedEmail(emailData)).unwrap(); // Send email and unwrap response
-          dispatch(EMAIL_RESET());
-          toast.success("Email notification sent to the owner.");
-        } catch (emailError) {
-          // Only catch errors from email dispatch
-          toast.error("Failed to send email notification to the owner.");
-        }
-      }
+      toast.success("Report deleted successfully.");
     } catch (error) {
-      // Catch errors from report deletion or fetching
-      toast.error("Error deleting report or refreshing list: " + error.message);
+      toast.error("Error deleting report: " + error.message);
     }
   };
 
   // Function to delete the report with a code (for non-admins)
-  const delReportWithCode = async (id, deleteCode) => {
+  /*  const delReportWithCode = async (id, deleteCode) => {
     try {
       const reportToDelete = reports.find((report) => report._id === id);
 
@@ -305,6 +271,7 @@ const ReportListNew = () => {
       toast.error("Error deleting report or refreshing list: " + error.message);
     }
   };
+ */
 
   // Function to handle the delete action with reactjs-popup
   const handleDeleteClick = (id) => {
@@ -323,7 +290,7 @@ const ReportListNew = () => {
 
   const handleConfirmDeleteWithCode = async () => {
     if (reportIdToDelete && deleteCodeInput) {
-      await delReportWithCode(reportIdToDelete, deleteCodeInput);
+      await delReport(reportIdToDelete, deleteCodeInput);
       setOpenCodeDialog(false);
       setDeleteCodeInput("");
     } else {

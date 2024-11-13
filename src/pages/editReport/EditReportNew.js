@@ -19,10 +19,7 @@ import {
   getCompanyByCode,
   selectCompany,
 } from "../../redux/features/company/companySlice";
-import {
-  EMAIL_RESET,
-  sendAutomatedEmail,
-} from "../../redux/features/email/emailSlice";
+
 import { toast } from "react-toastify";
 import { selectStores } from "../../redux/features/storeLocation/storeLocationSlice";
 
@@ -184,35 +181,13 @@ const EditReportNew = () => {
       const resultAction = await dispatch(updateReport({ id, formData }));
 
       if (updateReport.fulfilled.match(resultAction)) {
-        const updatedReport = resultAction.payload;
-
-        if (companyResponse.company && companyResponse.company.ownerEmail) {
-          const emailData = {
-            subject: `${companyResponse.company.name} - Sales Report Updated`,
-            send_to: companyResponse.company.ownerEmail,
-            reply_to: "noreply@gasstationpro.com",
-            template: "salesReportUpdatedEmail",
-            name: user?.name,
-            companyCode: null,
-            url: `/report-detail/${updatedReport._id}`,
-            ownerName: companyResponse.company.ownerName,
-            companyName: companyResponse.company.name,
-            storeName: updatedReport.storeName || "Unknown Store",
-            managerName: user?.name,
-            updatedDate: dayjs(new Date()).format("YYYY-MM-DD"),
-          };
-
-          await dispatch(sendAutomatedEmail(emailData));
-          dispatch(EMAIL_RESET());
-        }
-
+        toast.success("Report updated successfully.");
         navigate("/reports");
       }
     } catch (error) {
       toast.error("Failed to update report. Please try again.");
     }
   };
-
   const handleNextStep = () => {
     if (step < productKeys.length) setStep((prevStep) => prevStep + 1);
   };

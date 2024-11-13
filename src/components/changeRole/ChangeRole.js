@@ -6,46 +6,44 @@ import {
   changeUserRole,
   fetchUsers,
 } from "../../redux/features/auth/authSlice";
-import {
-  EMAIL_RESET,
-  sendAutomatedEmail,
-} from "../../redux/features/email/emailSlice";
+
 //import { getUsers, upgradeUser } from "../../redux/features/auth/authSlice";
-/* import {
-  EMAIL_RESET,
-  sendAutomatedEmail,
-} from "../../redux/features/email/emailSlice";
- */
+
 const ChangeRole = ({ _id, email }) => {
   const [userRole, setUserRole] = useState("");
   const dispatch = useDispatch();
 
-  // Change User role
+  // Change User Role and send email
   const changeRole = async (e) => {
     e.preventDefault();
 
     if (!userRole) {
       toast.error("Please select a role");
+      return;
     }
 
+    // Prepare data for backend request
     const userData = {
       newRole: userRole,
       id: _id,
     };
 
-    const emailData = {
-      subject: "Gas Station Pro Account Role Changed",
-      send_to: email,
-      reply_to: "noreply@gaststationpro",
-      template: "changeRoleEmail",
-      url: "/login",
-    };
+    try {
+      // Call backend to change user role and send notification email
+      await dispatch(changeUserRole(userData)).unwrap();
 
-    await dispatch(changeUserRole(userData));
+      // Fetch updated users list
+      await dispatch(fetchUsers());
 
-    await dispatch(sendAutomatedEmail(emailData));
-    await dispatch(fetchUsers());
-    dispatch(EMAIL_RESET());
+      toast.success(
+        "User role changed successfully and notification email sent."
+      );
+    } catch (error) {
+      toast.error(
+        "Failed to change user role or send email. Please try again."
+      );
+      console.error("Error changing user role:", error);
+    }
   };
 
   return (

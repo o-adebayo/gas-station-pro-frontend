@@ -6,26 +6,17 @@ import {
   changeUerStatus,
   fetchUsers,
 } from "../../redux/features/auth/authSlice";
-import {
-  EMAIL_RESET,
-  sendAutomatedEmail,
-} from "../../redux/features/email/emailSlice";
-//import { getUsers, upgradeUser } from "../../redux/features/auth/authSlice";
-/* import {
-  EMAIL_RESET,
-  sendAutomatedEmail,
-} from "../../redux/features/email/emailSlice";
- */
+
 const ChangeStatus = ({ _id, email }) => {
   const [userStatus, setUserStatus] = useState("");
   const dispatch = useDispatch();
 
-  // Change User role
+  // Change User status
   const changeStatus = async (e) => {
     e.preventDefault();
 
     if (!userStatus) {
-      toast.error("Please select a status");
+      return toast.error("Please select a status");
     }
 
     const userData = {
@@ -33,18 +24,16 @@ const ChangeStatus = ({ _id, email }) => {
       id: _id,
     };
 
-    const emailData = {
-      subject: "Gas Station Pro Account Status Changed",
-      send_to: email,
-      reply_to: "noreply@gaststationpro",
-      template: "changeStatusEmail",
-      url: "/login",
-    };
+    try {
+      // Dispatch action to change user status and send notification email from the backend
+      await dispatch(changeUerStatus(userData));
+      //toast.success("User status changed successfully, and email notification sent.");
 
-    await dispatch(changeUerStatus(userData));
-    await dispatch(sendAutomatedEmail(emailData));
-    await dispatch(fetchUsers());
-    dispatch(EMAIL_RESET());
+      // Refresh user list after status change
+      await dispatch(fetchUsers());
+    } catch (error) {
+      toast.error("Failed to change user status.");
+    }
   };
 
   return (

@@ -6,10 +6,6 @@ import {
   fetchStoreLocations,
   updateStoreLocationManager,
 } from "../../redux/features/storeLocation/storeLocationSlice";
-import {
-  EMAIL_RESET,
-  sendAutomatedEmail,
-} from "../../redux/features/email/emailSlice";
 
 const ChangeStoreManager = ({ storeId }) => {
   const [managerEmail, setManagerEmail] = useState("");
@@ -29,24 +25,18 @@ const ChangeStoreManager = ({ storeId }) => {
       storeId: storeId,
     };
 
-    const emailData = {
-      subject: " Gas Station Pro Store Assignment",
-      send_to: managerEmail,
-      reply_to: "noreply@gaststationpro",
-      template: "changeStoreManagerEmail",
-      url: "/login",
-      ownerName: "",
-      companyName: "",
-    };
+    try {
+      // Dispatch the action to update the store's manager
+      await dispatch(updateStoreLocationManager(storeData)).unwrap();
+      //toast.success("Store manager updated successfully.");
 
-    await dispatch(updateStoreLocationManager(storeData));
-    await dispatch(sendAutomatedEmail(emailData));
-    await dispatch(fetchStoreLocations());
-    dispatch(EMAIL_RESET());
-    // Add your dispatch action to update the store with the new manager
-    // Example:
-    // await dispatch(updateStoreManager(storeData));
-    //toast.success("Store manager updated successfully");
+      // Fetch updated store locations
+      await dispatch(fetchStoreLocations());
+
+      // Email will be sent from the backend after manager assignment
+    } catch (error) {
+      toast.error("Failed to update store manager or send email notification.");
+    }
   };
 
   return (

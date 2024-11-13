@@ -7,26 +7,20 @@ import {
   adminSetUserPassword,
   fetchUsers,
 } from "../../redux/features/auth/authSlice";
-import {
-  EMAIL_RESET,
-  sendAutomatedEmail,
-} from "../../redux/features/email/emailSlice";
+
 //import { getUsers, upgradeUser } from "../../redux/features/auth/authSlice";
-/* import {
-  EMAIL_RESET,
-  sendAutomatedEmail,
-} from "../../redux/features/email/emailSlice";
- */
+
 const AdminSetPassword = ({ _id, email }) => {
   const [userPassword, setUserPassword] = useState("");
   const dispatch = useDispatch();
 
-  // Change User role
+  // Change User Password
   const setPassword = async (e) => {
     e.preventDefault();
 
     if (!userPassword) {
       toast.error("Please enter a password");
+      return;
     }
 
     const userData = {
@@ -34,18 +28,17 @@ const AdminSetPassword = ({ _id, email }) => {
       id: _id,
     };
 
-    const emailData = {
-      subject: " Gas Station Pro Account Password Changed",
-      send_to: email,
-      reply_to: "noreply@gaststationpro",
-      template: "adminSetPasswordEmail",
-      url: "/login",
-    };
+    try {
+      // Dispatch the adminSetUserPassword action to update the user’s password
+      await dispatch(adminSetUserPassword(userData)).unwrap();
+      await dispatch(fetchUsers()); // Refresh users list after setting password
 
-    await dispatch(adminSetUserPassword(userData));
-    await dispatch(sendAutomatedEmail(emailData));
-    await dispatch(fetchUsers());
-    dispatch(EMAIL_RESET());
+      toast.success("Password set successfully, and user notified by email.");
+    } catch (error) {
+      toast.error("Failed to set password. Please try again.");
+    } finally {
+      setUserPassword(""); // Clear the password input field after action completes
+    }
   };
 
   return (

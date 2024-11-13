@@ -22,10 +22,7 @@ import {
   getCompanyByCode,
   selectCompany,
 } from "../../redux/features/company/companySlice";
-import {
-  EMAIL_RESET,
-  sendAutomatedEmail,
-} from "../../redux/features/email/emailSlice";
+
 import { CircularProgress } from "@mui/material";
 
 const initialState = {
@@ -176,32 +173,7 @@ const AddReportNew = () => {
       const resultAction = await dispatch(createReport(formData));
 
       if (createReport.fulfilled.match(resultAction)) {
-        const createdReport = resultAction.payload;
-        const reportId = createdReport._id;
-
-        if (companyResponse?.company && companyResponse.company.ownerEmail) {
-          const reportDate = new Date(values.date).toISOString().split("T")[0];
-
-          const emailData = {
-            subject: `${companyResponse.company.name} - Daily Sales Report Submitted`,
-            send_to: companyResponse.company.ownerEmail,
-            reply_to: "noreply@gasstationpro.com",
-            template: "salesReportSubmittedEmail",
-            name: user?.name,
-            companyCode: null,
-            url: `/report-detail/${reportId}`,
-            ownerName: companyResponse.company.ownerName,
-            companyName: companyResponse.company.name,
-            storeName: stores.find((store) => store._id === values.storeId)
-              ?.name,
-            managerName: user?.name,
-            reportDate,
-          };
-
-          await dispatch(sendAutomatedEmail(emailData));
-          dispatch(EMAIL_RESET());
-        }
-
+        toast.success("Report submitted successfully.");
         navigate("/reports");
       }
     } catch (error) {
