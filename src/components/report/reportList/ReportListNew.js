@@ -233,8 +233,7 @@ const ReportListNew = () => {
         const emailData = {
           subject: `${company.name} - Sales Report Deleted`,
           send_to: company.ownerEmail,
-          reply_to: "noreply@gasstationpro.com",
-          template: "reportDeleted", // Use the "reportDeleted" template you created
+          template: "SalesReportDeletionNotificationEmail", // Use the "reportDeleted" template you created
           name: user?.name, // The user who deleted the report
           companyCode: null,
           url: null,
@@ -262,13 +261,6 @@ const ReportListNew = () => {
   };
 
   // Function to delete the report with a code (for non-admins)
-  // Function to delete the report with a code (for non-admins)
-  /*   const delReportWithCode = async (id, deleteCode) => {
-    await dispatch(deleteReport({ id, deleteCode })); // Pass both id and deleteCode
-    await dispatch(getReports()); // Refresh the report list
-  };
- */
-  // Function to delete the report with a code (for non-admins)
   const delReportWithCode = async (id, deleteCode) => {
     try {
       const reportToDelete = reports.find((report) => report._id === id);
@@ -290,16 +282,13 @@ const ReportListNew = () => {
         const emailData = {
           subject: `${company.name} - Sales Report Deleted`,
           send_to: company.ownerEmail,
-          reply_to: "noreply@gasstationpro.com",
-          template: "reportDeleted",
+          template: "SalesReportDeletionNotificationEmail",
           name: user?.name,
           companyCode: null,
           ownerName: company.ownerName,
           storeName: reportToDelete.storeName,
-          reportCreationDate: new Date(reportToDelete.date)
-            .toISOString()
-            .split("T")[0],
-          deletionDate: new Date().toISOString().split("T")[0],
+          reportDate: new Date(reportToDelete.date).toISOString().split("T")[0],
+          updatedDate: new Date().toISOString().split("T")[0],
           deletedBy: user?.name,
         };
 
@@ -317,12 +306,6 @@ const ReportListNew = () => {
     }
   };
 
-  /*   const handleOnClickEdit = () => {
-    toast.info(
-      "Edit feature coming soon, please delete and recreate in the meantime"
-    );
-  };
- */
   // Function to handle the delete action with reactjs-popup
   const handleDeleteClick = (id) => {
     setReportIdToDelete(id);

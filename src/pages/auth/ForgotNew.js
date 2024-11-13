@@ -36,7 +36,7 @@ const ForgotNew = () => {
     try {
       await dispatch(forgotUserPassword({ email }));
       await dispatch(RESET());
-      toast.success("Reset password email sent successfully.");
+      //toast.success("Reset password email sent successfully.");
       resetForm();
     } catch (error) {
       toast.error("Failed to send reset password email. Please try again.");

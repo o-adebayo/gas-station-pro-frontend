@@ -51,9 +51,9 @@ const ChangePasswordNew = () => {
     const emailData = {
       subject: "Gas Station Pro Account Password Changed",
       send_to: user?.email,
-      reply_to: "noreply@gaststationpro.com",
-      template: "passwordChangedEmail",
-      url: "/forgotpassword",
+      name: user?.name,
+      template: "PasswordChangeNotificationEmail",
+      link: "/forgotpassword",
     };
 
     try {
