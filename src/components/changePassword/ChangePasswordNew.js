@@ -48,6 +48,8 @@ const ChangePasswordNew = () => {
 
     const formData = { oldPassword, password };
 
+    console.log("user email", user?.email);
+
     const emailData = {
       subject: "Gas Station Pro Account Password Changed",
       send_to: user?.email,
